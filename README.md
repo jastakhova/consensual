@@ -7,6 +7,6 @@ App for tracking agreements
 - Bind task actions
 - Proposal page
 - Comments on proposal page
-- Sign in
+- Sign in (Day: FB auth)
 - Days of week
 - Profile page
