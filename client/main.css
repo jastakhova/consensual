@@ -123,3 +123,15 @@ header .hide-completed {
         padding-bottom: 5px;
     }
 }     */
+
+.datepicker,
+.timepicker,
+.datetimepicker {
+	.form-control {
+		background: #fff;
+	}
+}
+
+.pq-grid, .pq-grid-center, div.pq-grid-cont, .pq-grid-cont-inner {
+    overflow: visible!important;
+}
