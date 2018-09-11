@@ -12,6 +12,8 @@ class TodosListCtrl {
 
     this.hideCompleted = false;
 
+    this.proposingInProgress = false;
+
     this.helpers({
       tasks() {
       	const selector = {};
@@ -55,6 +57,10 @@ class TodosListCtrl {
 
 	setPrivate(task) {
 		Meteor.call('tasks.setPrivate', task._id, !task.private);
+	}
+
+	flipProposingStatus() {
+		this.proposingInProgress = !this.proposingInProgress;
 	}
 }
 
