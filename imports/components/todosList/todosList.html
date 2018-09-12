@@ -70,12 +70,12 @@
                 <span class="title" style="padding-left:5px">Add a new proposal...</span>
               </div>
               <div class="content" ng-show="$ctrl.proposingInProgress">
-                <form>
+                <form ng-submit="$ctrl.addTask($ctrl.newTask)">
                   <div class="row">
                     <div class="col-md-12">
                       <div class="form-group">
                         <label>Proposal body</label>
-                        <textarea rows="5" class="form-control" placeholder="Describe your proposal" ></textarea>
+                        <textarea rows="5" ng-model="$ctrl.newTask" class="form-control" placeholder="Describe your proposal" ></textarea>
                       </div>
                     </div>
                   </div>
@@ -121,7 +121,7 @@
                     <tbody>
                     <tr ng-repeat="task in $ctrl.tasks">
                       <td>
-                        5pm
+                        {{task.time}}
                       </td>
                       <td>
                         <img class="avatar border-gray" src="assets/img/faces/face-3.jpg" alt="..."/>

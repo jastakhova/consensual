@@ -36,8 +36,8 @@ function onReady() {
   		}
   	};
 
-  	var optionsDatetime = $.extend({}, defaults, {format:'DD-MM-YYYY HH:mm'});
-		var optionsDate = $.extend({}, defaults, {format:'DD-MM-YYYY'});
+  	var optionsDatetime = $.extend({}, defaults, {format:'MM-DD-YYYY HH:mm'});
+		var optionsDate = $.extend({}, defaults, {format:'MM-DD-YYYY'});
 		var optionsTime = $.extend({}, defaults, {format:'HH:mm'});
 
 		$('.datetimepicker').datetimepicker(optionsDatetime);

@@ -1,6 +1,7 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 import { Tasks } from '../../api/tasks.js';
+import moment from 'moment';
 
 import template from './todosList.html';
 
@@ -18,13 +19,20 @@ class TodosListCtrl {
       tasks() {
       	const selector = {};
 
+      	function isNumeric(value) {
+            return /^-{0,1}\d+$/.test(value);
+        }
+
       	// If hide completed is checked, filter tasks
 				if (this.getReactively('hideCompleted')) {
 					selector.checked = {
 						$ne: true
 					};
 				}
-        return Tasks.find(selector, { sort: { createdAt: -1 } });
+        return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
+        	x.time = moment(x.createdAt).format("DD MMM h:mm a");
+        	return x;
+        });
       },
       incompleteCount() {
 				return Tasks.find({
@@ -40,7 +48,7 @@ class TodosListCtrl {
   }
 
   addTask(newTask) {
-      Meteor.call('tasks.insert', newTask);
+      Meteor.call('tasks.insert', newTask, document.getElementsByClassName('datetimepicker')[0].getElementsByTagName('input')[0].value);
 
       // Clear form
       this.newTask = '';

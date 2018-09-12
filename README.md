@@ -2,11 +2,14 @@
 App for tracking agreements
 
 ## TODO
-- Add proposal (Yulia)
-- Bind real db data
-- Bind task actions
-- Proposal page
+- FB auth (Day)
+- Make Sign in pretty
+- Proposal page (Yulia)
 - Comments on proposal page
-- Sign in (Day: FB auth)
 - Days of week
 - Profile page
+- Sign in page on start
+- Add facebook people search to add-proposal panel
+- Bind real receiver to proposal
+- Fix receiver picture in task list
+- After adding of the proposal the time input is not cleared
