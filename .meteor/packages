@@ -23,3 +23,6 @@ accounts-facebook
 cultofcoders:mocha
 accounts-ui
 tsega:bootstrap3-datetimepicker
+service-configuration
+facebook-config-ui
+tarang:ssl
