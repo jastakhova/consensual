@@ -515,7 +515,7 @@ input:focus {
     width: calc(100% - 260px);
 }
 
-.main-panel > .content {
+.main-panel .content {
     padding: 30px 15px;
     min-height: calc(100% - 123px);
 }

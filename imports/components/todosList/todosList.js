@@ -1,13 +1,13 @@
-import angular from 'angular';
-import angularMeteor from 'angular-meteor';
 import { Tasks } from '../../api/tasks.js';
 import moment from 'moment';
+import { Controller } from 'angular-ecmascript/module-helpers';
+import DateTimePicker from 'date-time-picker';
 
-import template from './todosList.html';
+export default class TodosListCtrl extends Controller {
+  constructor() {
+  	super(...arguments);
 
-class TodosListCtrl {
-  constructor($scope) {
-    $scope.viewModel(this);
+  	this.scope = arguments[0];
 
     this.subscribe('tasks');
 
@@ -48,10 +48,13 @@ class TodosListCtrl {
   }
 
   addTask(newTask) {
-      Meteor.call('tasks.insert', newTask, document.getElementsByClassName('datetimepicker')[0].getElementsByTagName('input')[0].value);
+      Meteor.call('tasks.insert', newTask, this.newDate + ' ' + this.newTime);
 
       // Clear form
       this.newTask = '';
+      this.newDate = '';
+      this.newTime = '';
+      this.scope.$apply();
     }
 
   setChecked(task) {
@@ -70,12 +73,44 @@ class TodosListCtrl {
 	flipProposingStatus() {
 		this.proposingInProgress = !this.proposingInProgress;
 	}
+
+	showDatePicker() {
+			var current = (this.newDate === '') ? new Date() : this.newDate;
+			var options = {
+				format: 'MM-dd-yyyy',
+				default: current
+      };
+      var controller = this;
+  		var timePicker = new DateTimePicker.Date(options, {})
+  		timePicker.on('selected', function (formatTime, now) {
+  			controller.newDate = formatTime;
+				controller.scope.$apply();
+  			timePicker.destroy();
+  		});
+  		timePicker.on('cleared', function () {
+  			this.newDate = '';
+				controller.scope.$apply();
+  		});
+  	}
+
+	showTimePicker() {
+		var current = (this.newTime === '') ? new Date() : (this.newDate + ' ' + this.newTime);
+		var options = {
+			minuteStep: 10,
+			default: current
+		};
+		var controller = this;
+		var timePicker = new DateTimePicker.Time(options, {})
+		timePicker.on('selected', function (formatTime, now) {
+			controller.newTime = formatTime;
+			controller.scope.$apply();
+			timePicker.destroy();
+		})
+		timePicker.on('cleared', function () {
+			this.newTime = '';
+			controller.scope.$apply();
+		})
+	}
 }
 
-export default angular.module('todosList', [
-  angularMeteor
-])
-  .component('todosList', {
-    templateUrl: 'imports/components/todosList/todosList.html',
-    controller: ['$scope', TodosListCtrl]
-  });
+TodosListCtrl.$name = 'TodosListCtrl';

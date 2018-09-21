@@ -27,17 +27,68 @@
   <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
   <link href="assets/css/pe-icon-7-stroke.css" rel="stylesheet" />
-
-  <!-- Ajax Libs -->
-  <script type="text/javascript"
-          src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js">
-  </script>
-
-  <script type="text/javascript"
-          src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/locale/en-ca.js">
-  </script>
 </head>
 
 <body>
-  <todos-list></todos-list>
+
+<div class="wrapper">
+  <div class="sidebar" data-color="purple" data-image="assets/img/sidebar-5.jpg">
+
+    <!--
+
+        Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
+        Tip 2: you can also add an image using data-image tag
+
+    -->
+
+    <div class="sidebar-wrapper">
+      <div class="logo">
+        <a href="http://www.creative-tim.com" class="simple-text">
+          Consensual
+        </a>
+      </div>
+
+      <ul class="nav">
+        <li class="active">
+          <a href="dashboard.html">
+            <p>Tasks</p>
+          </a>
+        </li>
+        <li>
+          <a href="user.html">
+            <p>User Profile</p>
+          </a>
+        </li>
+        <login-buttons></login-buttons>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="main-panel">
+
+
+    <ion-nav-view></ion-nav-view>
+
+    <footer class="footer">
+      <div class="container-fluid">
+        <nav class="pull-left">
+          <ul>
+            <li>
+              <a href="#">
+                Company
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <p class="copyright pull-right">
+          &copy; <script>document.write(new Date().getFullYear())</script> <a href="">Consensual</a>, made with love for a better web
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+</div>
+
 </body>

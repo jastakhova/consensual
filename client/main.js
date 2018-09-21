@@ -3,44 +3,30 @@ import angularMeteor from 'angular-meteor';
 import moment from 'moment';
 import todosList from '../imports/components/todosList/todosList';
 import '../imports/startup/accounts-config.js';
+import 'angular-animate';
+import 'angular-sanitize';
+import 'angular-ui-router';
+import 'ionic-scripts';
+import Loader from 'angular-ecmascript/module-loader';
+import { Meteor } from 'meteor/meteor';
 
-angular.module('consensual', [
+import TodosListCtrl from '../imports/components/todosList/todosList';
+import RoutesConfig from '../imports/components/routes';
+
+const App = 'consensual';
+
+angular.module(App, [
   angularMeteor,
-  todosList.name,
+  'ionic',
   'accounts.ui'
 ]);
 
+new Loader(App)
+	.load(TodosListCtrl)
+	.load(RoutesConfig);
+
 function onReady() {
-  angular.bootstrap(document, ['consensual']);
-
-  var defaults = {
-  		calendarWeeks: true,
-  		showClear: true,
-  		showClose: true,
-  		allowInputToggle: true,
-  		useCurrent: false,
-  		ignoreReadonly: true,
-  		minDate: new Date(),
-  		toolbarPlacement: 'top',
-  		locale: 'en-ca',
-  		icons: {
-  			time: 'fa fa-clock-o',
-  			date: 'fa fa-calendar',
-  			up: 'fa fa-angle-up',
-  			down: 'fa fa-angle-down',
-  			previous: 'fa fa-angle-left',
-  			next: 'fa fa-angle-right',
-  			today: 'fa fa-dot-circle-o',
-  			clear: 'fa fa-trash',
-  			close: 'fa fa-times'
-  		}
-  	};
-
-  	var optionsDatetime = $.extend({}, defaults, {format:'MM-DD-YYYY HH:mm'});
-		var optionsDate = $.extend({}, defaults, {format:'MM-DD-YYYY'});
-		var optionsTime = $.extend({}, defaults, {format:'HH:mm'});
-
-		$('.datetimepicker').datetimepicker(optionsDatetime);
+  angular.bootstrap(document, [App]);
 }
 
 if (Meteor.isCordova) {
