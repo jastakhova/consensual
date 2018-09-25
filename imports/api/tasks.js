@@ -35,6 +35,8 @@ Meteor.methods({
       createdAt: new Date(execution),
       owner: Meteor.userId(),
       username: Meteor.user().username,
+      authorStatus: 'green',
+      receiverStatus: 'yellow',
     });
   },
   'tasks.remove' (taskId) {

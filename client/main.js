@@ -11,6 +11,7 @@ import Loader from 'angular-ecmascript/module-loader';
 import { Meteor } from 'meteor/meteor';
 
 import TodosListCtrl from '../imports/components/todosList/todosList';
+import ProposalCtrl from '../imports/components/todosList/proposal';
 import RoutesConfig from '../imports/components/routes';
 
 const App = 'consensual';
@@ -23,6 +24,7 @@ angular.module(App, [
 
 new Loader(App)
 	.load(TodosListCtrl)
+	.load(ProposalCtrl)
 	.load(RoutesConfig);
 
 function onReady() {

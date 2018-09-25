@@ -6,3 +6,41 @@
     visibility: hidden;
     height: 0px;
 }
+
+.avatar-big {
+	border-radius: 50%;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.green-glow {
+	box-shadow: 0px 0px 45px #2dc937;
+}
+
+.yellow-glow {
+	box-shadow: 0px 0px 45px #e7b416;
+}
+
+.red-glow {
+	box-shadow: 0px 0px 45px #cc3232;
+}
+
+.header-title {
+    height: 30px;
+    line-height: 25px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.center {
+	text-align: center;
+}
+
+.same-line {
+	display: inline;
+}
+
+.grey {
+    color: #a9a9a9;
+}

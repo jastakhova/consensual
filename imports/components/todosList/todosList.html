@@ -1,4 +1,4 @@
-<ion-view view-title="ToDoList">
+<ion-view view-title="ToDoList" cache-view="false">
   <ion-content>
 
 
@@ -15,7 +15,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Dashboard</a>
+      <a class="navbar-brand" href="#!/tab/todo">Dashboard</a>
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav navbar-left">
@@ -112,7 +112,7 @@
                   <img class="avatar border-gray" src="assets/img/faces/face-3.jpg" alt="..."/>
                   {{task.username}}
                 </td>
-                <td>{{task.text}}</td>
+                <td><a href="#!/tab/proposal/{{task._id}}">{{task.text}}</a></td>
                 <td class="td-actions text-right">
                   <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
                     <i class="fa fa-edit"></i>

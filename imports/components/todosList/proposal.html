@@ -1,0 +1,61 @@
+<ion-view view-title="Proposal" cache-view="false">
+  <ion-content>
+
+    <nav class="navbar navbar-default navbar-fixed">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Proposal</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col-md-2 center">
+            <div class="header-title">Author</div>
+            <div>
+              <img class="avatar-big border-gray {{proposal.data.authorStatus}}-glow" src="assets/img/faces/face-3.jpg" alt="..."/>
+            </div>
+            <a href=""><h5 class="title same-line">{{proposal.data.username}}</h5></a><span class="grey"> {{proposal.authorStatus(proposal.data)}}</span>
+          </div>
+          <div class="col-md-2 center">
+            <div class="header-title">Receiver</div>
+            <div>
+              <img class="avatar-big border-gray {{proposal.data.receiverStatus}}-glow" src="assets/img/faces/face-3.jpg" alt="..."/>
+            </div>
+            <a href=""><h5 class="title same-line">{{proposal.data.username}}</h5></a><span class="grey"> {{proposal.receiverStatus(proposal.data)}}</span>
+          </div>
+          <div class="col-md-2">
+            <div class="header-title">ETA:</div> {{proposal.data.time}}
+            <div class="header-title" style="margin-top: 20px">Location:</div> ...
+          </div>
+        </div>
+        <div class="row" style="margin-top: 30px">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="content">
+                <td class="table-full-width">
+                  <table>
+                    <tbody>
+                    <tr><td>{{proposal.data.text}}</td></tr>
+                    </tbody>
+                  </table>
+                </td>
+              </div>
+            </div>
+            </div>
+        </div>
+        
+      </div>
+    </div>
+
+  </ion-content>
+</ion-view>
