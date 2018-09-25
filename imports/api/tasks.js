@@ -33,8 +33,10 @@ Meteor.methods({
     Tasks.insert({
       text,
       createdAt: new Date(execution),
-      owner: Meteor.userId(),
-      username: Meteor.user().username,
+      authorId: Meteor.userId(),
+      authorName: Meteor.user().username ? Meteor.user().username : Meteor.user().profile.name,
+      receiverId: Meteor.userId(),
+      receiverName: Meteor.user().username ? Meteor.user().username : Meteor.user().profile.name,
       authorStatus: 'green',
       receiverStatus: 'yellow',
     });

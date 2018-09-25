@@ -48,6 +48,9 @@ export default class TodosListCtrl extends Controller {
   }
 
   addTask(newTask) {
+  		console.log("id:" + Meteor.userId());
+  		console.log(Meteor.user());
+  		console.log("That's it");
       Meteor.call('tasks.insert', newTask, this.newDate + ' ' + this.newTime);
 
       // Clear form

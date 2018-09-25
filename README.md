@@ -11,10 +11,8 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 
 ## TODO
 - Make Sign in pretty (Day)
-- Proposal page (Yulia)
-- Fix receiver picture in task list
+- Fix receiver picture in task list (Yulia)
 - Add facebook people search to add-proposal panel
-- separate author in receiver in the task
 - Edit proposal
 - Comments on proposal page
 - Days of week
@@ -22,3 +20,4 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 - Sign in page on start
 - Bind real receiver to proposal
 - After adding of the proposal the time input is not cleared
+- icons don't appear under consensual domain

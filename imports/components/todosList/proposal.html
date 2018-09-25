@@ -24,14 +24,14 @@
             <div>
               <img class="avatar-big border-gray {{proposal.data.authorStatus}}-glow" src="assets/img/faces/face-3.jpg" alt="..."/>
             </div>
-            <a href=""><h5 class="title same-line">{{proposal.data.username}}</h5></a><span class="grey"> {{proposal.authorStatus(proposal.data)}}</span>
+            <a href=""><h5 class="title same-line">{{proposal.data.authorName}}</h5></a><span class="grey"> {{proposal.authorStatus(proposal.data)}}</span>
           </div>
           <div class="col-md-2 center">
             <div class="header-title">Receiver</div>
             <div>
               <img class="avatar-big border-gray {{proposal.data.receiverStatus}}-glow" src="assets/img/faces/face-3.jpg" alt="..."/>
             </div>
-            <a href=""><h5 class="title same-line">{{proposal.data.username}}</h5></a><span class="grey"> {{proposal.receiverStatus(proposal.data)}}</span>
+            <a href=""><h5 class="title same-line">{{proposal.data.receiverName}}</h5></a><span class="grey"> {{proposal.receiverStatus(proposal.data)}}</span>
           </div>
           <div class="col-md-2">
             <div class="header-title">ETA:</div> {{proposal.data.time}}
