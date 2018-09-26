@@ -8,16 +8,16 @@ if (Meteor.isServer) {
   // This code only runs on the server
     // Only publish tasks that are public or belong to the current user
     Meteor.publish('tasks', function tasksPublication() {
-      return Tasks.find({
-        $or: [{
-          private: {
-            $ne: true
-          }
-        }, {
-          owner: this.userId
-        }, ],
-      });
+      return Tasks.find({authorId: this.userId});
     });
+
+    Meteor.publish("allusers",
+      function () {
+        var receiverIds = Tasks.find({authorId: this.userId}).fetch().map(x => {return x.receiverId;});
+        return Meteor.users.find({$or: [{_id: {$in: receiverIds}}, {_id: {$eq: this.userId}}]},
+          {fields: {"services.facebook.accessToken": 1}});
+      }
+    );
 }
 
 Meteor.methods({

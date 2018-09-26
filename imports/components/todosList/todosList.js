@@ -11,6 +11,10 @@ export default class TodosListCtrl extends Controller {
 
     this.subscribe('tasks');
 
+		if (Meteor.userId()) {
+			this.subscribe('allusers');
+		}
+
     this.hideCompleted = false;
 
     this.proposingInProgress = false;
@@ -48,9 +52,6 @@ export default class TodosListCtrl extends Controller {
   }
 
   addTask(newTask) {
-  		console.log("id:" + Meteor.userId());
-  		console.log(Meteor.user());
-  		console.log("That's it");
       Meteor.call('tasks.insert', newTask, this.newDate + ' ' + this.newTime);
 
       // Clear form

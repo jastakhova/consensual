@@ -1,5 +1,5 @@
 # Consensual
-App for tracking agreements
+App for tracking agreements http://consensu.al/
 
 ```
 DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
