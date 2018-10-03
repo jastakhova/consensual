@@ -2,6 +2,7 @@ import { Tasks } from '../../api/tasks.js';
 import moment from 'moment';
 import { Controller } from 'angular-ecmascript/module-helpers';
 import DateTimePicker from 'date-time-picker';
+import graph from 'fbgraph';
 
 export default class TodosListCtrl extends Controller {
   constructor() {

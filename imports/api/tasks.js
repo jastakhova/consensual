@@ -1,8 +1,13 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
+import 'underscore';
 
 export const Tasks = new Mongo.Collection('tasks');
+
+//Images = new FS.Collection("images", {
+//  stores: [new FS.Store.FileSystem("images", {path: "/tmp/uploads"})]
+//});
 
 if (Meteor.isServer) {
   // This code only runs on the server
@@ -13,11 +18,23 @@ if (Meteor.isServer) {
 
     Meteor.publish("allusers",
       function () {
-        var receiverIds = Tasks.find({authorId: this.userId}).fetch().map(x => {return x.receiverId;});
-        return Meteor.users.find({$or: [{_id: {$in: receiverIds}}, {_id: {$eq: this.userId}}]},
-          {fields: {"services.facebook.accessToken": 1}});
+      	var authorIds = Tasks.find({receiverId: this.userId})
+      		.fetch()
+      		.map(x => {return x.authorId;});
+        var receiverIds = Tasks.find({authorId: this.userId})
+        	.fetch()
+        	.map(x => {return x.receiverId;});
+        return Meteor.users.find({$or: [{_id: {$in: receiverIds}}, {_id: {$eq: this.userId}}, {_id: {$in: authorIds}}]},
+          {fields: {"services.facebook.accessToken": 1, "services.facebook.id": 1}});
       }
     );
+
+//    Images.allow({
+//      'insert': function () {
+//        // add custom authentication code here
+//        return true;
+//      }
+//    });
 }
 
 Meteor.methods({
@@ -85,4 +102,18 @@ Meteor.methods({
         }
       });
     },
+//   'images.insert' (url) {
+//   		var fileObj = new FS.File();
+//   		if (Meteor.isServer) {
+//   		console.log("About to load " + url);
+//   		FS.debug = true;
+//          fileObj.attachData(url, function () {
+//            Images.insert(fileObj, function (err, fileObj) {
+//              console.log(err);
+//						  console.log(fileObj);
+//						  console.log("File object was created.");
+//            });
+//          });
+//          }
+//     },
 });

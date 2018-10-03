@@ -26,3 +26,6 @@ tsega:bootstrap3-datetimepicker
 service-configuration
 facebook-config-ui
 tarang:ssl
+cfs:standard-packages
+cfs:filesystem
+underscore
