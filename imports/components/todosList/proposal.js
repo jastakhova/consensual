@@ -7,13 +7,34 @@ export default class ProposalCtrl extends Controller {
     super(...arguments);
 
     this.subscribe('tasks');
+
+    if (Meteor.userId()) {
+			this.subscribe('allusers');
+		}
+
     this.proposalId = this.$stateParams.proposalId;
 
     this.helpers({
       data() {
+      	var createMapFromList = function(objectList, property) {
+						var objMap = {};
+						objectList.forEach(function(obj) {
+							objMap[obj[property]] = obj;
+						});
+						return objMap;
+					};
+
+				function picture(id) {
+						return 'https://graph.facebook.com/' + id + '/picture?width=500&height=500';
+				}
+
       	var foundTask = Tasks.findOne({_id: this.proposalId});
         if (foundTask) {
+        	var id2user = createMapFromList(Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch(), "_id");
 					foundTask.time = moment(foundTask.createdAt).format("DD MMM h:mm a");
+					
+					foundTask.authorPicture = picture(id2user[foundTask.authorId].services.facebook.id);
+          foundTask.receiverPicture = picture(id2user[foundTask.receiverId].services.facebook.id);
 					return foundTask;
 				} else {
 					return foundTask;

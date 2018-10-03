@@ -34,8 +34,26 @@ export default class TodosListCtrl extends Controller {
 						$ne: true
 					};
 				}
+
+				var createMapFromList = function(objectList, property) {
+            var objMap = {};
+            objectList.forEach(function(obj) {
+              objMap[obj[property]] = obj;
+            });
+            return objMap;
+          };
+
+				var id2user = createMapFromList(Meteor.users.find().fetch(), "_id");
+
+				function picture(id) {
+						return 'https://graph.facebook.com/' + id + '/picture?width=500&height=500';
+				}
+
         return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
         	x.time = moment(x.createdAt).format("DD MMM h:mm a");
+        	
+        	x.authorPicture = picture(id2user[x.authorId].services.facebook.id);
+        	x.receiverPicture = picture(id2user[x.receiverId].services.facebook.id);
         	return x;
         });
       },
