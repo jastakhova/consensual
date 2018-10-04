@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Controller } from 'angular-ecmascript/module-helpers';
 import DateTimePicker from 'date-time-picker';
 import graph from 'fbgraph';
+import ProfileUtils from  './profile.js';
 
 export default class TodosListCtrl extends Controller {
   constructor() {
@@ -35,25 +36,13 @@ export default class TodosListCtrl extends Controller {
 					};
 				}
 
-				var createMapFromList = function(objectList, property) {
-            var objMap = {};
-            objectList.forEach(function(obj) {
-              objMap[obj[property]] = obj;
-            });
-            return objMap;
-          };
+				var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
 
-				var id2user = createMapFromList(Meteor.users.find().fetch(), "_id");
-
-				function picture(id) {
-						return 'https://graph.facebook.com/' + id + '/picture?width=500&height=500';
-				}
-
-        return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
+				return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
         	x.time = moment(x.createdAt).format("DD MMM h:mm a");
         	
-        	x.authorPicture = picture(id2user[x.authorId].services.facebook.id);
-        	x.receiverPicture = picture(id2user[x.receiverId].services.facebook.id);
+        	x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
+        	x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
         	return x;
         });
       },

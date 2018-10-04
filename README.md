@@ -10,14 +10,13 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
 
 ## TODO
-- Make Sign in pretty (Day)
-- Fix receiver picture in task list (Yulia)
-- Add facebook people search to add-proposal panel
+- Make Sign in pretty: to right-upper corner with a matching the overall theme CSS (Day)
+- Add facebook people search to add-proposal panel (Yulia)
 - Edit proposal
 - Comments on proposal page
 - Days of week
 - Profile page
-- Sign in page on start
+- Sign in page on start + prohibit guest access
 - Bind real receiver to proposal
 - After adding of the proposal the time input is not cleared
 - icons don't appear under consensual domain

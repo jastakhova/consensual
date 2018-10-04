@@ -1,6 +1,7 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
 import { Tasks } from '../../api/tasks.js';
 import moment from 'moment';
+import ProfileUtils from './profile.js';
 
 export default class ProposalCtrl extends Controller {
   constructor() {
@@ -16,25 +17,15 @@ export default class ProposalCtrl extends Controller {
 
     this.helpers({
       data() {
-      	var createMapFromList = function(objectList, property) {
-						var objMap = {};
-						objectList.forEach(function(obj) {
-							objMap[obj[property]] = obj;
-						});
-						return objMap;
-					};
-
-				function picture(id) {
-						return 'https://graph.facebook.com/' + id + '/picture?width=500&height=500';
-				}
-
       	var foundTask = Tasks.findOne({_id: this.proposalId});
         if (foundTask) {
-        	var id2user = createMapFromList(Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch(), "_id");
+        	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
+        	console.log(ProfileUtils);
+        	var id2user = ProfileUtils.createMapFromList(users, "_id");
 					foundTask.time = moment(foundTask.createdAt).format("DD MMM h:mm a");
 					
-					foundTask.authorPicture = picture(id2user[foundTask.authorId].services.facebook.id);
-          foundTask.receiverPicture = picture(id2user[foundTask.receiverId].services.facebook.id);
+					foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
+          foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
 					return foundTask;
 				} else {
 					return foundTask;
