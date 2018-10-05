@@ -10,7 +10,7 @@ export default class ProposalCtrl extends Controller {
     this.subscribe('tasks');
 
     if (Meteor.userId()) {
-			this.subscribe('allusers');
+			this.subscribe('alltaskpartners');
 		}
 
     this.proposalId = this.$stateParams.proposalId;
@@ -20,7 +20,6 @@ export default class ProposalCtrl extends Controller {
       	var foundTask = Tasks.findOne({_id: this.proposalId});
         if (foundTask) {
         	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
-        	console.log(ProfileUtils);
         	var id2user = ProfileUtils.createMapFromList(users, "_id");
 					foundTask.time = moment(foundTask.createdAt).format("DD MMM h:mm a");
 					

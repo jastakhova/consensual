@@ -4,6 +4,8 @@ import { Controller } from 'angular-ecmascript/module-helpers';
 import DateTimePicker from 'date-time-picker';
 import graph from 'fbgraph';
 import ProfileUtils from  './profile.js';
+import '../../../public/assets/js/bootstrap-typeahead.min.js';
+import { Tracker } from 'meteor/tracker'
 
 export default class TodosListCtrl extends Controller {
   constructor() {
@@ -14,7 +16,8 @@ export default class TodosListCtrl extends Controller {
     this.subscribe('tasks');
 
 		if (Meteor.userId()) {
-			this.subscribe('allusers');
+			this.handleAllUsers = this.subscribe('allusers');
+			this.handleAllTaskPartners = this.subscribe('alltaskpartners');
 		}
 
     this.hideCompleted = false;
@@ -24,6 +27,22 @@ export default class TodosListCtrl extends Controller {
     this.helpers({
       tasks() {
       	const selector = {};
+
+      	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
+
+				function getSuggest() {
+					var suggest = [];
+					var suggestSize = 0;
+					Object.keys(id2user).forEach(function(key) {
+							suggest[suggestSize++] = {id: key, name: (id2user[key].profile ? id2user[key].profile.name : id2user[key].username)};
+					});
+					return suggest;
+        }
+
+				var suggest = getSuggest();
+				if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
+      		$(".typeahead").typeahead({ source: suggest});
+      	}
 
       	function isNumeric(value) {
             return /^-{0,1}\d+$/.test(value);
@@ -35,8 +54,6 @@ export default class TodosListCtrl extends Controller {
 						$ne: true
 					};
 				}
-
-				var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
 
 				return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
         	x.time = moment(x.createdAt).format("DD MMM h:mm a");
@@ -60,12 +77,17 @@ export default class TodosListCtrl extends Controller {
   }
 
   addTask(newTask) {
-      Meteor.call('tasks.insert', newTask, this.newDate + ' ' + this.newTime);
+      Meteor.call('tasks.insert', {
+      	task: newTask,
+      	time: this.newDate + ' ' + this.newTime,
+      	receiver: $('.typeahead').typeahead('getActive').id
+      	});
 
       // Clear form
       this.newTask = '';
       this.newDate = '';
       this.newTime = '';
+      $('.typeahead').val(''); //TODO: clears form but not model
       this.scope.$apply();
     }
 

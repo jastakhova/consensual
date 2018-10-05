@@ -12,7 +12,7 @@ if (Meteor.isServer) {
       return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
     });
 
-    Meteor.publish("allusers",
+    Meteor.publish("alltaskpartners",
       function () {
       	var authorIds = Tasks.find({receiverId: this.userId})
       		.fetch()
@@ -24,25 +24,39 @@ if (Meteor.isServer) {
           {fields: {"services.facebook.accessToken": 1, "services.facebook.id": 1}});
       }
     );
+
+    Meteor.publish("allusers",
+    	function () {
+          	return Meteor.users.find({},
+              {fields: {"username": 1, "profile.name" : 1}});
+          }
+    );
 }
 
 Meteor.methods({
-  'tasks.insert' (text, execution) {
-    check(text, String);
-    check(execution, String);
+  'tasks.insert' (newTask) {
+    check(newTask.task, String);
+    check(newTask.time, String);
+    check(newTask.receiver, String);
 
     // Make sure the user is logged in before inserting a task
     if (!Meteor.userId()) {
       throw new Meteor.Error('not-authorized');
     }
 
+    var receiver = Meteor.users.findOne({_id: newTask.receiver});
+
+    function getName(user) {
+    	return user.username ? user.username : user.profile.name;
+    }
+
     Tasks.insert({
-      text,
-      createdAt: new Date(execution),
+      text: newTask.task,
+      createdAt: new Date(newTask.time),
       authorId: Meteor.userId(),
-      authorName: Meteor.user().username ? Meteor.user().username : Meteor.user().profile.name,
-      receiverId: Meteor.userId(),
-      receiverName: Meteor.user().username ? Meteor.user().username : Meteor.user().profile.name,
+      authorName: getName(Meteor.user()),
+      receiverId: newTask.receiver,
+      receiverName: getName(receiver),
       authorStatus: 'green',
       receiverStatus: 'yellow',
     });

@@ -2123,13 +2123,9 @@ fieldset[disabled] .btn-neutral.active {
 }
 
 .dropdown-menu > li:first-child > a {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
 }
 
 .dropdown-menu > li:last-child > a {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
 }
 
 .select .dropdown-menu > li:first-child > a {
