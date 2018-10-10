@@ -13,6 +13,12 @@ var ProfileUtils = {
 		} else {
 			return 'assets/img/default-avatar.png';
 		}
+	},
+
+	redirectToLogin: function() {
+	//	if (!Meteor.isLoggedIn()) {
+	//		document.location.href = '#!/login';
+	//	}
 	}
 };
 

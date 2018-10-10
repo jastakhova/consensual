@@ -17,6 +17,8 @@ export default class ProposalCtrl extends Controller {
 
     this.helpers({
       data() {
+		ProfileUtils.redirectToLogin();
+
       	var foundTask = Tasks.findOne({_id: this.proposalId});
         if (foundTask) {
         	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();

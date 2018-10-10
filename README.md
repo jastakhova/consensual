@@ -21,6 +21,11 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 - After adding of the proposal the time input is not cleared
 - icons don't appear under consensual domain
 
+## Known issues
+- Handling input errors for add proposal form (disable submit)
+- Error notifications on add, delete actions (show alert)
+- Broken CSS in add-proposal form
+
 ## Development
 
 ### ENV

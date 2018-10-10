@@ -15,10 +15,8 @@ export default class TodosListCtrl extends Controller {
 
     this.subscribe('tasks');
 
-		if (Meteor.userId()) {
-			this.handleAllUsers = this.subscribe('allusers');
-			this.handleAllTaskPartners = this.subscribe('alltaskpartners');
-		}
+	this.handleAllUsers = this.subscribe('allusers');
+	this.handleAllTaskPartners = this.subscribe('alltaskpartners');
 
     this.hideCompleted = false;
 
@@ -26,6 +24,8 @@ export default class TodosListCtrl extends Controller {
 
     this.helpers({
       tasks() {
+		ProfileUtils.redirectToLogin();
+
       	const selector = {};
 
       	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
@@ -39,8 +39,8 @@ export default class TodosListCtrl extends Controller {
 					return suggest;
         }
 
-				var suggest = getSuggest();
-				if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
+		var suggest = getSuggest();
+		if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
       		$(".typeahead").typeahead({ source: suggest});
       	}
 

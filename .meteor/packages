@@ -30,3 +30,6 @@ cfs:standard-packages
 cfs:filesystem
 underscore
 jquery
+blaze
+useraccounts:ionic
+useraccounts:core
