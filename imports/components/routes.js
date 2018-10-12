@@ -11,8 +11,8 @@ export default class RoutesConfig extends Config {
     this.$stateProvider
       .state('tab', {
         url: '/tab',
-        abstract: true,
-        templateUrl: tabsTemplateUrl
+        templateUrl: tabsTemplateUrl,
+        abstract: true
       })
       .state('tab.todo', {
         url: '/todo',
