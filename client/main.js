@@ -70,8 +70,7 @@ angularMeteorModule.requires.push('angular-blaze-template');
 
 angular.module(App, [
   angularMeteor,
-  'ionic',
-  'accounts.ui'
+  'ionic'
 ])
 .run(function ($ionicHistory, $state) {
   AccountsTemplates.options.onSubmitHook = onSubmitHook;
