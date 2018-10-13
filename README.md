@@ -11,15 +11,18 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 
 ## TODO
 - Make Sign in pretty: to right-upper corner with a matching the overall theme CSS (Day)
-- Add facebook people search to add-proposal panel (Yulia)
-- Edit proposal
+- Edit proposal (Yulia)
+- introduce activity
+- agree or disagree + state change to In doubt
 - Comments on proposal page
 - Days of week
 - Profile page
 - Sign in page on start + prohibit guest access
-- Bind real receiver to proposal
 - After adding of the proposal the time input is not cleared
 - icons don't appear under consensual domain
+- emails and notifications about status changes
+- show error message on proposal page if task is not found
+- time picker is not strict setting minutes
 
 ## Known issues
 - Handling input errors for add proposal form (disable submit)

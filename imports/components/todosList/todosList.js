@@ -24,7 +24,7 @@ export default class TodosListCtrl extends Controller {
 
     this.helpers({
       tasks() {
-		ProfileUtils.redirectToLogin();
+		    ProfileUtils.redirectToLogin();
 
       	const selector = {};
 
@@ -39,40 +39,40 @@ export default class TodosListCtrl extends Controller {
 					return suggest;
         }
 
-		var suggest = getSuggest();
-		if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
-      		$(".typeahead").typeahead({ source: suggest});
-      	}
+        var suggest = getSuggest();
+        if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
+          $(".typeahead").typeahead({ source: suggest});
+        }
 
-      	function isNumeric(value) {
+        function isNumeric(value) {
             return /^-{0,1}\d+$/.test(value);
         }
 
-      	// If hide completed is checked, filter tasks
-				if (this.getReactively('hideCompleted')) {
-					selector.checked = {
-						$ne: true
-					};
-				}
+        // If hide completed is checked, filter tasks
+        if (this.getReactively('hideCompleted')) {
+          selector.checked = {
+            $ne: true
+          };
+        }
 
-				return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
-        	x.time = moment(x.createdAt).format("DD MMM h:mm a");
-        	
-        	x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
-        	x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
-        	return x;
+        return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
+          x.time = moment(x.createdAt).format("DD MMM h:mm a");
+
+          x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
+          x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
+          return x;
         });
       },
       incompleteCount() {
-				return Tasks.find({
-					checked: {
-						$ne: true
-					}
-				}).count();
-			},
-			currentUser() {
-				return Meteor.user();
-			}
+        return Tasks.find({
+          checked: {
+            $ne: true
+          }
+        }).count();
+      },
+      currentUser() {
+        return Meteor.user();
+      }
     })
   }
 

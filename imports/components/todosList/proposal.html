@@ -21,21 +21,51 @@
         <div class="row">
           <div class="col-md-2 center">
             <div class="header-title">Author</div>
+            <span class="grey"> {{proposal.authorStatus(proposal.data)}}</span>
             <div>
               <img class="avatar-big border-gray {{proposal.data.authorStatus}}-glow" src="{{proposal.data.authorPicture}}" alt="..."/>
             </div>
-            <a href=""><h5 class="title same-line">{{proposal.data.authorName}}</h5></a><span class="grey"> {{proposal.authorStatus(proposal.data)}}</span>
+            <a href=""><h5 class="title same-line">{{proposal.data.authorName}}</h5></a>
           </div>
           <div class="col-md-2 center">
             <div class="header-title">Receiver</div>
+            <span class="grey"> {{proposal.receiverStatus(proposal.data)}}</span>
             <div>
               <img class="avatar-big border-gray {{proposal.data.receiverStatus}}-glow" src="{{proposal.data.receiverPicture}}" alt="..."/>
             </div>
-            <a href=""><h5 class="title same-line">{{proposal.data.receiverName}}</h5></a><span class="grey"> {{proposal.receiverStatus(proposal.data)}}</span>
+            <a href=""><h5 class="title same-line">{{proposal.data.receiverName}}</h5></a>
           </div>
           <div class="col-md-2">
-            <div class="header-title">ETA:</div> {{proposal.data.time}}
-            <div class="header-title" style="margin-top: 20px">Location:</div> ...
+            <div class="header-title">ETA:</div>
+            <span ng-show="!proposal.editingTime">{{proposal.data.time}}
+              <button rel="tooltip" title="Edit" ng-click="proposal.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
+                <i class="fa fa-edit"></i>
+              </button>
+            </span>
+            <div class="card" ng-show="proposal.editingTime">
+              <div class="content">
+                <label>Date</label>
+                <div class="form-group" ng-click="proposal.showDatePicker()">
+                  <div class="input-group">
+                    <input type="text" class="form-control" ng-model="proposal.newDate" readonly>
+                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                  </div>
+                </div>
+                <label>Time</label>
+                <div class="form-group" ng-click="proposal.showTimePicker()">
+                  <div class="input-group">
+                    <input type="text" class="form-control" ng-model="proposal.newTime" readonly>
+                    <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
+                  </div>
+                </div>
+                <button type="submit" ng-click="proposal.saveTime()" class="btn btn-info btn-fill">Save</button>
+              </div>
+            </div>
+            <div class="header-title" style="margin-top: 20px">Location:</div>
+            <span ng-show="!proposal.editingLocation">{{proposal.data.location}}</span>
+            <button rel="tooltip" title="Edit" ng-click="" class="btn btn-danger btn-simple btn-xs">
+              <i class="fa fa-edit"></i>
+            </button>
           </div>
         </div>
         <div class="row" style="margin-top: 30px">
@@ -51,9 +81,11 @@
                 </td>
               </div>
             </div>
-            </div>
+          </div>
+          <button rel="tooltip" title="Edit" ng-click="" class="btn btn-danger btn-simple btn-xs">
+            <i class="fa fa-edit"></i>
+          </button>
         </div>
-        
       </div>
     </div>
 

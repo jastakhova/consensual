@@ -59,6 +59,7 @@ Meteor.methods({
       receiverName: getName(receiver),
       authorStatus: 'green',
       receiverStatus: 'yellow',
+      location: '...'
     });
   },
   'tasks.remove' (taskId) {
@@ -105,4 +106,15 @@ Meteor.methods({
         }
       });
     },
+  'tasks.updateTime' (taskId, newTime) {
+    check(taskId, String);
+    check(newTime, String);
+
+    const task = Tasks.findOne(taskId);
+    Tasks.update(taskId, {
+      $set: {
+        createdAt: new Date(newTime)
+      }
+    });
+  },
 });
