@@ -88,7 +88,8 @@ export default class TodosListCtrl extends Controller {
       this.newDate = '';
       this.newTime = '';
       $('.typeahead').val(''); //TODO: clears form but not model
-      this.scope.$apply();
+      // Removed because it was causing an error "$apply already in progress"
+      // this.scope.$apply();
     }
 
   setChecked(task) {
