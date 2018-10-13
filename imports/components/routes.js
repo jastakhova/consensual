@@ -7,7 +7,6 @@ import tabsTemplateUrl from './tabs.html';
 
 export default class RoutesConfig extends Config {
   configure() {
-
     this.$stateProvider
       .state('tab', {
         url: '/tab',

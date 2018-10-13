@@ -22,10 +22,6 @@ Meteor.isLoggedIn = function() {
     return Meteor.userId();
 }
 
-//if (!Meteor.isLoggedIn()) {
-//    document.location.href = '#!/login';
-//}
-
 var angularMeteorTemplate = angular.module('angular-blaze-template', []);
 
 // blaze-template adds Blaze templates to Angular as directives
@@ -76,7 +72,44 @@ angular.module(App, [
   angularMeteor,
   'ionic',
   'accounts.ui'
-]);
+])
+.run(function ($ionicHistory, $state) {
+  AccountsTemplates.options.onSubmitHook = onSubmitHook;
+  AccountsTemplates.options.onLogoutHook = onLogoutHook;
+
+  // Always enforce login on page load
+  if (!Meteor.isLoggedIn()) {
+    onLogoutHook();
+  }
+
+  var logout = Meteor.logout;
+  Meteor.logout = function() {
+     // Invoke the original method
+     logout.apply(Meteor);
+     onLogoutHook();
+  };
+
+  function onSubmitHook(error, state) {
+    if (!error) {
+      if (state === "signIn" || state === "signUp") {
+        $ionicHistory.nextViewOptions({
+          historyRoot: true
+        });
+
+        $state.go("tab.todo");
+      }
+    }
+  }
+
+  function onLogoutHook() {
+    $ionicHistory.nextViewOptions({
+        disableBack: true,
+        historyRoot: true
+    });
+
+    $state.go("login");
+  }
+});
 
 AccountsTemplates.configure({
     //defaultLayout: 'emptyLayout',
@@ -84,7 +117,6 @@ AccountsTemplates.configure({
     overrideLoginErrors: true,
     enablePasswordChange: true,
     sendVerificationEmail: false,
-
     //enforceEmailVerification: true,
     //confirmPassword: true,
     //continuousValidation: false,
@@ -110,7 +142,7 @@ AccountsTemplates.configure({
 new Loader(App)
 	.load(TodosListCtrl)
 	.load(ProposalCtrl)
-    .load(LoginCtrl)
+  .load(LoginCtrl)
 	.load(RoutesConfig);
 
 function onReady() {
