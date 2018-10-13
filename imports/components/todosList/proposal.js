@@ -19,6 +19,8 @@ export default class ProposalCtrl extends Controller {
     this.editingTime = false;
     this.editingLocation = false;
     this.editingDescription = false;
+    this.currentUser = Meteor.userId();
+    this.activityShowed = false;
 
     this.helpers({
       data() {
@@ -31,6 +33,8 @@ export default class ProposalCtrl extends Controller {
 					foundTask.time = moment(foundTask.createdAt).format("DD MMM h:mm a");
 					this.newDate = moment(foundTask.createdAt).format("MM-DD-YYYY");
 					this.newTime = moment(foundTask.createdAt).format("h:mm");
+					this.activityShowed = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
+            Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
 
 					foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
           foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
@@ -77,6 +81,10 @@ export default class ProposalCtrl extends Controller {
 
   flipDescriptionEditingStatus() {
     this.editingDescription = !this.editingDescription;
+  }
+
+  flipActivityShowingStatus() {
+    this.activityShowed = !this.activityShowed;
   }
 
   saveTime() {

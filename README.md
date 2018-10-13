@@ -11,9 +11,7 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 
 ## TODO
 - Make Sign in pretty: to right-upper corner with a matching the overall theme CSS (Day)
-- Edit proposal (Yulia)
-- introduce activity
-- agree or disagree + state change to In doubt
+- agree or disagree + state change to In doubt (Yulia)
 - Comments on proposal page
 - Days of week
 - Profile page
@@ -80,4 +78,11 @@ Run the proxy server in a new terminal tab:
 
 ```
 $ sudo node main.js
+```
+
+### Mongo cheat sheet
+
+```
+meteor mongo
+>> db.<table>.find() - show the whole table
 ```

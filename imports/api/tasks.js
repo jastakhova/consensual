@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
 import 'underscore';
+import moment from 'moment';
 
 export const Tasks = new Mongo.Collection('tasks');
 
@@ -33,6 +34,10 @@ if (Meteor.isServer) {
     );
 }
 
+function getName(user) {
+  return user.username ? user.username : user.profile.name;
+}
+
 Meteor.methods({
   'tasks.insert' (newTask) {
     check(newTask.task, String);
@@ -46,10 +51,6 @@ Meteor.methods({
 
     var receiver = Meteor.users.findOne({_id: newTask.receiver});
 
-    function getName(user) {
-    	return user.username ? user.username : user.profile.name;
-    }
-
     Tasks.insert({
       text: newTask.task,
       createdAt: new Date(newTask.time),
@@ -59,7 +60,8 @@ Meteor.methods({
       receiverName: getName(receiver),
       authorStatus: 'green',
       receiverStatus: 'yellow',
-      location: '...'
+      location: '...',
+      activity: []
     });
   },
   'tasks.remove' (taskId) {
@@ -111,9 +113,22 @@ Meteor.methods({
     check(newTime, String);
 
     const task = Tasks.findOne(taskId);
+    if (newDate(newTime) === task.createdAt) {
+      return;
+    }
+
+    task.activity.push({
+      actor: Meteor.userId(),
+      actorName: getName(Meteor.user()),
+      field: 'time',
+      oldValue: moment(task.createdAt).format("DD MMM h:mm a"),
+      newValue: moment(new Date(newTime)).format("DD MMM h:mm a"),
+      time: new Date()
+    });
     Tasks.update(taskId, {
       $set: {
-        createdAt: new Date(newTime)
+        createdAt: new Date(newTime),
+        activity: task.activity
       }
     });
   },
@@ -122,9 +137,22 @@ Meteor.methods({
     check(newLocation, String);
 
     const task = Tasks.findOne(taskId);
+    if (newLocation === task.location) {
+      return;
+    }
+
+    task.activity.push({
+          actor: Meteor.userId(),
+          actorName: getName(Meteor.user()),
+          field: 'location',
+          oldValue: task.location,
+          newValue: newLocation,
+          time: new Date()
+        });
     Tasks.update(taskId, {
       $set: {
-        location: newLocation
+        location: newLocation,
+        activity: task.activity
       }
     });
   },
@@ -133,9 +161,22 @@ Meteor.methods({
     check(newDescription, String);
 
     const task = Tasks.findOne(taskId);
+    if (newDescription === task.text) {
+      return;
+    }
+
+    task.activity.push({
+          actor: Meteor.userId(),
+          actorName: getName(Meteor.user()),
+          field: 'description',
+          oldValue: task.text,
+          newValue: newDescription,
+          time: new Date()
+        });
     Tasks.update(taskId, {
       $set: {
-        text: newDescription
+        text: newDescription,
+        activity: task.activity
       }
     });
   },

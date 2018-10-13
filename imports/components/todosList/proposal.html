@@ -74,13 +74,27 @@
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
-            <textarea ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text">
+            <textarea style="padding-left: 30px;" ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text">
             </textarea>
           </div>
           <button ng-show="!proposal.editingDescription" rel="tooltip" title="Edit" ng-click="proposal.flipDescriptionEditingStatus()" class="btn btn-danger btn-simple btn-xs">
             <i class="fa fa-edit"></i>
           </button>
           <button ng-show="proposal.editingDescription" type="submit" ng-click="proposal.saveDescription(proposal.data.text)" class="btn btn-info btn-fill">Save</button>
+        </div>
+        <div class="row" style="padding-left: 15px; padding-right: 27px;">
+          <div class="card col-md-8">
+            <div class="header" style="{{proposal.activityShowed ? '':'padding-bottom:15px;'}} cursor: pointer;" ng-click="proposal.flipActivityShowingStatus()">
+              <i class="pe-7s-{{proposal.activityShowed ? 'close-circle': 'plus'}}"></i>
+              <span class="title" style="padding-left:5px">Activity log</span>
+            </div>
+            <div class="content" ng-show="proposal.activityShowed">
+              <hr style="margin-top: 10px">
+              <div ng-repeat="activityRecord in proposal.data.activity | orderBy:'-time'">
+                <b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }}</b> changed <b>{{activityRecord.field}}</b> from '{{activityRecord.oldValue}}' to '{{activityRecord.newValue}}'.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
