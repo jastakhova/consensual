@@ -128,4 +128,15 @@ Meteor.methods({
       }
     });
   },
+  'tasks.updateDescription' (taskId, newDescription) {
+    check(taskId, String);
+    check(newDescription, String);
+
+    const task = Tasks.findOne(taskId);
+    Tasks.update(taskId, {
+      $set: {
+        text: newDescription
+      }
+    });
+  },
 });

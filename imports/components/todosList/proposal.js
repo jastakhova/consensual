@@ -18,6 +18,7 @@ export default class ProposalCtrl extends Controller {
     this.proposalId = this.$stateParams.proposalId;
     this.editingTime = false;
     this.editingLocation = false;
+    this.editingDescription = false;
 
     this.helpers({
       data() {
@@ -74,6 +75,10 @@ export default class ProposalCtrl extends Controller {
     this.editingLocation = !this.editingLocation;
   }
 
+  flipDescriptionEditingStatus() {
+    this.editingDescription = !this.editingDescription;
+  }
+
   saveTime() {
     Meteor.call('tasks.updateTime', this.proposalId, this.newDate + ' ' + this.newTime);
     this.flipTimeEditingStatus();
@@ -82,6 +87,11 @@ export default class ProposalCtrl extends Controller {
   saveLocation(location) {
     Meteor.call('tasks.updateLocation', this.proposalId, location);
     this.flipLocationEditingStatus();
+  }
+
+  saveDescription(description) {
+    Meteor.call('tasks.updateDescription', this.proposalId, description);
+    this.flipDescriptionEditingStatus();
   }
 
   showDatePicker() {

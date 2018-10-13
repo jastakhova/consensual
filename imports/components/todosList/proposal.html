@@ -74,21 +74,13 @@
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
-            <div class="card">
-              <div class="content">
-                <td class="table-full-width">
-                  <table>
-                    <tbody>
-                    <tr><td>{{proposal.data.text}}</td></tr>
-                    </tbody>
-                  </table>
-                </td>
-              </div>
-            </div>
+            <textarea ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text">
+            </textarea>
           </div>
-          <button rel="tooltip" title="Edit" ng-click="" class="btn btn-danger btn-simple btn-xs">
+          <button ng-show="!proposal.editingDescription" rel="tooltip" title="Edit" ng-click="proposal.flipDescriptionEditingStatus()" class="btn btn-danger btn-simple btn-xs">
             <i class="fa fa-edit"></i>
           </button>
+          <button ng-show="proposal.editingDescription" type="submit" ng-click="proposal.saveDescription(proposal.data.text)" class="btn btn-info btn-fill">Save</button>
         </div>
       </div>
     </div>
