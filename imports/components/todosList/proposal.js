@@ -70,9 +70,18 @@ export default class ProposalCtrl extends Controller {
     this.editingTime = !this.editingTime;
   }
 
+  flipLocationEditingStatus() {
+    this.editingLocation = !this.editingLocation;
+  }
+
   saveTime() {
     Meteor.call('tasks.updateTime', this.proposalId, this.newDate + ' ' + this.newTime);
     this.flipTimeEditingStatus();
+  }
+
+  saveLocation(location) {
+    Meteor.call('tasks.updateLocation', this.proposalId, location);
+    this.flipLocationEditingStatus();
   }
 
   showDatePicker() {

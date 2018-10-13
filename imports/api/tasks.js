@@ -117,4 +117,15 @@ Meteor.methods({
       }
     });
   },
+  'tasks.updateLocation' (taskId, newLocation) {
+    check(taskId, String);
+    check(newLocation, String);
+
+    const task = Tasks.findOne(taskId);
+    Tasks.update(taskId, {
+      $set: {
+        location: newLocation
+      }
+    });
+  },
 });
