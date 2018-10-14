@@ -31,5 +31,5 @@ cfs:filesystem
 underscore@1.0.10
 jquery
 blaze
-useraccounts:ionic
 useraccounts:core
+useraccounts:ionic
