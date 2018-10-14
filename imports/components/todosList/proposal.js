@@ -20,7 +20,7 @@ export default class ProposalCtrl extends Controller {
     this.editingLocation = false;
     this.editingDescription = false;
     this.currentUser = Meteor.userId();
-    this.activityShowed = false;
+    this.currentUserIsInDoubt = false;
 
     this.helpers({
       data() {
@@ -33,8 +33,9 @@ export default class ProposalCtrl extends Controller {
 					foundTask.time = moment(foundTask.createdAt).format("DD MMM h:mm a");
 					this.newDate = moment(foundTask.createdAt).format("MM-DD-YYYY");
 					this.newTime = moment(foundTask.createdAt).format("h:mm");
-					this.activityShowed = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
+          this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
             Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
+          this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
 
 					foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
           foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
@@ -49,12 +50,12 @@ export default class ProposalCtrl extends Controller {
 
   status(statusColor) {
   	if (statusColor === 'green') {
-  		return "agrees";
+  		return "approves";
   	}
-  	if (statusColor === 'green') {
-			return "disagrees";
+  	if (statusColor === 'red') {
+			return "declines";
 		}
-		return "is indecisive"
+		return "is considering"
   }
 
   authorStatus(task) {
@@ -135,6 +136,14 @@ export default class ProposalCtrl extends Controller {
       this.newTime = '';
       controller.$scope.$apply();
     })
+  }
+
+  approveTask() {
+    Meteor.call('tasks.updateStatuses', this.proposalId, 'green');
+  }
+
+  declineTask() {
+    Meteor.call('tasks.updateStatuses', this.proposalId, 'red');
   }
 }
 

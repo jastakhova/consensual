@@ -82,7 +82,11 @@
           </button>
           <button ng-show="proposal.editingDescription" type="submit" ng-click="proposal.saveDescription(proposal.data.text)" class="btn btn-info btn-fill">Save</button>
         </div>
-        <div class="row" style="padding-left: 15px; padding-right: 27px;">
+        <div class="row" ng-show="proposal.currentUserIsInDoubt" style="margin-bottom: 20px; margin-left: 2px">
+          <button type="submit" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">Approve</button>
+          <button type="submit" style="background-color: #FF3636" ng-click="proposal.declineTask()" class="btn btn-info btn-fill">Disapprove</button>
+        </div>
+        <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.activity.length > 0">
           <div class="card col-md-8">
             <div class="header" style="{{proposal.activityShowed ? '':'padding-bottom:15px;'}} cursor: pointer;" ng-click="proposal.flipActivityShowingStatus()">
               <i class="pe-7s-{{proposal.activityShowed ? 'close-circle': 'plus'}}"></i>
