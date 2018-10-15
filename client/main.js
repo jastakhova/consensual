@@ -72,7 +72,7 @@ angular.module(App, [
   angularMeteor,
   'ionic'
 ])
-.run(function ($ionicHistory, $state) {
+.run(['$ionicHistory', '$state', function ($ionicHistory, $state) {
   AccountsTemplates.options.onSubmitHook = onSubmitHook;
   AccountsTemplates.options.onLogoutHook = onLogoutHook;
 
@@ -108,7 +108,7 @@ angular.module(App, [
 
     $state.go("login");
   }
-});
+}]);
 
 AccountsTemplates.configure({
     //defaultLayout: 'emptyLayout',
