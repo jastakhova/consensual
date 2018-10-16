@@ -113,6 +113,9 @@ Meteor.methods({
     check(newTime, String);
 
     var newTimeObj = new Date(newTime);
+    console.log(newTime);
+    console.log(newTimeObj);
+    console.log(moment(newTimeObj));
 
     const task = Tasks.findOne(taskId);
     if (newTimeObj === task.createdAt) {
