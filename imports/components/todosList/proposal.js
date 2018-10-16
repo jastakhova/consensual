@@ -21,6 +21,8 @@ export default class ProposalCtrl extends Controller {
     this.editingDescription = false;
     this.currentUser = Meteor.userId();
     this.currentUserIsInDoubt = false;
+    this.commentsShowed = true;
+    this.comment = '';
 
     this.helpers({
       data() {
@@ -36,6 +38,9 @@ export default class ProposalCtrl extends Controller {
           this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
             Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
           this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
+          foundTask.comments.forEach(function(obj) {
+            obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
+          });
 
 					foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
           foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
@@ -86,6 +91,10 @@ export default class ProposalCtrl extends Controller {
 
   flipActivityShowingStatus() {
     this.activityShowed = !this.activityShowed;
+  }
+
+  flipCommentsShowingStatus() {
+    this.commentsShowed = !this.commentsShowed;
   }
 
   saveTime() {
@@ -144,6 +153,11 @@ export default class ProposalCtrl extends Controller {
 
   declineTask() {
     Meteor.call('tasks.updateStatuses', this.proposalId, 'red');
+  }
+
+  addComment() {
+    Meteor.call('tasks.addComment', this.proposalId, this.comment);
+    this.comment = '';
   }
 }
 

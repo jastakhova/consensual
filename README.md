@@ -11,11 +11,9 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 
 ## TODO
 - Store datetimes as GMT and display in local timezone (Day)
-- Broken CSS for datetime picker in add-proposal form
+- Broken CSS for datetime picker in add-proposal form (Yulia)
 - Add user profile page
 - Add current user mini profile (image in upper right) w/ logout
-- Agree/Disagree + state change to 'Undecided' (Yulia)
-- Comments on proposal page
 - Order tasks by days of week
 - After adding of the proposal the time input is not cleared
 - Icons don't appear under consensual domain

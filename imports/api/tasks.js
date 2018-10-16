@@ -61,7 +61,8 @@ Meteor.methods({
       authorStatus: 'green',
       receiverStatus: Meteor.userId() === newTask.receiver ? 'green' : 'yellow',
       location: '...',
-      activity: []
+      activity: [],
+      comments: []
     });
   },
   'tasks.remove' (taskId) {
@@ -239,6 +240,26 @@ Meteor.methods({
         activity: task.activity,
         authorStatus: newAuthorStatus,
         receiverStatus: newReceiverStatus
+      }
+    });
+  },
+  'tasks.addComment' (taskId, text) {
+    check(taskId, String);
+    check(text, String);
+
+    const task = Tasks.findOne(taskId);
+
+    task.comments.push({
+          author: Meteor.userId(),
+          authorName: getName(Meteor.user()),
+          text: text,
+          time: new Date()
+        });
+    Tasks.update(taskId, {
+      $set: {
+        comments: task.comments,
+        authorStatus: 'yellow',
+        receiverStatus: 'yellow'
       }
     });
   },
