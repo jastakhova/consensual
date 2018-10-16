@@ -10,22 +10,27 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
 
 ## TODO
-- Make Sign in pretty: to right-upper corner with a matching the overall theme CSS (Day)
-- agree or disagree + state change to In doubt (Yulia)
+- Store datetimes as GMT and display in local timezone (Day)
+- Broken CSS for datetime picker in add-proposal form
+- Add user profile page
+- Add current user mini profile (image in upper right) w/ logout
+- Agree/Disagree + state change to 'Undecided' (Yulia)
 - Comments on proposal page
-- Days of week
-- Profile page
-- Sign in page on start + prohibit guest access
+- Order tasks by days of week
 - After adding of the proposal the time input is not cleared
-- icons don't appear under consensual domain
-- emails and notifications about status changes
-- show error message on proposal page if task is not found
-- time picker is not strict setting minutes
+- Icons don't appear under consensual domain
+- Emails and/or notifications about status changes
+- Show error message on proposal page if task is not found
 
 ## Known issues
 - Handling input errors for add proposal form (disable submit)
 - Error notifications on add, delete actions (show alert)
-- Broken CSS in add-proposal form
+- Datetime picker is not strict setting minutes (uses nearest 10 min)
+- We're abusing task.createdAt as the execution time for the agreement
+- Hamburger menu in upper right of mobile view does nothing. What should it do?
+
+## Bugs
+- Cannot read property 'services' of undefined at Object.picture on Proposal page
 
 ## Development
 
