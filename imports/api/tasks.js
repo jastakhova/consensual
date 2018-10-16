@@ -112,8 +112,10 @@ Meteor.methods({
     check(taskId, String);
     check(newTime, String);
 
+    var newTimeObj = new Date(newTime);
+
     const task = Tasks.findOne(taskId);
-    if (newDate(newTime) === task.createdAt) {
+    if (newTimeObj === task.createdAt) {
       return;
     }
 
@@ -125,13 +127,13 @@ Meteor.methods({
       actorName: getName(Meteor.user()),
       field: 'time',
       oldValue: moment(task.createdAt).format("DD MMM h:mm a"),
-      newValue: moment(new Date(newTime)).format("DD MMM h:mm a"),
+      newValue: moment(newTimeObj).format("DD MMM h:mm a"),
       time: new Date()
     });
 
     Tasks.update(taskId, {
       $set: {
-        createdAt: new Date(newTime),
+        createdAt: newTimeObj,
         activity: task.activity,
         authorStatus: newAuthorStatus,
         receiverStatus: newReceiverStatus
