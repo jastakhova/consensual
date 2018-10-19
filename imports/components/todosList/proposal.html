@@ -35,7 +35,7 @@
           </div>
           <div class="col-md-2">
             <div class="header-title">ETA:</div>
-            <span ng-show="!proposal.editingTime">{{proposal.data.time}}
+            <span ng-show="!proposal.editingTime">{{proposal.data.ETA}}
               <button rel="tooltip" title="Edit" ng-click="proposal.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
                 <i class="fa fa-edit"></i>
               </button>
@@ -45,14 +45,14 @@
                 <label>Date</label>
                 <div class="form-group" ng-click="proposal.showDatePicker()">
                   <div class="input-group">
-                    <input type="text" class="form-control" ng-model="proposal.newDate" readonly>
+                    <input type="text" class="form-control" ng-model="proposal.selectedDate" readonly>
                     <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                   </div>
                 </div>
                 <label>Time</label>
                 <div class="form-group" ng-click="proposal.showTimePicker()">
                   <div class="input-group">
-                    <input type="text" class="form-control" ng-model="proposal.newTime" readonly>
+                    <input type="text" class="form-control" ng-model="proposal.selectedTime" readonly>
                     <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
                   </div>
                 </div>
@@ -95,7 +95,7 @@
             <div class="content" ng-show="proposal.activityShowed">
               <hr style="margin-top: 10px">
               <div ng-repeat="activityRecord in proposal.data.activity | orderBy:'-time'">
-                <b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }}</b> changed <b>{{activityRecord.field}}</b> from '{{activityRecord.oldValue}}' to '{{activityRecord.newValue}}'.
+                <b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }}</b> changed <b>{{activityRecord.field}}</b> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.
               </div>
             </div>
           </div>

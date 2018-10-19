@@ -10,8 +10,7 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
 
 ## TODO
-- Store datetimes as GMT and display in local timezone (Day)
-- Broken CSS for datetime picker in add-proposal form (Yulia)
+- Make responsive layouts render properly on mobile devices (this is a DNS and SSL issue)
 - Add user profile page
 - Add current user mini profile (image in upper right) w/ logout
 - Order tasks by days of week
@@ -23,9 +22,9 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 ## Known issues
 - Handling input errors for add proposal form (disable submit)
 - Error notifications on add, delete actions (show alert)
-- Datetime picker is not strict setting minutes (uses nearest 10 min)
 - We're abusing task.createdAt as the execution time for the agreement
 - Hamburger menu in upper right of mobile view does nothing. What should it do?
+- You need to fiddle with the controls to select the same hour as previously selected in the datetime picker
 
 ## Bugs
 - Cannot read property 'services' of undefined at Object.picture on Proposal page
@@ -88,4 +87,5 @@ $ sudo node main.js
 ```
 meteor mongo
 >> db.<table>.find() - show the whole table
+>> db.collection.find().pretty() - you can ask it to be pretty
 ```

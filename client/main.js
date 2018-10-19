@@ -1,3 +1,6 @@
+// Global settings
+const App = 'consensual';
+
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 import moment from 'moment';
@@ -9,6 +12,7 @@ import 'angular-ui-router';
 import 'ionic-scripts';
 import Loader from 'angular-ecmascript/module-loader';
 import { Meteor } from 'meteor/meteor';
+
 import { Template } from 'meteor/templating';
 
 import TodosListCtrl from '../imports/components/todosList/todosList';
@@ -16,12 +20,12 @@ import ProposalCtrl from '../imports/components/todosList/proposal';
 import LoginCtrl from '../imports/components/account/login';
 import RoutesConfig from '../imports/components/routes';
 
-const App = 'consensual';
-
+// Alias for readability
 Meteor.isLoggedIn = function() {
     return Meteor.userId();
 }
 
+// The useraccounts:ionic package uses Blaze even though the rest of the app uses Angular
 var angularMeteorTemplate = angular.module('angular-blaze-template', []);
 
 // blaze-template adds Blaze templates to Angular as directives

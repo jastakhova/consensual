@@ -2,9 +2,12 @@ import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
 import 'underscore';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export const Tasks = new Mongo.Collection('tasks');
+
+// available where Tasks is imported
+datetimeDisplayFormat = "MMM DD, YYYY, h:mm A";
 
 if (Meteor.isServer) {
   // This code only runs on the server
@@ -109,40 +112,40 @@ Meteor.methods({
         }
       });
     },
-  'tasks.updateTime' (taskId, newTime) {
+  'tasks.updateTime' (taskId, oldTimeUTCString, newTimeUTCString) {
     check(taskId, String);
-    check(newTime, String);
-
-    var newTimeObj = new Date(newTime);
-    console.log(newTime);
-    console.log(newTimeObj);
-    console.log(moment(newTimeObj));
+    check(oldTimeUTCString, String);
+    check(newTimeUTCString, String);
 
     const task = Tasks.findOne(taskId);
-    if (newTimeObj === task.createdAt) {
+
+    if (newTimeUTCString === oldTimeUTCString) {
       return;
     }
+    else {
+      var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
+      var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
 
-    var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
-    var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
+      task.activity.push({
+        actor: Meteor.userId(),
+        actorName: getName(Meteor.user()),
+        field: 'time',
+        oldValue: new Date(moment(oldTimeUTCString).format()),
+        newValue: new Date(moment(newTimeUTCString).format()),
+        time: new Date()
+      });
 
-    task.activity.push({
-      actor: Meteor.userId(),
-      actorName: getName(Meteor.user()),
-      field: 'time',
-      oldValue: moment(task.createdAt).format("DD MMM h:mm a"),
-      newValue: moment(newTimeObj).format("DD MMM h:mm a"),
-      time: new Date()
-    });
+      Tasks.update(taskId, {
+        $set: {
+          createdAt: new Date(moment(newTimeUTCString).format()),
+          updatedAt: new Date(),
+          activity: task.activity,
+          authorStatus: newAuthorStatus,
+          receiverStatus: newReceiverStatus
+        }
+      });
+    }
 
-    Tasks.update(taskId, {
-      $set: {
-        createdAt: newTimeObj,
-        activity: task.activity,
-        authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus
-      }
-    });
   },
   'tasks.updateLocation' (taskId, newLocation) {
     check(taskId, String);

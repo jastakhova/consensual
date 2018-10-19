@@ -1,6 +1,5 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
 import { Tasks } from '../../api/tasks.js';
-import moment from 'moment';
 import ProfileUtils from './profile.js';
 import DateTimePicker from 'date-time-picker';
 import { Tracker } from 'meteor/tracker'
@@ -32,9 +31,10 @@ export default class ProposalCtrl extends Controller {
         if (foundTask) {
         	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
         	var id2user = ProfileUtils.createMapFromList(users, "_id");
-					foundTask.time = moment(foundTask.createdAt).format("DD MMM h:mm a");
-					this.newDate = moment(foundTask.createdAt).format("MM-DD-YYYY");
-					this.newTime = moment(foundTask.createdAt).format("h:mm");
+					foundTask.ETA = moment(foundTask.createdAt).format(datetimeDisplayFormat);
+					this.selectedDate = moment(foundTask.createdAt).format("MM-DD-YYYY");
+					this.selectedTime = moment(foundTask.createdAt).format("HH:mm");
+					this.previousDateTime = moment(foundTask.createdAt).format();
           this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
             Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
           this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
@@ -51,6 +51,9 @@ export default class ProposalCtrl extends Controller {
 				}
       }
     });
+  }
+  display(value) {
+    return (moment(new Date(value)).isValid() ? moment(new Date(value)).format(datetimeDisplayFormat) : value);
   }
 
   status(statusColor) {
@@ -98,7 +101,8 @@ export default class ProposalCtrl extends Controller {
   }
 
   saveTime() {
-    Meteor.call('tasks.updateTime', this.proposalId, this.newDate + ' ' + this.newTime);
+    this.newDateTime = moment.utc(new Date(this.selectedDate + ' ' + this.selectedTime)).format();
+    Meteor.call('tasks.updateTime', this.proposalId, moment.utc(this.previousDateTime).format(), this.newDateTime);
     this.flipTimeEditingStatus();
   }
 
@@ -115,34 +119,33 @@ export default class ProposalCtrl extends Controller {
   showDatePicker() {
       var options = {
         format: 'MM-dd-yyyy',
-        default: this.newDate
+        default: this.previousDateTime
       };
       var controller = this;
-      var timePicker = new DateTimePicker.Date(options, {})
-      timePicker.on('selected', function (formatTime, now) {
-        controller.newDate = formatTime;
+      var datePicker = new DateTimePicker.Date(options, {})
+      datePicker.on('selected', function (formatDate, now) {
+        controller.selectedDate = formatDate;
         controller.$scope.$apply();
-        timePicker.destroy();
+        datePicker.destroy();
       });
-      timePicker.on('cleared', function () {
+      datePicker.on('cleared', function () {
         controller.$scope.$apply();
       });
     }
 
   showTimePicker() {
     var options = {
-      minuteStep: 10,
-      default: (this.newDate + ' ' + this.newTime)
+      minuteStep: 1,
+      default: this.previousDateTime
     };
     var controller = this;
     var timePicker = new DateTimePicker.Time(options, {})
     timePicker.on('selected', function (formatTime, now) {
-      controller.newTime = formatTime;
+      controller.selectedTime = formatTime;
       controller.$scope.$apply();
       timePicker.destroy();
     })
     timePicker.on('cleared', function () {
-      this.newTime = '';
       controller.$scope.$apply();
     })
   }
