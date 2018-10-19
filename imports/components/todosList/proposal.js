@@ -25,8 +25,6 @@ export default class ProposalCtrl extends Controller {
 
     this.helpers({
       data() {
-		    ProfileUtils.redirectToLogin();
-
       	var foundTask = Tasks.findOne({_id: this.proposalId});
         if (foundTask) {
         	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
@@ -54,6 +52,14 @@ export default class ProposalCtrl extends Controller {
   }
   display(value) {
     return (moment(new Date(value)).isValid() ? moment(new Date(value)).format(datetimeDisplayFormat) : value);
+  }
+
+  logout() {
+    Meteor.logout();
+  }
+
+  accountPicture() {
+    return ProfileUtils.picture(Meteor.user());
   }
 
   status(statusColor) {

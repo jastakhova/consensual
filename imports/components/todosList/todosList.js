@@ -24,8 +24,6 @@ export default class TodosListCtrl extends Controller {
 
     this.helpers({
       tasks() {
-		    ProfileUtils.redirectToLogin();
-
       	const selector = {};
 
       	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
@@ -74,6 +72,14 @@ export default class TodosListCtrl extends Controller {
         return Meteor.user();
       }
     })
+  }
+
+  logout() {
+    Meteor.logout();
+  }
+
+  accountPicture() {
+    return ProfileUtils.picture(Meteor.user());
   }
 
   addTask(newTask) {

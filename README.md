@@ -11,13 +11,12 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 
 ## TODO
 - Make responsive layouts render properly on mobile devices (this is a DNS and SSL issue)
-- Add user profile page
-- Add current user mini profile (image in upper right) w/ logout
-- Order tasks by days of week
+- Order tasks by days of week (Yulia)
 - After adding of the proposal the time input is not cleared
 - Icons don't appear under consensual domain
 - Emails and/or notifications about status changes
 - Show error message on proposal page if task is not found
+- Deal with side menu on the left
 
 ## Known issues
 - Handling input errors for add proposal form (disable submit)
@@ -27,7 +26,6 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 - You need to fiddle with the controls to select the same hour as previously selected in the datetime picker
 
 ## Bugs
-- Cannot read property 'services' of undefined at Object.picture on Proposal page
 
 ## Development
 
@@ -87,5 +85,4 @@ $ sudo node main.js
 ```
 meteor mongo
 >> db.<table>.find() - show the whole table
->> db.collection.find().pretty() - you can ask it to be pretty
 ```

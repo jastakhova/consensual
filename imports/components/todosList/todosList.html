@@ -21,6 +21,12 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+        <li class="card" style="box-shadow: none; margin-top:15px;">
+          <img class="avatar border-gray" src="{{todoList.accountPicture()}}" alt="..."/>
+        </li>
+        <li>
+          <a href="#!/login" ng-click="todoList.logout()">Log out</a>
+        </li>
         <li class="separator hidden-lg"></li>
       </ul>
     </div>
