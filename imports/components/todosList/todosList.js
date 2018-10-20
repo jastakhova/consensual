@@ -116,7 +116,7 @@ export default class TodosListCtrl extends Controller {
 	}
 
 	showDatePicker() {
-			var current = (this.newDate === '') ? new Date() : this.newDate;
+			var current = (this.newDate === '' || this.newDate === undefined) ? new Date() : this.newDate;
 			var options = {
 				format: 'MM-dd-yyyy',
 				default: current
@@ -135,9 +135,10 @@ export default class TodosListCtrl extends Controller {
   	}
 
 	showTimePicker() {
-		var current = (this.newTime === '') ? new Date() : (this.newDate + ' ' + this.newTime);
+	  console.log("[" + this.newTime + "]");
+		var current = (this.newTime === '' || this.newTime === undefined) ? new Date() : (this.newDate + ' ' + this.newTime);
 		var options = {
-			minuteStep: 10,
+			minuteStep: 1,
 			default: current
 		};
 		var controller = this;

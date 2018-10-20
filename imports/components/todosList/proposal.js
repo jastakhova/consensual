@@ -125,7 +125,7 @@ export default class ProposalCtrl extends Controller {
   showDatePicker() {
       var options = {
         format: 'MM-dd-yyyy',
-        default: this.previousDateTime
+        default: this.selectedDate
       };
       var controller = this;
       var datePicker = new DateTimePicker.Date(options, {})
