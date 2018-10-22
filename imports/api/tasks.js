@@ -56,7 +56,7 @@ Meteor.methods({
 
     Tasks.insert({
       text: newTask.task,
-      eta: new Date(newTask.time),
+      eta: new Date(moment(newTask.time).format()),
       authorId: Meteor.userId(),
       authorName: getName(Meteor.user()),
       receiverId: newTask.receiver,
