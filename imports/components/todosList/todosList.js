@@ -90,12 +90,20 @@ export default class TodosListCtrl extends Controller {
       	});
 
       // Clear form
+
       this.newTask = '';
-      this.newDate = '';
-      this.newTime = '';
+      this.setPristineAndUntouched(this, 'newTask');
+      this.runParsers(this, 'newTask', this.newTask);
+      this.newReceiver = '';
+      this.setPristineAndUntouched(this, 'newReceiver');
+      this.runParsers(this, 'newReceiver', this.newReceiver);
       $('.typeahead').val(''); //TODO: clears form but not model
-      // Removed because it was causing an error "$apply already in progress"
-      // this.scope.$apply();
+      this.newDate = '';
+      this.setPristineAndUntouched(this, 'newDate');
+      this.runParsers(this, 'newDate', this.newDate);
+      this.newTime = '';
+      this.setPristineAndUntouched(this, 'newTime');
+      this.runParsers(this, 'newTime', this.newTime);
     }
 
   setChecked(task) {
@@ -115,6 +123,16 @@ export default class TodosListCtrl extends Controller {
 		this.proposingInProgress = !this.proposingInProgress;
 	}
 
+	runParsers(controller, fieldName, newValue) {
+	  controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0].$parsers.forEach(function(x) {x(newValue);});
+	}
+
+	setPristineAndUntouched(controller, fieldName) {
+    var fieldCtrl = controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
+    fieldCtrl.$setPristine();
+    fieldCtrl.$setUntouched();
+  }
+
 	showDatePicker() {
 			var current = (this.newDate === '' || this.newDate === undefined) ? new Date() : this.newDate;
 			var options = {
@@ -125,17 +143,18 @@ export default class TodosListCtrl extends Controller {
   		var timePicker = new DateTimePicker.Date(options, {})
   		timePicker.on('selected', function (formatTime, now) {
   			controller.newDate = formatTime;
-				controller.scope.$apply();
+  			controller.runParsers(controller, 'newDate', controller.newDate);
+  			controller.scope.$apply();
   			timePicker.destroy();
   		});
   		timePicker.on('cleared', function () {
-  			this.newDate = '';
+  			controller.newDate = '';
+  			controller.runParsers(controller, 'newDate', controller.newDate);
 				controller.scope.$apply();
   		});
   	}
 
 	showTimePicker() {
-	  console.log("[" + this.newTime + "]");
 		var current = (this.newTime === '' || this.newTime === undefined) ? new Date() : (this.newDate + ' ' + this.newTime);
 		var options = {
 			minuteStep: 1,
@@ -145,11 +164,13 @@ export default class TodosListCtrl extends Controller {
 		var timePicker = new DateTimePicker.Time(options, {})
 		timePicker.on('selected', function (formatTime, now) {
 			controller.newTime = formatTime;
+			controller.runParsers(controller, 'newTime', controller.newTime);
 			controller.scope.$apply();
 			timePicker.destroy();
 		})
 		timePicker.on('cleared', function () {
-			this.newTime = '';
+			controller.newTime = '';
+			controller.runParsers(controller, 'newTime', controller.newTime);
 			controller.scope.$apply();
 		})
 	}

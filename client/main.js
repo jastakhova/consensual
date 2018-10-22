@@ -72,11 +72,12 @@ angularMeteorTemplate.directive('blazeTemplate', [
 var angularMeteorModule = angular.module('angular-meteor');
 angularMeteorModule.requires.push('angular-blaze-template');
 
-angular.module(App, [
+consensual = angular.module(App, [
   angularMeteor,
   'ionic'
-])
-.run(['$ionicHistory', '$state', function ($ionicHistory, $state) {
+]);
+
+consensual.run(['$ionicHistory', '$state', function ($ionicHistory, $state) {
   AccountsTemplates.options.onSubmitHook = onSubmitHook;
   AccountsTemplates.options.onLogoutHook = onLogoutHook;
 
@@ -113,6 +114,26 @@ angular.module(App, [
     $state.go("login");
   }
 }]);
+
+// Defines an angular directive, 'required-field', which runs validation when an input is changed
+consensual.directive('requiredField', function() {
+  return {
+    require: 'ngModel',
+    link: function(scope, element, attr, mCtrl) {
+      // The following line is necessary to disable the submit button by default
+      mCtrl.$setValidity('required-field', false);
+      function requiredField(value) {
+        if (value !== "") {
+          mCtrl.$setValidity('required-field', true);
+        } else {
+          mCtrl.$setValidity('required-field', false);
+        }
+        return value;
+      }
+      mCtrl.$parsers.push(requiredField);
+    }
+  };
+});
 
 AccountsTemplates.configure({
     //defaultLayout: 'emptyLayout',

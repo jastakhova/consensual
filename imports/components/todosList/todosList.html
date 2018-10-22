@@ -43,12 +43,12 @@
           <span class="title" style="padding-left:5px">Add a new proposal...</span>
         </div>
         <div class="content" ng-show="todoList.proposingInProgress">
-          <form ng-submit="todoList.addTask(todoList.newTask)">
+          <form name="addTaskForm" ng-submit="todoList.addTask(todoList.newTask)">
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
                   <label>Proposal body</label>
-                  <textarea rows="5" ng-model="todoList.newTask" class="form-control" placeholder="Describe your proposal" ></textarea>
+                  <textarea rows="5" name="newTask" ng-model="todoList.newTask" class="form-control" placeholder="Describe your proposal" required-field></textarea>
                 </div>
               </div>
             </div>
@@ -57,7 +57,7 @@
               <div class="col-md-5">
                 <div class="form-group">
                   <label>Receiver</label>
-                  <input type="text" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" autocomplete="off">
+                  <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" autocomplete="off" required-field>
                 </div>
               </div>
               <div class="col-md-3">
@@ -65,7 +65,7 @@
                   <label>Date</label>
                   <div class="form-group" ng-click="todoList.showDatePicker()">
                     <div class="input-group">
-                      <input type="text" class="form-control" ng-model="todoList.newDate" readonly>
+                      <input type="text" name="newDate" class="form-control" ng-model="todoList.newDate" readonly required-field>
                       <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                     </div>
                   </div>
@@ -76,7 +76,7 @@
                   <label>Time</label>
                   <div class="form-group" ng-click="todoList.showTimePicker()">
                     <div class="input-group">
-                      <input type="text" class="form-control" ng-model="todoList.newTime" readonly>
+                      <input type="text" name="newTime" class="form-control" ng-model="todoList.newTime" readonly required-field>
                       <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
                     </div>
                   </div>
@@ -84,7 +84,7 @@
               </div>
 
               <div class="col-md-2">
-                <button style="margin-top:25px" type="submit" class="btn btn-info btn-fill pull-right">Send the proposal</button>
+                <button style="margin-top:25px" type="submit" onclick="this.focus();" class="btn btn-info btn-fill pull-right" ng-disabled="addTaskForm.newTask.$invalid || addTaskForm.newReceiver.$invalid || addTaskForm.newDate.$invalid || addTaskForm.newTime.$invalid">Send the proposal</button>
               </div>
             </div>
 
