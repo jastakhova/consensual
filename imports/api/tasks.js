@@ -300,19 +300,19 @@ Meteor.methods({
       //            status: default 'open'
       //            archived: default false
 
-      Tasks.updateMany({"eta": null}, {
+      Tasks.update({"eta": null}, {
         $rename: {
           'createdAt': 'eta'
         }
       });
 
-      Tasks.updateMany({"status": null}, {
+      Tasks.update({"status": null}, {
         $set: {
           status: 'open'
         }
       });
 
-      Tasks.updateMany({"archived": null}, {
+      Tasks.update({"archived": null}, {
         $set: {
           archived: false
         }
