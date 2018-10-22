@@ -85,6 +85,21 @@
               <button type="submit" ng-click="proposal.saveLocation(proposal.data.location)" class="btn btn-info btn-fill">Save</button>
             </div>
           </div>
+          <div class="col-md-2">
+            <button ng-show="proposal.data.status != 'open'" style="margin-bottom: 10px; border-width: 1px; border-color: brown; color: brown" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsReopened()">
+              <i class="pe-7s-refresh"></i>
+              Reopen
+            </button>
+            <button ng-show="proposal.data.status != 'done' && !proposal.data.archived" style="margin-bottom: 10px; border-width: 1px; border-color: green; color: green" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsDone()">
+              <i class="pe-7s-like2"></i>
+              Done
+            </button>
+            <br/>
+            <button ng-show="proposal.data.status != 'cancelled' && !proposal.data.archived" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsCancelled()">
+              <i class="pe-7s-trash"></i>
+              Cancel
+            </button>
+          </div>
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
@@ -97,8 +112,7 @@
           <button ng-show="proposal.editingDescription" type="submit" ng-click="proposal.saveDescription(proposal.data.text)" class="btn btn-info btn-fill">Save</button>
         </div>
         <div class="row" ng-show="proposal.currentUserIsInDoubt" style="margin-bottom: 20px; margin-left: 2px">
-          <button type="submit" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">Approve</button>
-          <button type="submit" style="background-color: #FF3636" ng-click="proposal.declineTask()" class="btn btn-info btn-fill">Disapprove</button>
+          <button type="submit" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">{{proposal.acknowledgeLabel}}</button>
         </div>
         <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.activity.length > 0">
           <div class="card col-md-8">
@@ -133,7 +147,7 @@
             </div>
             <hr style="margin-top: 10px">
             <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px">
-              <textarea placeholder="Enter your comment... It will automatically change the status of the proposal to 'Under Consideration'." style="padding-left: 30px;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment">
+              <textarea placeholder="Enter your comment..." style="padding-left: 30px;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment">
               </textarea>
               <button type="submit" ng-click="proposal.addComment()" ng-disabled="proposal.comment.length === 0" class="btn btn-info btn-fill pull-right" style="margin-bottom: 15px">Add comment</button>
             </div>

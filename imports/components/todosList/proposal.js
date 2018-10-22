@@ -22,6 +22,8 @@ export default class ProposalCtrl extends Controller {
     this.currentUserIsInDoubt = false;
     this.commentsShowed = true;
     this.comment = '';
+    this.acknowledgeLabel = 'Acknowledge';
+    this.needsToApproveStatusChange = false;
 
     this.helpers({
       data() {
@@ -29,16 +31,36 @@ export default class ProposalCtrl extends Controller {
         if (foundTask) {
         	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
         	var id2user = ProfileUtils.createMapFromList(users, "_id");
-					foundTask.ETA = moment(foundTask.createdAt).format(datetimeDisplayFormat);
-					this.selectedDate = moment(foundTask.createdAt).format("MM-DD-YYYY");
-					this.selectedTime = moment(foundTask.createdAt).format("HH:mm");
-					this.previousDateTime = moment(foundTask.createdAt).format();
+					foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
+					this.selectedDate = moment(foundTask.eta).format("MM-DD-YYYY");
+					this.selectedTime = moment(foundTask.eta).format("HH:mm");
+					this.previousDateTime = moment(foundTask.eta).format();
           this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
             Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
           this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
           foundTask.comments.forEach(function(obj) {
             obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
           });
+
+          function compare(a, b) {
+            let comparison = 0;
+
+            if (a < b) {
+              comparison = 1;
+            } else if (b < a) {
+              comparison = -1;
+            }
+
+            return comparison;
+          }
+
+          var recentStatusChangeActivity = foundTask.activity
+            .sort(function(record1, record2) {return compare(record1.time, record2.time);})
+            .filter(function(record) {return record.field === 'status' && (record.newValue === 'Done' || record.newValue === 'Cancelled');});
+          if (foundTask.status != 'open' && !foundTask.archived && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
+            this.acknowledgeLabel = 'Acknowledge task status change to ' + foundTask.status;
+            this.needsToApproveStatusChange = true;
+          }
 
 					foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
           foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
@@ -66,9 +88,6 @@ export default class ProposalCtrl extends Controller {
   	if (statusColor === 'green') {
   		return "approves";
   	}
-  	if (statusColor === 'red') {
-			return "declines";
-		}
 		return "is considering"
   }
 
@@ -157,11 +176,19 @@ export default class ProposalCtrl extends Controller {
   }
 
   approveTask() {
-    Meteor.call('tasks.updateStatuses', this.proposalId, 'green');
+    Meteor.call('tasks.updateStatuses', this.proposalId, 'green', this.needsToApproveStatusChange);
   }
 
-  declineTask() {
-    Meteor.call('tasks.updateStatuses', this.proposalId, 'red');
+  markTaskAsDone() {
+    Meteor.call('tasks.changeTaskStatus', this.proposalId, 'done');
+  }
+
+  markTaskAsCancelled() {
+    Meteor.call('tasks.changeTaskStatus', this.proposalId, 'cancelled');
+  }
+
+  markTaskAsReopened() {
+    Meteor.call('tasks.changeTaskStatus', this.proposalId, 'open');
   }
 
   addComment() {

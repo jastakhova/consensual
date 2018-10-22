@@ -56,7 +56,7 @@ Meteor.methods({
 
     Tasks.insert({
       text: newTask.task,
-      createdAt: new Date(newTask.time),
+      eta: new Date(newTask.time),
       authorId: Meteor.userId(),
       authorName: getName(Meteor.user()),
       receiverId: newTask.receiver,
@@ -65,7 +65,9 @@ Meteor.methods({
       receiverStatus: Meteor.userId() === newTask.receiver ? 'green' : 'yellow',
       location: '...',
       activity: [],
-      comments: []
+      comments: [],
+      status: 'open',
+      archived: false
     });
   },
   'tasks.remove' (taskId) {
@@ -137,8 +139,7 @@ Meteor.methods({
 
       Tasks.update(taskId, {
         $set: {
-          createdAt: new Date(moment(newTimeUTCString).format()),
-          updatedAt: new Date(),
+          eta: new Date(moment(newTimeUTCString).format()),
           activity: task.activity,
           authorStatus: newAuthorStatus,
           receiverStatus: newReceiverStatus
@@ -205,7 +206,7 @@ Meteor.methods({
       }
     });
   },
-  'tasks.updateStatuses' (taskId, status) {
+  'tasks.updateStatuses' (taskId, status, archive) {
     check(taskId, String);
     check(status, String);
 
@@ -221,13 +222,10 @@ Meteor.methods({
     var oldValue = task.authorId === Meteor.userId() ? task.authorStatus : task.receiverStatus;
 
     function verbalize(status) {
-      if ('green' === status) {
-        return 'Approved';
+      if (!archive) {
+        return 'green' === status ? 'Approved' : 'Under Consideration';
       }
-      if ('yellow' === status) {
-        return 'Under Consideration';
-      }
-      return 'Declined';
+      return ('green' === status ? 'Confirmed ': '') + task.status;
     }
 
     task.activity.push({
@@ -242,7 +240,8 @@ Meteor.methods({
       $set: {
         activity: task.activity,
         authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus
+        receiverStatus: newReceiverStatus,
+        archived: archive
       }
     });
   },
@@ -261,8 +260,36 @@ Meteor.methods({
     Tasks.update(taskId, {
       $set: {
         comments: task.comments,
-        authorStatus: 'yellow',
-        receiverStatus: 'yellow'
+        authorStatus: Meteor.userId() === task.authorId ? task.authorStatus : 'yellow',
+        receiverStatus: Meteor.userId() === task.receiverId ? task.receiverStatus : 'yellow',
+      }
+    });
+  },
+  'tasks.changeTaskStatus' (taskId, status) {
+    check(taskId, String);
+    check(status, String);
+
+    const task = Tasks.findOne(taskId);
+
+    function capitalize(status) {
+      return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+
+    task.activity.push({
+      actor: Meteor.userId(),
+      actorName: getName(Meteor.user()),
+      field: 'status',
+      oldValue: capitalize(task.status),
+      newValue: capitalize(status),
+      time: new Date()
+    });
+    Tasks.update(taskId, {
+      $set: {
+        activity: task.activity,
+        authorStatus: Meteor.userId() === task.authorId ? 'green' : 'yellow',
+        receiverStatus: Meteor.userId() === task.receiverId ? 'green' : 'yellow',
+        status: status,
+        archived: task.authorId === task.receiverId && status !== 'open'
       }
     });
   },

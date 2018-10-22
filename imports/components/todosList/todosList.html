@@ -105,6 +105,9 @@
               <tbody>
               <tr ng-repeat="task in todoList.tasks">
                 <td>
+                  <i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i>
+                </td>
+                <td>
                   {{task.time}}
                 </td>
                 <td>

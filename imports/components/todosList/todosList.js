@@ -15,8 +15,8 @@ export default class TodosListCtrl extends Controller {
 
     this.subscribe('tasks');
 
-	this.handleAllUsers = this.subscribe('allusers');
-	this.handleAllTaskPartners = this.subscribe('alltaskpartners');
+    this.handleAllUsers = this.subscribe('allusers');
+    this.handleAllTaskPartners = this.subscribe('alltaskpartners');
 
     this.hideCompleted = false;
 
@@ -53,8 +53,8 @@ export default class TodosListCtrl extends Controller {
           };
         }
 
-        return Tasks.find(selector, { sort: { createdAt: 1 } }).map(x => {
-          x.time = moment(x.createdAt).format("DD MMM h:mm a");
+        return Tasks.find(selector, { sort: { eta: 1 } }).map(x => {
+          x.time = moment(x.eta).format("DD MMM h:mm a");
 
           x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
           x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
@@ -131,6 +131,29 @@ export default class TodosListCtrl extends Controller {
     var fieldCtrl = controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
     fieldCtrl.$setPristine();
     fieldCtrl.$setUntouched();
+  }
+
+  getTaskStatusImage(task) {
+    if (Meteor.userId() === task.authorId && task.authorStatus === 'yellow' ||
+            Meteor.userId() === task.receiverId && task.receiverStatus === 'yellow') {
+              return 'look'; // requires user's attention
+            }
+    if (task.status === 'open') {
+      if (task.authorStatus === 'yellow' || task.receiverStatus === 'yellow') {
+        return 'timer'; // is blocking current user
+      }
+      if (task.eta < new Date()) {
+        return 'alarm'; // is overdue
+      }
+      return 'paper-plane'; // agreed upon and can be executed
+    }
+    if (task.status === 'done') {
+      return 'check'; // done
+    }
+    if (task.status === 'cancelled') {
+      return 'close-circle'; // cancelled
+    }
+    return 'science'; // unrecognized state
   }
 
 	showDatePicker() {
