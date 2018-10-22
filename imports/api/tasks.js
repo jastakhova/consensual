@@ -241,7 +241,7 @@ Meteor.methods({
         activity: task.activity,
         authorStatus: newAuthorStatus,
         receiverStatus: newReceiverStatus,
-        archived: archive
+        archived: archive || task.archived
       }
     });
   },
