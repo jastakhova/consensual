@@ -293,4 +293,29 @@ Meteor.methods({
       }
     });
   },
+  'tasks.dataMigration.67b1618851a9021478046c74b350c968f599c68b' () {
+
+      // 1. Renamed created --> eta
+      // 2. Added:
+      //            status: default 'open'
+      //            archived: default false
+
+      Tasks.updateMany({"eta": null}, {
+        $rename: {
+          'createdAt': 'eta'
+        }
+      });
+
+      Tasks.updateMany({"status": null}, {
+        $set: {
+          status: 'open'
+        }
+      });
+
+      Tasks.updateMany({"archived": null}, {
+        $set: {
+          archived: false
+        }
+      });
+    }
 });
