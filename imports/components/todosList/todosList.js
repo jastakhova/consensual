@@ -53,7 +53,7 @@ export default class TodosListCtrl extends Controller {
           };
         }
 
-        return Tasks.find(selector, { sort: { createdAt: -1 } }).map(x => {
+        return Tasks.find(selector, { sort: { createdAt: 1 } }).map(x => {
           x.time = moment(x.createdAt).format("DD MMM h:mm a");
 
           x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
