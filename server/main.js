@@ -1,9 +1,10 @@
 import { Meteor } from 'meteor/meteor';
+import { Tasks } from '../imports/api/tasks.js';
 
-Tasks = new Meteor.Collection('tasks');
 Migrations = [
   '67b1618851a9021478046c74b350c968f599c68b'
-]
+];
+
 Meteor.methods({
   'Migrations.67b1618851a9021478046c74b350c968f599c68b' () {
     // 1. Renamed created --> eta
@@ -29,7 +30,7 @@ Meteor.methods({
       }
     },{ multi: true });
   }
-})
+});
 
 // This only runs on the server
 if (Meteor.isServer) {
