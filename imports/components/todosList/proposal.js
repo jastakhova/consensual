@@ -42,20 +42,8 @@ export default class ProposalCtrl extends Controller {
             obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
           });
 
-          function compare(a, b) {
-            let comparison = 0;
-
-            if (a < b) {
-              comparison = 1;
-            } else if (b < a) {
-              comparison = -1;
-            }
-
-            return comparison;
-          }
-
           var recentStatusChangeActivity = foundTask.activity
-            .sort(function(record1, record2) {return compare(record1.time, record2.time);})
+            .sort(function(record1, record2) {return ProfileUtils.comparator(record2.time, record1.time);})
             .filter(function(record) {return record.field === 'status' && (record.newValue === 'Done' || record.newValue === 'Cancelled');});
           if (foundTask.status != 'open' && !foundTask.archived && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
             this.acknowledgeLabel = 'Acknowledge task status change to ' + foundTask.status;

@@ -12,6 +12,7 @@ export default class TodosListCtrl extends Controller {
   	super(...arguments);
 
   	this.scope = arguments[0];
+  	console.log(arguments);
 
     this.subscribe('tasks');
 
@@ -22,9 +23,32 @@ export default class TodosListCtrl extends Controller {
 
     this.proposingInProgress = false;
 
+//    this.sorts = [
+//      {name: "Default", groups: [
+//          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3},
+//          {name: "Needs attention", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.activity., task2.eta)}, limit: 5},
+//          {name: "Today", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: "eta", limit: 5},
+//        ]}
+//    ]
+
+    this.filters = [
+    {name: "All", selector: {archived: false}},
+    {name: "Open", selector: {status: "open"}},
+    {name: "To me", selector: {receiverId: Meteor.userId(), archived: false}},
+    {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}},
+    {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}},
+    {name: "Blocked", selector: {archived: false, $or: [{authorId: Meteor.userId(), authorStatus: "green", receiverStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "green", authorStatus: "yellow"}]}},
+    {name: "Done", selector: {status: "done", archived: false}},
+    {name: "Cancelled", selector: {status: "cancelled", archived: false}},
+    {name: "Archived", selector: {archived: true}},
+    ];
+
+    this.currentFilter = this.filters[0];
+
     this.helpers({
       tasks() {
-      	const selector = {};
+      	const selector = this.getReactively("currentFilter").selector;
+      	console.log(selector);
 
       	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
 
@@ -46,13 +70,6 @@ export default class TodosListCtrl extends Controller {
             return /^-{0,1}\d+$/.test(value);
         }
 
-        // If hide completed is checked, filter tasks
-        if (this.getReactively('hideCompleted')) {
-          selector.checked = {
-            $ne: true
-          };
-        }
-
         return Tasks.find(selector, { sort: { eta: 1 } }).map(x => {
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
@@ -72,6 +89,10 @@ export default class TodosListCtrl extends Controller {
         return Meteor.user();
       }
     })
+  }
+
+  applyFilter(filterToggle) {
+    this.currentFilter = filterToggle;
   }
 
   logout() {

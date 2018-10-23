@@ -54,3 +54,22 @@
 .ng-invalid-required-field.ng-touched {
     border: 1px solid red;
 }
+
+.btn-filter {
+  border-color: #9A9A9A !important;
+  border-width: 1px !important;
+  color: #9A9A9A !important;
+  margin-bottom: 10px !important;
+  margin-right: 10px !important;
+}
+
+.btn-filter:hover {
+  color: #1DC7EA !important;
+  border-color: #1DC7EA !important;
+}
+
+.btn-filter.active {
+  background-color: #1DC7EA !important;
+  border-color: #1DC7EA !important;
+  color: white !important;
+}

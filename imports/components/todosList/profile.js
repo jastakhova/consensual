@@ -14,6 +14,25 @@ var ProfileUtils = {
 			return 'assets/img/default-avatar.png';
 		}
 	},
+
+	comparator: function(a, b) {
+    let comparison = 0;
+
+    if (a > b) {
+      comparison = 1;
+    } else if (b > a) {
+      comparison = -1;
+    }
+
+    return comparison;
+  },
+
+  getLatestActivityTime: function(task) {
+    if (task.activity.length === 0) {
+      return null;
+    }
+    return task.activity.sort(function(x, y) {return comparator(y.time, x.time);})[0].time;
+  }
 };
 
 export default ProfileUtils;
