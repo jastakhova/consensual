@@ -292,30 +292,5 @@ Meteor.methods({
         archived: task.authorId === task.receiverId && status !== 'open'
       }
     });
-  },
-  'tasks.dataMigration.67b1618851a9021478046c74b350c968f599c68b' () {
-
-      // 1. Renamed created --> eta
-      // 2. Added:
-      //            status: default 'open'
-      //            archived: default false
-
-      Tasks.update({"eta": null}, {
-        $rename: {
-          'createdAt': 'eta'
-        }
-      });
-
-      Tasks.update({"status": null}, {
-        $set: {
-          status: 'open'
-        }
-      });
-
-      Tasks.update({"archived": null}, {
-        $set: {
-          archived: false
-        }
-      });
-    }
+  }
 });

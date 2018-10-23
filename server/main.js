@@ -1,10 +1,48 @@
 import { Meteor } from 'meteor/meteor';
 
-import '../imports/api/tasks.js';
+Tasks = new Meteor.Collection('tasks');
+Migrations = [
+  '67b1618851a9021478046c74b350c968f599c68b'
+]
+Meteor.methods({
+  'Migrations.67b1618851a9021478046c74b350c968f599c68b' () {
+    // 1. Renamed created --> eta
+    // 2. Added:
+    //            status: default 'open'
+    //            archived: default false
 
-Meteor.startup(() => {
-  // code to run on server at startup
-});
+    Tasks.update({"eta": null}, {
+      $rename: {
+        'createdAt': 'eta'
+      }
+    },{ multi: true });
+
+    Tasks.update({"status": null}, {
+      $set: {
+        status: 'open'
+      }
+    },{ multi: true });
+
+    Tasks.update({"archived": null}, {
+      $set: {
+        archived: false
+      }
+    },{ multi: true });
+  }
+})
+
+// This only runs on the server
+if (Meteor.isServer) {
+  // This only runs on startup
+  Meteor.startup(() => {
+    // Add DB migrations here
+    console.log('Running Migrations...');
+    for (let commit_id of Migrations) {
+      console.log(commit_id + '...');
+      Meteor.call('Migrations.' + commit_id);
+    }
+  });
+}
 
 //Package.onTest(function (api) {
 //  api.use('cultofcoders:mocha');

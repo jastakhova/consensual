@@ -178,12 +178,3 @@ if (Meteor.isCordova) {
 } else {
   angular.element(document).ready(onReady);
 }
-
-// This only runs on the server
-if (Meteor.isServer) {
-  // This only runs on startup
-  Meteor.startup(() => {
-    // Add DB migrations here
-    Meteor.call('tasks.dataMigration.67b1618851a9021478046c74b350c968f599c68b');
-  });
-}
