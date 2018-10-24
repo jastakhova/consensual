@@ -47,7 +47,6 @@ export default class TodosListCtrl extends Controller {
     this.helpers({
       tasks() {
       	const selector = this.getReactively("currentFilter").selector;
-      	console.log(selector);
 
       	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
 
