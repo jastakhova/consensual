@@ -120,8 +120,6 @@ consensual.directive('requiredField', function() {
   return {
     require: 'ngModel',
     link: function(scope, element, attr, mCtrl) {
-      // The following line is necessary to disable the submit button by default
-      mCtrl.$setValidity('required-field', false);
       function requiredField(value) {
         if (value !== "") {
           mCtrl.$setValidity('required-field', true);

@@ -29,7 +29,7 @@
 
     <div class="content">
       <div class="container-fluid">
-
+        <form name="editProposalForm">
         <div class="row">
           <div class="col-md-2 center">
             <div class="header-title">Author</div>
@@ -59,18 +59,18 @@
                 <label>Date</label>
                 <div class="form-group" ng-click="proposal.showDatePicker()">
                   <div class="input-group">
-                    <input type="text" class="form-control" ng-model="proposal.selectedDate" readonly>
+                    <input type="text" class="form-control" ng-model="proposal.selectedDate" readonly name="editDate" required-field>
                     <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                   </div>
                 </div>
                 <label>Time</label>
                 <div class="form-group" ng-click="proposal.showTimePicker()">
                   <div class="input-group">
-                    <input type="text" class="form-control" ng-model="proposal.selectedTime" readonly>
+                    <input type="text" class="form-control" ng-model="proposal.selectedTime" readonly name="editTime" required-field>
                     <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
                   </div>
                 </div>
-                <button type="submit" ng-click="proposal.saveTime()" class="btn btn-info btn-fill">Save</button>
+                <button ng-disabled="editProposalForm.editDate.$invalid || editProposalForm.editTime.$invalid" type="submit" ng-click="proposal.saveTime()" class="btn btn-info btn-fill">Save</button>
               </div>
             </div>
             <div class="header-title" style="margin-top: 20px">Location:</div>
@@ -81,8 +81,8 @@
               </button>
             </div>
             <div ng-show="proposal.editingLocation">
-              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location">
-              <button type="submit" ng-click="proposal.saveLocation(proposal.data.location)" class="btn btn-info btn-fill">Save</button>
+              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field>
+              <button ng-disabled="editProposalForm.editLocation.$invalid" type="submit" ng-click="proposal.saveLocation(proposal.data.location)" class="btn btn-info btn-fill">Save</button>
             </div>
           </div>
           <div class="col-md-2">
@@ -103,13 +103,13 @@
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
-            <textarea style="padding-left: 30px;" ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text">
+            <textarea style="padding-left: 30px;" ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
             </textarea>
           </div>
           <button ng-show="!proposal.editingDescription" rel="tooltip" title="Edit" ng-click="proposal.flipDescriptionEditingStatus()" class="btn btn-danger btn-simple btn-xs">
             <i class="fa fa-edit"></i>
           </button>
-          <button ng-show="proposal.editingDescription" type="submit" ng-click="proposal.saveDescription(proposal.data.text)" class="btn btn-info btn-fill">Save</button>
+          <button ng-show="proposal.editingDescription" ng-disabled="editProposalForm.editDescription.$invalid" type="submit" ng-click="proposal.saveDescription(proposal.data.text)" class="btn btn-info btn-fill">Save</button>
         </div>
         <div class="row" ng-show="proposal.currentUserIsInDoubt" style="margin-bottom: 20px; margin-left: 2px">
           <button type="submit" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">{{proposal.acknowledgeLabel}}</button>
@@ -147,12 +147,13 @@
             </div>
             <hr style="margin-top: 10px">
             <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px">
-              <textarea placeholder="Enter your comment..." style="padding-left: 30px;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment">
+              <textarea placeholder="Enter your comment..." style="padding-left: 30px;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field>
               </textarea>
-              <button type="submit" ng-click="proposal.addComment()" ng-disabled="proposal.comment.length === 0" class="btn btn-info btn-fill pull-right" style="margin-bottom: 15px">Add comment</button>
+              <button ng-disabled="editProposalForm.addComment.$invalid" type="submit" ng-click="proposal.addComment()" class="btn btn-info btn-fill pull-right" style="margin-bottom: 15px">Add comment</button>
             </div>
           </div>
         </div>
+        </form>
       </div>
     </div>
 </ion-view>
