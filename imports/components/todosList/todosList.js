@@ -12,7 +12,6 @@ export default class TodosListCtrl extends Controller {
   	super(...arguments);
 
   	this.scope = arguments[0];
-  	console.log(arguments);
 
     this.subscribe('tasks');
 
