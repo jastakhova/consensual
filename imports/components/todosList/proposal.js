@@ -182,7 +182,14 @@ export default class ProposalCtrl extends Controller {
   addComment() {
     Meteor.call('tasks.addComment', this.proposalId, this.comment);
     this.comment = '';
+    this.setPristineAndUntouched(this, 'addComment');
   }
+
+  setPristineAndUntouched(controller, fieldName) {
+      var fieldCtrl = controller.$scope.editProposalForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
+      fieldCtrl.$setPristine();
+      fieldCtrl.$setUntouched();
+    }
 }
 
 ProposalCtrl.$name = 'ProposalCtrl';
