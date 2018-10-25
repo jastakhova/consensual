@@ -135,6 +135,10 @@
               <span class="title" style="padding-left:5px">Comments</span>
               <hr style="margin-top: 10px">
             </div>
+            <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px;text-align: right;">
+              <textarea placeholder="Enter your comment..." style="padding-left: 30px; text-align: right;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field></textarea>
+              <button ng-disabled="editProposalForm.addComment.$pristine || editProposalForm.addComment.$invalid" type="submit" ng-click="proposal.addComment()" class="btn btn-info btn-fill" style="margin-bottom: 15px;">Add comment</button>
+            </div>
             <div class="content pre-scrollable" ng-show="proposal.commentsShowed">
               <div ng-repeat="comment in proposal.data.comments | orderBy:'-time'">
                 <div class="alert alert-info col-md-8 col-md-offset-{{comment.author === proposal.currentUser ? '4' : '0'}}" style="margin-bottom: 0px; {{comment.author === proposal.currentUser ? '' : 'background-color: #4091e2'}}">
@@ -144,12 +148,6 @@
                   {{comment.formattedTime}}
                 </div>
               </div>
-            </div>
-            <hr style="margin-top: 10px">
-            <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px">
-              <textarea placeholder="Enter your comment..." style="padding-left: 30px;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field>
-              </textarea>
-              <button ng-disabled="editProposalForm.addComment.$pristine || editProposalForm.addComment.$invalid" type="submit" ng-click="proposal.addComment()" class="btn btn-info btn-fill pull-right" style="margin-bottom: 15px">Add comment</button>
             </div>
           </div>
         </div>
