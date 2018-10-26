@@ -110,7 +110,7 @@
               <tbody>
               <tr ng-repeat="task in todoList.tasks">
                 <td>
-                  <i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i>
+                  <a href="#!/tab/proposal/{{task._id}}"><i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i></a>
                 </td>
                 <td>
                   {{task.time}}
@@ -127,11 +127,6 @@
                   {{task.receiverName}}
                 </td>
                 <td><a href="#!/tab/proposal/{{task._id}}">{{task.text}}</a></td>
-                <td class="td-actions text-right">
-                  <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                    <a href="#!/tab/proposal/{{task._id}}"><i class="fa fa-edit"></i></a>
-                  </button>
-                </td>
               </tr>
               </tbody>
             </table>
