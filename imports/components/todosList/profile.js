@@ -31,7 +31,7 @@ var ProfileUtils = {
     if (task.activity.length === 0) {
       return null;
     }
-    return task.activity.sort(function(x, y) {return comparator(y.time, x.time);})[0].time;
+    return task.activity.sort(function(x, y) {return ProfileUtils.comparator(y.time, x.time);})[0].time;
   }
 };
 
