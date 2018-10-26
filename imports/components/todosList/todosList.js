@@ -22,13 +22,31 @@ export default class TodosListCtrl extends Controller {
 
     this.proposingInProgress = false;
 
-//    this.sorts = [
-//      {name: "Default", groups: [
-//          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3},
-//          {name: "Needs attention", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.activity., task2.eta)}, limit: 5},
-//          {name: "Today", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: "eta", limit: 5},
-//        ]}
-//    ]
+    // TODO: align with the client timezone
+    const nextMidnight = new Date(moment().format());
+    nextMidnight.setHours(24, 0, 0, 0);
+    const prevMidnight = new Date(moment().format());
+    prevMidnight.setHours(0, 0, 0, 0);
+
+    this.sorts = [
+      {name: "Default", groups: [
+          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3},
+          {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5},
+          {name: "Today", selector: {status: "open", eta: {$lt: nextMidnight, $gt: prevMidnight}}, sort: function(task1, task2) {
+            if (task1.receiverId === Meteor.userId() && task2.receiverId === Meteor.userId() ||
+                task1.receiverId !== Meteor.userId() && task2.receiverId !== Meteor.userId()) {
+              return ProfileUtils.comparator(task1.eta, task2.eta);
+            }
+            return task1.receiverId === Meteor.userId() ? -1 : 1;
+          }},
+        ], configuration: {sort: "eta", grouping: function(task) {return "Tasks";}, groupingName: function(group) {return group;}}},
+      {name: "By Time", configuration: {sort: "eta", grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();}, groupingName: function(groupField) {
+        var d = new Date();
+        d.setTime(groupField);
+        return moment(d).format("DD MMM");
+      }}},
+      {name: "By Assignee", configuration: {sort: "receiverId", grouping: function(task) {return (task.receiverId === Meteor.userId()? "1" : "2") + task.receiverName;}, groupingName: function(group) {return group.slice(1);}}},
+    ];
 
     this.filters = [
     {name: "All", selector: {archived: false}},
@@ -37,16 +55,18 @@ export default class TodosListCtrl extends Controller {
     {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}},
     {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}},
     {name: "Blocked", selector: {archived: false, $or: [{authorId: Meteor.userId(), authorStatus: "green", receiverStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "green", authorStatus: "yellow"}]}},
-    {name: "Done", selector: {status: "done", archived: false}},
-    {name: "Cancelled", selector: {status: "cancelled", archived: false}},
+    {name: "Done", selector: {status: "done"}},
+    {name: "Cancelled", selector: {status: "cancelled"}},
     {name: "Archived", selector: {archived: true}},
     ];
 
+    this.currentSort = this.sorts[0];
     this.currentFilter = this.filters[0];
 
     this.helpers({
       tasks() {
-      	const selector = this.getReactively("currentFilter").selector;
+      	const selector = this.getReactively("currentFilter");
+      	const sortMethod = this.getReactively("currentSort");
 
       	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
 
@@ -68,13 +88,27 @@ export default class TodosListCtrl extends Controller {
             return /^-{0,1}\d+$/.test(value);
         }
 
-        return Tasks.find(selector, { sort: { eta: 1 } }).map(x => {
+        function prepareTask(x) {
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
           x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
           x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
           return x;
-        });
+        }
+
+        if (sortMethod.groups && selector.name === this.filters[0].name) {
+          return sortMethod.groups.map(sortGroup => {
+            var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
+            return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length};
+            }).filter(group => group.size > 0);
+        } else {
+          var sortingField = sortMethod.configuration.sort;
+          var tasks = Tasks.find(selector.selector, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
+          var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
+          return Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
+            return {name: sortMethod.configuration.groupingName(groupKey), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
+          });
+        }
       },
       incompleteCount() {
         return Tasks.find({
@@ -87,6 +121,10 @@ export default class TodosListCtrl extends Controller {
         return Meteor.user();
       }
     })
+  }
+
+  selectSort(sortToggle) {
+    this.currentSort = sortToggle;
   }
 
   applyFilter(filterToggle) {

@@ -128,6 +128,7 @@ tmeasday:check-npm-versions@0.1.1
 tmeasday:test-reporter-helpers@0.2.1
 tracker@1.2.0
 tsega:bootstrap3-datetimepicker@4.17.37_1
+twbs:bootstrap@3.3.5
 ui@1.0.13
 underscore@1.0.10
 url@1.2.0

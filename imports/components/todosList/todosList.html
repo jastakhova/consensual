@@ -97,18 +97,27 @@
       <button ng-repeat="filterToggle in todoList.filters" style="border-color: #9A9A9A; border-width: 1px; color: #9A9A9A; margin-bottom: 10px; margin-right: 10px" class="btn btn-round btn-social btn-outline btn-filter {{todoList.currentFilter.name === filterToggle.name ? 'active': ''}}" ng-click="todoList.applyFilter(filterToggle)">
         {{filterToggle.name}}
       </button>
+
+      <div class="dropdown" style="float: right !important;">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sort: {{todoList.currentSort.name}}
+          <span style="margin-left: 10px;" class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a ng-repeat="sortToggle in todoList.sorts" style="cursor: pointer;" ng-click="todoList.selectSort(sortToggle)">{{sortToggle.name}}</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="row">
+    <div ng-repeat="taskList in todoList.tasks" class="row">
       <div class="card ">
         <div class="header">
-          <h4 class="title">Tasks</h4>
-          <p class="category">Backend development</p>
+          <h4 class="title">{{taskList.name}}</h4>
         </div>
         <div class="content">
           <div class="table-full-width">
             <table class="table">
               <tbody>
-              <tr ng-repeat="task in todoList.tasks">
+              <tr ng-repeat="task in taskList.tasks">
                 <td>
                   <a href="#!/tab/proposal/{{task._id}}"><i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i></a>
                 </td>
@@ -130,13 +139,6 @@
               </tr>
               </tbody>
             </table>
-          </div>
-
-          <div class="footer">
-            <hr>
-            <div class="stats">
-              <i class="fa fa-history"></i> Updated 3 minutes ago
-            </div>
           </div>
         </div>
       </div>

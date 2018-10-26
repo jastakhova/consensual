@@ -11,6 +11,8 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 
 ## TODO
 - Ordering of tasks by time, status, etc (Yulia)
+- Use limit to show/hide extra tasks from preset groups
+- sort and filter should propagate to url to participate in the browser history
 - Emails and/or notifications about status changes
 - Show error message on proposal page if task is not found
 - Deal with side menu on the left
@@ -36,6 +38,7 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 - Comments block CSS doesn't look nice when there is no comments
 - Bring adding comment block higher than actual comments
 - It's not obvious what are you about to approve
+- Poll for new FB friend images without requiring logout/login.
 
 ## Bugs
 - Cannot read property 'services' of undefined at Object.picture on Proposal page. How to reproduce this?
