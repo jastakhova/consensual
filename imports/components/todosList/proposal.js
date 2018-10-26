@@ -134,8 +134,11 @@ export default class ProposalCtrl extends Controller {
         format: 'MM-dd-yyyy',
         default: this.selectedDate
       };
+      var config = {
+        shortDay: ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa']
+      };
       var controller = this;
-      var datePicker = new DateTimePicker.Date(options, {})
+      var datePicker = new DateTimePicker.Date(options, config)
       datePicker.on('selected', function (formatDate, now) {
         controller.selectedDate = formatDate;
         controller.$scope.$apply();

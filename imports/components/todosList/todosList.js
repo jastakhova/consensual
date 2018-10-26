@@ -181,8 +181,12 @@ export default class TodosListCtrl extends Controller {
 				format: 'MM-dd-yyyy',
 				default: current
       };
+      var config = {
+        shortDay: ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa']
+      };
+
       var controller = this;
-  		var timePicker = new DateTimePicker.Date(options, {})
+  		var timePicker = new DateTimePicker.Date(options, config)
   		timePicker.on('selected', function (formatTime, now) {
   			controller.newDate = formatTime;
   			controller.runParsers(controller, 'newDate', controller.newDate);
