@@ -73,3 +73,7 @@
   border-color: #1DC7EA !important;
   color: white !important;
 }
+
+.time-picker-container .picker-active {
+  pointer-events: auto !important;
+}
