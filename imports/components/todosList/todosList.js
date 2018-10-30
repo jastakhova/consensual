@@ -27,10 +27,22 @@ export default class TodosListCtrl extends Controller {
     const prevMidnight = new Date(moment().format());
     prevMidnight.setHours(0, 0, 0, 0);
 
+    this.filters = [
+        {name: "All", selector: {archived: false}},
+        {name: "Open", selector: {status: "open"}},
+        {name: "To me", selector: {receiverId: Meteor.userId(), archived: false}},
+        {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}},
+        {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}},
+        {name: "Blocked", selector: {archived: false, $or: [{authorId: Meteor.userId(), authorStatus: "green", receiverStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "green", authorStatus: "yellow"}]}},
+        {name: "Done", selector: {status: "done"}},
+        {name: "Cancelled", selector: {status: "cancelled"}},
+        {name: "Archived", selector: {archived: true}},
+        ];
+
     this.sorts = [
       {name: "Default", groups: [
-          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3},
-          {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5},
+          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[4]},
+          {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5, appliedFilter: this.filters[3]},
           {name: "Today", selector: {status: "open", eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
             if (task1.receiverId === Meteor.userId() && task2.receiverId === Meteor.userId() ||
                 task1.receiverId !== Meteor.userId() && task2.receiverId !== Meteor.userId()) {
@@ -45,18 +57,6 @@ export default class TodosListCtrl extends Controller {
         return moment(d).format("DD MMM");
       }}},
       {name: "By Assignee", configuration: {sort: "receiverId", grouping: function(task) {return (task.receiverId === Meteor.userId()? "1" : "2") + task.receiverName;}, groupingName: function(group) {return group.slice(1);}}},
-    ];
-
-    this.filters = [
-    {name: "All", selector: {archived: false}},
-    {name: "Open", selector: {status: "open"}},
-    {name: "To me", selector: {receiverId: Meteor.userId(), archived: false}},
-    {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}},
-    {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}},
-    {name: "Blocked", selector: {archived: false, $or: [{authorId: Meteor.userId(), authorStatus: "green", receiverStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "green", authorStatus: "yellow"}]}},
-    {name: "Done", selector: {status: "done"}},
-    {name: "Cancelled", selector: {status: "cancelled"}},
-    {name: "Archived", selector: {archived: true}},
     ];
 
     this.currentSort = this.sorts[0];
@@ -102,7 +102,7 @@ export default class TodosListCtrl extends Controller {
         if (sortMethod.groups && selector.name === this.filters[0].name) {
           var groups = sortMethod.groups.map(sortGroup => {
             var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
-            return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length};
+            return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length, sliced: tasks.length > sortGroup.limit, appliedFilter: sortGroup.appliedFilter};
             }).filter(group => group.tasks.length > 0);
           if (groups.length > 0) {
             return groups;
