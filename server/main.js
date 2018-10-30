@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../imports/api/tasks.js';
 
 Migrations = [
+  '1539727846000',
   '1540319678000',
   '1540929490000'
 ];
