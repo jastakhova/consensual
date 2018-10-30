@@ -2,11 +2,12 @@ import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../imports/api/tasks.js';
 
 Migrations = [
-  '67b1618851a9021478046c74b350c968f599c68b'
+  '1540319678000',
+  '1540929490000'
 ];
 
 Meteor.methods({
-  'Migrations.67b1618851a9021478046c74b350c968f599c68b' () {
+  'Migrations.1540319678000' () {
     // 1. Renamed created --> eta
     // 2. Added:
     //            status: default 'open'
@@ -29,6 +30,35 @@ Meteor.methods({
         archived: false
       }
     },{ multi: true });
+  },
+  'Migrations.1540929490000' () {
+    // 1. Converted eta from ISODate --> Timestamp
+    // 2. Converted activity.time ISODate --> Timestamp
+
+    tasks = Tasks.find();
+
+    for (let task of tasks) {
+      var newEta = task.eta instanceof Date ? task.eta.getTime() : task.eta;
+
+      for (let action of task.activity) {
+        if (action.time instanceof Date) {
+          action.time = action.time.getTime();
+        }
+        if (action.oldValue instanceof Date) {
+          action.oldValue = action.oldValue.getTime();
+        }
+        if (action.newValue instanceof Date) {
+          action.newValue = action.newValue.getTime();
+        }
+      }
+
+      Tasks.update({_id: task._id}, {
+        $set: {
+          eta: newEta,
+          activity: task.activity
+        }
+      });
+    }
   }
 });
 

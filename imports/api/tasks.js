@@ -56,7 +56,7 @@ Meteor.methods({
 
     Tasks.insert({
       text: newTask.task,
-      eta: new Date(moment(newTask.time).format()),
+      eta: new Date(moment(newTask.time).format()).getTime(),
       authorId: Meteor.userId(),
       authorName: getName(Meteor.user()),
       receiverId: newTask.receiver,
@@ -132,14 +132,14 @@ Meteor.methods({
         actor: Meteor.userId(),
         actorName: getName(Meteor.user()),
         field: 'time',
-        oldValue: new Date(moment(oldTimeUTCString).format()),
-        newValue: new Date(moment(newTimeUTCString).format()),
-        time: new Date()
+        oldValue: new Date(moment(oldTimeUTCString).format()).getTime(),
+        newValue: new Date(moment(newTimeUTCString).format()).getTime(),
+        time: new Date().getTime()
       });
 
       Tasks.update(taskId, {
         $set: {
-          eta: new Date(moment(newTimeUTCString).format()),
+          eta: new Date(moment(newTimeUTCString).format()).getTime(),
           activity: task.activity,
           authorStatus: newAuthorStatus,
           receiverStatus: newReceiverStatus
@@ -166,7 +166,7 @@ Meteor.methods({
           field: 'location',
           oldValue: task.location,
           newValue: newLocation,
-          time: new Date()
+          time: new Date().getTime()
         });
     Tasks.update(taskId, {
       $set: {
@@ -195,7 +195,7 @@ Meteor.methods({
           field: 'description',
           oldValue: task.text,
           newValue: newDescription,
-          time: new Date()
+          time: new Date().getTime()
         });
     Tasks.update(taskId, {
       $set: {
@@ -234,7 +234,7 @@ Meteor.methods({
           field: 'status',
           oldValue: verbalize(oldValue),
           newValue: verbalize(status),
-          time: new Date()
+          time: new Date().getTime()
         });
     Tasks.update(taskId, {
       $set: {
@@ -255,7 +255,7 @@ Meteor.methods({
           author: Meteor.userId(),
           authorName: getName(Meteor.user()),
           text: text,
-          time: new Date()
+          time: new Date().getTime()
         });
     Tasks.update(taskId, {
       $set: {
@@ -281,7 +281,7 @@ Meteor.methods({
       field: 'status',
       oldValue: capitalize(task.status),
       newValue: capitalize(status),
-      time: new Date()
+      time: new Date().getTime()
     });
     Tasks.update(taskId, {
       $set: {

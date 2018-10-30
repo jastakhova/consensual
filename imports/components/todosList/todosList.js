@@ -30,7 +30,7 @@ export default class TodosListCtrl extends Controller {
 
     this.sorts = [
       {name: "Default", groups: [
-          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3},
+          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3},
           {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5},
           {name: "Today", selector: {status: "open", eta: {$lt: nextMidnight, $gt: prevMidnight}}, sort: function(task1, task2) {
             if (task1.receiverId === Meteor.userId() && task2.receiverId === Meteor.userId() ||
@@ -53,7 +53,7 @@ export default class TodosListCtrl extends Controller {
     {name: "Open", selector: {status: "open"}},
     {name: "To me", selector: {receiverId: Meteor.userId(), archived: false}},
     {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}},
-    {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format())}}},
+    {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}},
     {name: "Blocked", selector: {archived: false, $or: [{authorId: Meteor.userId(), authorStatus: "green", receiverStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "green", authorStatus: "yellow"}]}},
     {name: "Done", selector: {status: "done"}},
     {name: "Cancelled", selector: {status: "cancelled"}},
@@ -142,7 +142,7 @@ export default class TodosListCtrl extends Controller {
   addTask(newTask) {
       Meteor.call('tasks.insert', {
       	task: newTask,
-      	time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format(),
+      	time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format('x'),
       	receiver: $('.typeahead').typeahead('getActive').id
       	});
 
