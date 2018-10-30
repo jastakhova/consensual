@@ -7,6 +7,28 @@ Migrations = [
 ];
 
 Meteor.methods({
+  'Migrations.1539727846000' () {
+    // 1. Added:
+    //            activity: default []
+
+    Tasks.update({"activity": null}, {
+      $set: {
+        activity: []
+      }
+    },{ multi: true });
+
+    Tasks.update({"status": null}, {
+      $set: {
+        status: 'open'
+      }
+    },{ multi: true });
+
+    Tasks.update({"archived": null}, {
+      $set: {
+        archived: false
+      }
+    },{ multi: true });
+  },
   'Migrations.1540319678000' () {
     // 1. Renamed created --> eta
     // 2. Added:
