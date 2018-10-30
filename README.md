@@ -10,7 +10,6 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
 
 ## TODO
-- Ordering of tasks by time, status, etc (Yulia)
 - Use limit to show/hide extra tasks from preset groups
 - sort and filter should propagate to url to participate in the browser history
 - Emails and/or notifications about status changes

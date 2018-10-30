@@ -94,7 +94,7 @@
       </div>
     </div>
     <div class="row">
-      <button ng-repeat="filterToggle in todoList.filters" style="border-color: #9A9A9A; border-width: 1px; color: #9A9A9A; margin-bottom: 10px; margin-right: 10px" class="btn btn-round btn-social btn-outline btn-filter {{todoList.currentFilter.name === filterToggle.name ? 'active': ''}}" ng-click="todoList.applyFilter(filterToggle)">
+      <button ng-repeat="filterToggle in todoList.filters" style="border-color: #9A9A9A; border-width: 1px; color: #9A9A9A; margin-bottom: 10px; margin-right: 10px" class="btn btn-round btn-social btn-outline btn-filter {{todoList.currentFilter.name === filterToggle.name ? 'active': ''}}" ng-click="todoList.applyFilter(filterToggle)" ng-show="filterToggle.name !== 'All'">
         {{filterToggle.name}}
       </button>
 
