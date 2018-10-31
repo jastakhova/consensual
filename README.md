@@ -12,8 +12,7 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 ## TODO
 - Validate receiver on add proposal form (disable submit) (Day) **Work In Progress**
 - Invalid fields should be highlighted (including when they have focus) (Day)
-- Sort and filter should propagate to url to participate in the browser history (Yulia) **Work In Progress**
-- Emails about status changes
+- Emails about status changes (Yulia) ** Work In Progress**
 - Show error message on proposal page if task is not found
 - Prettify mobile version
 - Make responsive layouts render properly on mobile devices (DNS and SSL issue; i.e. domain cloaking)

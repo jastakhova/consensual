@@ -59,8 +59,11 @@ export default class TodosListCtrl extends Controller {
       {name: "By Assignee", configuration: {sort: "receiverId", grouping: function(task) {return (task.receiverId === Meteor.userId()? "1" : "2") + task.receiverName;}, groupingName: function(group) {return group.slice(1);}}},
     ];
 
-    this.currentSort = this.sorts[0];
-    this.currentFilter = this.filters[0];
+    var requestedSort = this.sorts.filter(s => s.name === this.$state.params.group);
+    var requestedFilter = this.filters.filter(f => f.name === this.$state.params.filter);
+
+    this.currentSort = requestedSort.length > 0 ? requestedSort[0] : this.sorts[0];
+    this.currentFilter = requestedFilter.length > 0 ? requestedFilter[0] : this.filters[0];
 
     this.helpers({
       tasks() {
@@ -134,6 +137,7 @@ export default class TodosListCtrl extends Controller {
 
   selectSort(sortToggle) {
     this.currentSort = sortToggle;
+    this.$state.go('tab.todo', {'filter': this.currentFilter.name, 'group' : sortToggle.name});
   }
 
   applyFilter(filterToggle) {
@@ -141,6 +145,7 @@ export default class TodosListCtrl extends Controller {
       filterToggle = this.filters[0];
     }
     this.currentFilter = filterToggle;
+    this.$state.go('tab.todo', {'filter': filterToggle.name, 'group' : this.currentSort.name});
   }
 
   logout() {
@@ -273,3 +278,4 @@ export default class TodosListCtrl extends Controller {
 }
 
 TodosListCtrl.$name = 'TodosListCtrl';
+TodosListCtrl.$inject = ['$state'];
