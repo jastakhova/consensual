@@ -3,6 +3,7 @@ import { Tasks } from '../imports/api/tasks.js';
 
 Migrations = [
   '1539727846000',
+  '1540240902000',
   '1540319678000',
   '1540929490000'
 ];
@@ -15,6 +16,16 @@ Meteor.methods({
     Tasks.update({"activity": null}, {
       $set: {
         activity: []
+      }
+    },{ multi: true });
+  },
+  'Migrations.1540240902000' () {
+    // 1. Added:
+    //            comments: default []
+
+    Tasks.update({"comments": null}, {
+      $set: {
+        comments: []
       }
     },{ multi: true });
   },
