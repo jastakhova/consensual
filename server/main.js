@@ -17,18 +17,6 @@ Meteor.methods({
         activity: []
       }
     },{ multi: true });
-
-    Tasks.update({"status": null}, {
-      $set: {
-        status: 'open'
-      }
-    },{ multi: true });
-
-    Tasks.update({"archived": null}, {
-      $set: {
-        archived: false
-      }
-    },{ multi: true });
   },
   'Migrations.1540319678000' () {
     // 1. Renamed created --> eta
@@ -57,11 +45,15 @@ Meteor.methods({
   'Migrations.1540929490000' () {
     // 1. Converted eta from ISODate --> Timestamp
     // 2. Converted activity.time ISODate --> Timestamp
+    // 3. Converted comments.time ISODate --> Timestamp
 
     tasks = Tasks.find();
 
     for (let task of tasks) {
-      var newEta = task.eta instanceof Date ? task.eta.getTime() : task.eta;
+
+      if (task.eta instanceof Date) {
+        task.eta = task.eta.getTime();
+      }
 
       for (let action of task.activity) {
         if (action.time instanceof Date) {
@@ -75,10 +67,17 @@ Meteor.methods({
         }
       }
 
+      for (let comment of task.comments) {
+        if (comment.time instanceof Date) {
+          comment.time = comment.time.getTime();
+        }
+      }
+
       Tasks.update({_id: task._id}, {
         $set: {
-          eta: newEta,
-          activity: task.activity
+          eta: task.eta,
+          activity: task.activity,
+          comments: task.comments
         }
       });
     }
