@@ -10,18 +10,21 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
 
 ## TODO
-- sort and filter should propagate to url to participate in the browser history
-- Emails and/or notifications about status changes
+- Validate receiver on add proposal form (disable submit) (Day) **Work In Progress**
+- Invalid fields should be highlighted (including when they have focus) (Day)
+- Sort and filter should propagate to url to participate in the browser history (Yulia) **Work In Progress**
+- Emails about status changes
 - Show error message on proposal page if task is not found
-- Deal with side menu on the left
+- Prettify mobile version
 - Make responsive layouts render properly on mobile devices (DNS and SSL issue; i.e. domain cloaking)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above)
-- Add user profile page (low priority)
 - Author can reassign proposal to new receiver
 - Integration with calendar
+- Integration with Google Calendar
+- Notifications in mobile version
+- Add user profile page (low priority)
 
 ## Known issues
-- Handling input errors for add proposal form (disable submit) (Day)
 - Error notifications on add, delete actions (show alert)
 - Hamburger menu in upper right of mobile view does nothing. What should it do?
 - You need to fiddle with the controls to select the same hour as previously selected in the datetime picker
@@ -105,4 +108,5 @@ $ sudo node main.js
 ```
 meteor mongo
 >> db.<table>.find() - show the whole table
+>> db.<table>.find().pretty() - you can make it pretty
 ```
