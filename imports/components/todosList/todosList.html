@@ -56,8 +56,8 @@
             <div class="row">
               <div class="col-md-5">
                 <div class="form-group">
-                  <label>Receiver</label>
-                  <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" autocomplete="off" required-field>
+                  <label>Receiver</label><input name="autocompleteOff" style="visibility:hidden;">
+                  <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" autocomplete="off" required-field contacts-only>
                 </div>
               </div>
               <div class="col-md-3">
@@ -84,7 +84,7 @@
               </div>
 
               <div class="col-md-2">
-                <button style="margin-top:25px" type="submit" onclick="this.focus();" class="btn btn-info btn-fill pull-right" ng-disabled="addTaskForm.$pristine || addTaskForm.newTask.$invalid || addTaskForm.newReceiver.$invalid || addTaskForm.newDate.$invalid || addTaskForm.newTime.$invalid">Send the proposal</button>
+                <button style="margin-top:25px" type="submit" onclick="this.focus();" class="btn btn-info btn-fill pull-right" ng-disabled="addTaskForm.newTask.$pristine || addTaskForm.newTask.$invalid || addTaskForm.newReceiver.$pristine || addTaskForm.newReceiver.$invalid || addTaskForm.newDate.$pristine  || addTaskForm.newDate.$invalid || addTaskForm.newTime.$pristine || addTaskForm.newTime.$invalid">Send the proposal</button>
               </div>
             </div>
 

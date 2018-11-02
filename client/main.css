@@ -51,7 +51,7 @@
     min-height: calc(100% - 123px);
 }
 
-.ng-invalid-required-field.ng-touched {
+.ng-invalid.ng-touched {
     border: 1px solid red;
 }
 

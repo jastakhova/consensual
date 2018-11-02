@@ -10,14 +10,12 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
 
 ## TODO
-- Validate receiver on add proposal form (disable submit) (Day) **Work In Progress**
-- Invalid fields should be highlighted (including when they have focus) (Day)
 - Emails about status changes (Yulia) ** Work In Progress**
 - Show error message on proposal page if task is not found
 - Prettify mobile version
 - Make responsive layouts render properly on mobile devices (DNS and SSL issue; i.e. domain cloaking)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above)
-- Author can reassign proposal to new receiver
+- Author can reassign proposal to new receiver (Day) **Work In Progress**
 - Integration with calendar
 - Integration with Google Calendar
 - Notifications in mobile version
@@ -26,30 +24,30 @@ Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-das
 ## Known issues
 - Error notifications on add, delete actions (show alert)
 - Hamburger menu in upper right of mobile view does nothing. What should it do?
-- You need to fiddle with the controls to select the same hour as previously selected in the datetime picker
 - Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
 - Date should not wrap...and there should be a min width for the date picker
 - Date picker sometimes freezes (not sure how to reproduce)
 - Description field should be taller on web (not sure how it is on mobile)
 - I want to be able to hit enter for a newline
-- Date default is not being set properly. Should be current value or now.
 - Proposal description shouldn't be a disabled textarea
 - Activity log doesn't open when new record appears from other person
 - Comments block CSS doesn't look nice when there is no comments
 - Bring adding comment block higher than actual comments
 - It's not obvious what are you about to approve
 - Poll for new FB friend images without requiring logout/login.
+- If you mouseover a name in the receiver typeahead, but don't select it, the value is put in the input, but the model isn't validated
 
 ## Bugs
 - Cannot read property 'services' of undefined at Object.picture on Proposal page. How to reproduce this?
 
+## Ideas for future
+- Description field should accept markdown
+- Ability to mark tasks as 'in progress' (related to having start and end dates).
+
 ## Mysteries
 - What is happening with server vs. client time, and in what context are collection methods executed?
 
-## Ideas for future
-- Description field should accept markdown
-
-## Development
+# Dev Setup
 
 ### ENV
 ```

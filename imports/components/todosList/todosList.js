@@ -82,12 +82,13 @@ export default class TodosListCtrl extends Controller {
 					Object.keys(id2user).forEach(function(key) {
 							suggest[suggestSize++] = {id: key, name: (id2user[key].profile ? id2user[key].profile.name : id2user[key].username)};
 					});
+					Meteor.settings.public.contacts = suggest;
 					return suggest;
         }
 
         var suggest = getSuggest();
         if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
-          $(".typeahead").typeahead({ source: suggest});
+          $(".typeahead").typeahead({ source: suggest, autoSelect: false});
         }
 
         function isNumeric(value) {
@@ -166,17 +167,17 @@ export default class TodosListCtrl extends Controller {
       // Clear form
 
       this.newTask = '';
-      this.setPristineAndUntouched(this, 'newTask');
+      this.setUntouchedAndPristine(this, 'newTask');
       this.runParsers(this, 'newTask', this.newTask);
       this.newReceiver = '';
-      this.setPristineAndUntouched(this, 'newReceiver');
+      this.setUntouchedAndPristine(this, 'newReceiver');
       this.runParsers(this, 'newReceiver', this.newReceiver);
       $('.typeahead').val(''); //TODO: clears form but not model
       this.newDate = '';
-      this.setPristineAndUntouched(this, 'newDate');
+      this.setUntouchedAndPristine(this, 'newDate');
       this.runParsers(this, 'newDate', this.newDate);
       this.newTime = '';
-      this.setPristineAndUntouched(this, 'newTime');
+      this.setUntouchedAndPristine(this, 'newTime');
       this.runParsers(this, 'newTime', this.newTime);
     }
 
@@ -201,10 +202,18 @@ export default class TodosListCtrl extends Controller {
 	  controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0].$parsers.forEach(function(x) {x(newValue);});
 	}
 
-	setPristineAndUntouched(controller, fieldName) {
+	setUntouchedAndPristine(controller, fieldName) {
     var fieldCtrl = controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
-    fieldCtrl.$setPristine();
     fieldCtrl.$setUntouched();
+    fieldCtrl.$setPristine();
+    fieldCtrl.$setValidity('', false);
+  }
+
+  setViewValue(controller, fieldName, fieldValue, eventName) {
+    var fieldCtrl = controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
+    fieldCtrl.$setViewValue(fieldValue, eventName);
+    fieldCtrl.$setTouched();
+    fieldCtrl.$setDirty();
   }
 
   getTaskStatusImage(task) {
@@ -231,29 +240,25 @@ export default class TodosListCtrl extends Controller {
   }
 
 	showDatePicker() {
-			var current = (this.newDate === '' || this.newDate === undefined) ? new Date() : this.newDate;
-			var options = {
-				format: 'MM-dd-yyyy',
-				default: current
-      };
-      var config = {
-        shortDay: ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa']
-      };
+    var current = (this.newDate === '' || this.newDate === undefined) ? new Date() : this.newDate;
+    var options = {
+      format: 'MM-dd-yyyy',
+      default: current
+    };
+    var config = {
+      shortDay: ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa']
+    };
 
-      var controller = this;
-  		var timePicker = new DateTimePicker.Date(options, config)
-  		timePicker.on('selected', function (formatTime, now) {
-  			controller.newDate = formatTime;
-  			controller.runParsers(controller, 'newDate', controller.newDate);
-  			controller.scope.$apply();
-  			timePicker.destroy();
-  		});
-  		timePicker.on('cleared', function () {
-  			controller.newDate = '';
-  			controller.runParsers(controller, 'newDate', controller.newDate);
-				controller.scope.$apply();
-  		});
-  	}
+    var controller = this;
+    var timePicker = new DateTimePicker.Date(options, config)
+    controller.setViewValue(controller, 'newDate', '', 'click');
+    timePicker.on('selected', function (formatTime, now) {
+      controller.newDate = formatTime;
+      controller.runParsers(controller, 'newDate', controller.newDate);
+      controller.scope.$apply();
+      timePicker.destroy();
+    });
+  }
 
 	showTimePicker() {
 		var current = (this.newTime === '' || this.newTime === undefined) ? new Date() : (this.newDate + ' ' + this.newTime);
@@ -263,17 +268,13 @@ export default class TodosListCtrl extends Controller {
 		};
 		var controller = this;
 		var timePicker = new DateTimePicker.Time(options, {})
+		controller.setViewValue(controller, 'newTime', '', 'click');
 		timePicker.on('selected', function (formatTime, now) {
 			controller.newTime = formatTime;
 			controller.runParsers(controller, 'newTime', controller.newTime);
 			controller.scope.$apply();
 			timePicker.destroy();
-		})
-		timePicker.on('cleared', function () {
-			controller.newTime = '';
-			controller.runParsers(controller, 'newTime', controller.newTime);
-			controller.scope.$apply();
-		})
+		});
 	}
 }
 

@@ -120,6 +120,8 @@ consensual.directive('requiredField', function() {
   return {
     require: 'ngModel',
     link: function(scope, element, attr, mCtrl) {
+      mCtrl.$setValidity('required-field', false);
+      console.log(element[0].name);
       function requiredField(value) {
         if (value !== "") {
           mCtrl.$setValidity('required-field', true);
@@ -129,6 +131,36 @@ consensual.directive('requiredField', function() {
         return value;
       }
       mCtrl.$parsers.push(requiredField);
+    }
+  };
+});
+
+consensual.directive('contactsOnly', function() {
+  return {
+    require: 'ngModel',
+    link: function(scope, element, attr, mCtrl) {
+      function contactsOnly(value) {
+        var valid = false;
+        for (let contact of Meteor.settings.public.contacts) {
+          if (value === contact.name) {
+            valid = true;
+          }
+        }
+        if (valid) {
+          mCtrl.$setValidity('contacts-only', true);
+        } else {
+          mCtrl.$setValidity('contacts-only', false);
+        }
+        console.log("Inside contactsOnly");
+        console.log("Returning Value: " + value);
+        return value;
+      }
+      mCtrl.$parsers.push(contactsOnly);
+      element.on('blur', function() {
+        mCtrl.$setViewValue(this.value, 'blur');
+        console.log("blur happened");
+        contactsOnly(this.value);
+      });
     }
   };
 });
