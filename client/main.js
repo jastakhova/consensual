@@ -120,8 +120,9 @@ consensual.directive('requiredField', function() {
   return {
     require: 'ngModel',
     link: function(scope, element, attr, mCtrl) {
-      mCtrl.$setValidity('required-field', false);
-      console.log(element[0].name);
+      if (mCtrl.$$parentForm.$name.substring(0,3) === "add") {
+        mCtrl.$setValidity('required-field', false);
+      }
       function requiredField(value) {
         if (value !== "") {
           mCtrl.$setValidity('required-field', true);
@@ -151,15 +152,11 @@ consensual.directive('contactsOnly', function() {
         } else {
           mCtrl.$setValidity('contacts-only', false);
         }
-        console.log("Inside contactsOnly");
-        console.log("Returning Value: " + value);
         return value;
       }
       mCtrl.$parsers.push(contactsOnly);
       element.on('blur', function() {
         mCtrl.$setViewValue(this.value, 'blur');
-        console.log("blur happened");
-        contactsOnly(this.value);
       });
     }
   };
