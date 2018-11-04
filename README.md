@@ -1,50 +1,70 @@
 # Consensual
-App for tracking agreements http://consensu.al/
+All of human society is built upon the agreements we make...with ourselves, and with one another.
+Consensual helps us keep track of the agreements we've made, and helps us build the trust
+essential to a truly planetary civilization.
 
-```
-DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
-```
+Our small dedicated team, based in Oakland, CA, is committed to providing an easy-to-use cross-platform
+solution that is robust, trustworthy, and scalable.
 
-## Source links
+The "Hella Alpha" release (PWA version, currently under active development) is available at:
 
-Used bootstrap theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
+https://app.consensu.al/
 
-## TODO
-- Emails about status changes (Yulia) ** Work In Progress**
+Please feel free to play around with it and give us feedback. Bug reports and feature requests can be
+made using the app by sending a proposal directly to our Product Manager, Day Waterbury, or via email to:
+
+team.consensual@gmail.com
+
+Thanks for your support!
+
+*~Team Consensual*
+
+## Roadmap
+
+### Alpha Release (v0): 2018 Q4
+#### Active ToDo
+- Emails about status changes (Yulia) **Work In Progress**
 - Show error message on proposal page if task is not found
-- Prettify mobile version
-- Make responsive layouts render properly on mobile devices (DNS and SSL issue; i.e. domain cloaking)
-- Icons don't appear under consensual domain (this is also because of domain cloaking, as above)
-- Author can reassign proposal to new receiver (Day) **Work In Progress**
-- Integration with calendar
-- Integration with Google Calendar
-- Notifications in mobile version
-- Add user profile page (low priority)
-
-## Known issues
 - Error notifications on add, delete actions (show alert)
+- Prettify mobile version (Day) **Work In Progress**
+- Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
+- Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
+- Notifications in mobile version
+- Poll for new FB friend images without requiring logout/login.
+- Add user profile page
+
+#### Known Issues
 - Hamburger menu in upper right of mobile view does nothing. What should it do?
+- Bring adding comment block higher than actual comments
 - Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
 - Date should not wrap...and there should be a min width for the date picker
-- Date picker sometimes freezes (not sure how to reproduce)
 - Description field should be taller on web (not sure how it is on mobile)
-- I want to be able to hit enter for a newline
+- I want to be able to hit enter for a newline when editing an agreement
 - Proposal description shouldn't be a disabled textarea
 - Activity log doesn't open when new record appears from other person
 - Comments block CSS doesn't look nice when there is no comments
-- Bring adding comment block higher than actual comments
 - It's not obvious what are you about to approve
-- Poll for new FB friend images without requiring logout/login.
-- If you mouseover a name in the receiver typeahead, but don't select it, the value is put in the input, but the model isn't validated
 
-## Bugs
-- Cannot read property 'services' of undefined at Object.picture on Proposal page. How to reproduce this?
+### Beta Release (v1): 2019 Q1
+- Start and end dates (ranges)
+- Ability to mark tasks as 'In Progress'
+- Allow unassigned agreements
+- Allow author to reassign proposal to new receiver
+- Allow receiver to delegate fulfillment
+- Integration with Google Calendar
+- Integration with iCal
 
-## Ideas for future
+### Future Releases: No ETA
+- Multiparty agreements
+- Repeating and scheduled tasks
+- Browse "offers" (open/unassigned standing agreements)
 - Description field should accept markdown
-- Ability to mark tasks as 'in progress' (related to having start and end dates).
 
-## Mysteries
+
+### Bugs & Mysteries
+- Date picker sometimes freezes (not sure how to reproduce)
+- If you mouseover a name in the receiver typeahead, but don't select it, the value is put in the input, but the model isn't validated
+- Cannot read property 'services' of undefined at Object.picture on Proposal page. How to reproduce this?
 - What is happening with server vs. client time, and in what context are collection methods executed?
 
 # Dev Setup
@@ -100,10 +120,27 @@ Run the proxy server in a new terminal tab:
 $ sudo node main.js
 ```
 
-### Mongo cheat sheet
+### Deployment
+```
+$ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
+```
+
+### Mongo
 
 ```
 meteor mongo
 >> db.<table>.find() - show the whole table
 >> db.<table>.find().pretty() - you can make it pretty
 ```
+
+### Sources
+* Bootstrap Theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
+
+### References
+* Meteor: https://docs.meteor.com/api
+* AngularJS: https://docs.angularjs.org/api
+* Bootstrap Typeahead: https://github.com/bassjobsen/Bootstrap-3-Typeahead
+* MomentJS: http://momentjs.com
+
+### Forums
+* Meteor: https://forums.meteor.com
