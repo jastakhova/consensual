@@ -115,7 +115,8 @@ export default class ProposalCtrl extends Controller {
 
   saveTime() {
     this.newDateTime = moment.utc(new Date(this.selectedDate + ' ' + this.selectedTime)).format();
-    Meteor.call('tasks.updateTime', this.proposalId, moment.utc(this.previousDateTime).format(), this.newDateTime);
+    Meteor.call('tasks.updateTime', this.proposalId, moment.utc(this.previousDateTime).format(), this.newDateTime,
+      Intl.DateTimeFormat().resolvedOptions().timeZone);
     this.flipTimeEditingStatus();
   }
 
