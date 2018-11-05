@@ -23,9 +23,7 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
-- Emails about status changes (Yulia) **Work In Progress**
-- Show error message on proposal page if task is not found
-- Error notifications on add, delete actions (show alert)
+- Error notifications on add, delete actions (show alert) (Yulia) **Work In Progress**
 - Prettify mobile version (Day) **Work In Progress**
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)

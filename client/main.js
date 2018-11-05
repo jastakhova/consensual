@@ -18,6 +18,7 @@ import { Template } from 'meteor/templating';
 import TodosListCtrl from '../imports/components/todosList/todosList';
 import ProposalCtrl from '../imports/components/todosList/proposal';
 import LoginCtrl from '../imports/components/account/login';
+import NotFoundCtrl from '../imports/components/account/notfound';
 import RoutesConfig from '../imports/components/routes';
 
 // Alias for readability
@@ -77,7 +78,7 @@ consensual = angular.module(App, [
   'ionic'
 ]);
 
-consensual.run(['$ionicHistory', '$state', function ($ionicHistory, $state) {
+consensual.run(['$ionicHistory', '$state', '$rootScope', function ($ionicHistory, $state, $rootScope) {
   AccountsTemplates.options.onSubmitHook = onSubmitHook;
   AccountsTemplates.options.onLogoutHook = onLogoutHook;
 
@@ -113,6 +114,14 @@ consensual.run(['$ionicHistory', '$state', function ($ionicHistory, $state) {
 
     $state.go("login");
   }
+
+//  $rootScope.$on('$stateChangeStart', function(event, toState, fromState) {
+//    console.log('from/to', fromState, toState);
+//  });
+//
+//  $rootScope.$on('$stateChangeSuccess', function(event, toState) {
+//    console.log('success ', toState);
+//  });
 }]);
 
 // Defines an angular directive, 'required-field', which runs validation when an input is changed
@@ -194,6 +203,7 @@ new Loader(App)
 	.load(TodosListCtrl)
 	.load(ProposalCtrl)
   .load(LoginCtrl)
+  .load(NotFoundCtrl)
 	.load(RoutesConfig);
 
 function onReady() {

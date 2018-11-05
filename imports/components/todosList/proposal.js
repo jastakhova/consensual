@@ -25,38 +25,40 @@ export default class ProposalCtrl extends Controller {
     this.acknowledgeLabel = 'Acknowledge';
     this.needsToApproveStatusChange = false;
 
+    var foundTask = Tasks.findOne({_id: this.proposalId});
+    if (!foundTask) {
+      this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
+    }
+
     this.helpers({
       data() {
-      	var foundTask = Tasks.findOne({_id: this.proposalId});
-        if (foundTask) {
-        	var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
-        	var id2user = ProfileUtils.createMapFromList(users, "_id");
-					foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
-					this.selectedDate = moment(foundTask.eta).format("MM-DD-YYYY");
-					this.selectedTime = moment(foundTask.eta).format("HH:mm");
-					this.previousDateTime = moment(foundTask.eta).format();
-          this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
-            Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
-          this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
-          foundTask.comments.forEach(function(obj) {
-            obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
-          });
+        if (!foundTask) {
+          return {};
+        }
+        var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
+        var id2user = ProfileUtils.createMapFromList(users, "_id");
+        foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
+        this.selectedDate = moment(foundTask.eta).format("MM-DD-YYYY");
+        this.selectedTime = moment(foundTask.eta).format("HH:mm");
+        this.previousDateTime = moment(foundTask.eta).format();
+        this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
+          Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
+        this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
+        foundTask.comments.forEach(function(obj) {
+          obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
+        });
 
-          var recentStatusChangeActivity = foundTask.activity
-            .sort(function(record1, record2) {return ProfileUtils.comparator(record2.time, record1.time);})
-            .filter(function(record) {return record.field === 'status' && (record.newValue === 'Done' || record.newValue === 'Cancelled');});
-          if (foundTask.status != 'open' && !foundTask.archived && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
-            this.acknowledgeLabel = 'Acknowledge task status change to ' + foundTask.status;
-            this.needsToApproveStatusChange = true;
-          }
+        var recentStatusChangeActivity = foundTask.activity
+          .sort(function(record1, record2) {return ProfileUtils.comparator(record2.time, record1.time);})
+          .filter(function(record) {return record.field === 'status' && (record.newValue === 'Done' || record.newValue === 'Cancelled');});
+        if (foundTask.status != 'open' && !foundTask.archived && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
+          this.acknowledgeLabel = 'Acknowledge task status change to ' + foundTask.status;
+          this.needsToApproveStatusChange = true;
+        }
 
-					foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
-          foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
-					return foundTask;
-				} else {
-				  // TODO: show error message
-					return foundTask;
-				}
+        foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
+        foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
+        return foundTask;
       }
     });
   }
@@ -197,4 +199,4 @@ export default class ProposalCtrl extends Controller {
 }
 
 ProposalCtrl.$name = 'ProposalCtrl';
-ProposalCtrl.$inject = ['$stateParams'];
+ProposalCtrl.$inject = ['$stateParams', '$state'];
