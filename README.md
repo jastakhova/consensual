@@ -31,6 +31,7 @@ Thanks for your support!
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
 - Notifications in mobile version
 - Poll for new FB friend images without requiring logout/login.
+- Full text agreement search
 - Add user profile page
 
 #### Known Issues
