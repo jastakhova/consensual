@@ -125,7 +125,7 @@ export default class TodosListCtrl extends Controller {
         });
         } catch (err) {
           ProfileUtils.showError();
-          Meteor.call('email.withError', {err);
+          Meteor.call('email.withError', {error : err});
           return [];
         }
       },
