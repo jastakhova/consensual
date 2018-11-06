@@ -287,6 +287,10 @@ Meteor.methods({
         }
       );
     }
+  },
+  'email.withError'(error) {
+    console.log(error);
+    Meteor.call('email.send', 'Team Consensual <team.consensual@gmail.com>', "New Error " + error.message, error.stack);
   }
 });
 

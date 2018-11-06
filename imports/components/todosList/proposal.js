@@ -31,6 +31,7 @@ export default class ProposalCtrl extends Controller {
           return {};
         }
 
+        try {
         var foundTask = Tasks.findOne({_id: this.proposalId});
         if (!foundTask) {
           this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
@@ -61,6 +62,11 @@ export default class ProposalCtrl extends Controller {
         foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
         foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
         return foundTask;
+        } catch (err) {
+          ProfileUtils.showError();
+          Meteor.call('email.withError', {error: err});
+          return {};
+        }
       }
     });
   }
@@ -118,19 +124,34 @@ export default class ProposalCtrl extends Controller {
   }
 
   saveTime() {
-    this.newDateTime = moment.utc(new Date(this.selectedDate + ' ' + this.selectedTime)).format();
-    Meteor.call('tasks.updateTime', this.proposalId, moment.utc(this.previousDateTime).format(), this.newDateTime,
-      Intl.DateTimeFormat().resolvedOptions().timeZone);
+    try {
+      this.newDateTime = moment.utc(new Date(this.selectedDate + ' ' + this.selectedTime)).format();
+      Meteor.call('tasks.updateTime', this.proposalId, moment.utc(this.previousDateTime).format(), this.newDateTime,
+        Intl.DateTimeFormat().resolvedOptions().timeZone);
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', {error: err});
+    }
     this.flipTimeEditingStatus();
   }
 
   saveLocation(location) {
-    Meteor.call('tasks.updateLocation', this.proposalId, location);
+    try {
+      Meteor.call('tasks.updateLocation', this.proposalId, location);
+     } catch (err) {
+       ProfileUtils.showError();
+       Meteor.call('email.withError', err);
+     }
     this.flipLocationEditingStatus();
   }
 
   saveDescription(description) {
-    Meteor.call('tasks.updateDescription', this.proposalId, description);
+    try {
+      Meteor.call('tasks.updateDescription', this.proposalId, description);
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
     this.flipDescriptionEditingStatus();
   }
 
@@ -172,23 +193,48 @@ export default class ProposalCtrl extends Controller {
   }
 
   approveTask() {
-    Meteor.call('tasks.updateStatuses', this.proposalId, 'green', this.needsToApproveStatusChange);
+    try {
+      Meteor.call('tasks.updateStatuses', this.proposalId, 'green', this.needsToApproveStatusChange);
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
   }
 
   markTaskAsDone() {
-    Meteor.call('tasks.changeTaskStatus', this.proposalId, 'done');
+    try {
+      Meteor.call('tasks.changeTaskStatus', this.proposalId, 'done');
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
   }
 
   markTaskAsCancelled() {
-    Meteor.call('tasks.changeTaskStatus', this.proposalId, 'cancelled');
+    try {
+      Meteor.call('tasks.changeTaskStatus', this.proposalId, 'cancelled');
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
   }
 
   markTaskAsReopened() {
-    Meteor.call('tasks.changeTaskStatus', this.proposalId, 'open');
+    try {
+      Meteor.call('tasks.changeTaskStatus', this.proposalId, 'open');
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
   }
 
   addComment() {
-    Meteor.call('tasks.addComment', this.proposalId, this.comment);
+    try {
+      Meteor.call('tasks.addComment', this.proposalId, this.comment);
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
     this.comment = '';
     this.setPristineAndUntouched(this, 'addComment');
   }

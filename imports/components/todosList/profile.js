@@ -36,7 +36,7 @@ var ProfileUtils = {
 
   showError(message) {
     $('.notification').removeClass("hidden");
-    $('#notificationMessage').text(message);
+    $('#notificationMessage').text(message ? message : "An inner error occurred. We are already working on a fix. Please try to use the service later.");
   }
 };
 

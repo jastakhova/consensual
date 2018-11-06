@@ -23,26 +23,25 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
-- Error notifications on add, delete actions (show alert) (Yulia) **Work In Progress**
 - Prettify mobile version (Day) **Work In Progress**
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
-- Notifications in mobile version
 - Poll for new FB friend images without requiring logout/login.
 - Full text agreement search
 - Add user profile page (+ unsubscribe)
+- Notifications in mobile version [mobile]
 
 #### Known Issues
-- Hamburger menu in upper right of mobile view does nothing. What should it do?
-- Bring adding comment block higher than actual comments
-- Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
-- Date should not wrap...and there should be a min width for the date picker
-- Description field should be taller on web (not sure how it is on mobile)
-- I want to be able to hit enter for a newline when editing an agreement
+- I want to be able to hit enter for a newline when editing an agreement (Yulia) **Work In Progress**
 - Proposal description shouldn't be a disabled textarea
 - Activity log doesn't open when new record appears from other person
 - Comments block CSS doesn't look nice when there is no comments
 - It's not obvious what are you about to approve
+- Error handling saves empty object to log
+- Hamburger menu in upper right of mobile view does nothing. What should it do? [mobile]
+- Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
+- Date should not wrap...and there should be a min width for the date picker
+- Description field should be taller on web (not sure how it is on mobile) [mobile]
 
 ### Beta Release (v1): 2019 Q1
 - Start and end dates (ranges)

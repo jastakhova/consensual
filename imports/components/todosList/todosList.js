@@ -71,6 +71,7 @@ export default class TodosListCtrl extends Controller {
           return [];
         }
 
+        try {
       	var selector = this.getReactively("currentFilter");
       	var sortMethod = this.getReactively("currentSort");
 
@@ -122,6 +123,11 @@ export default class TodosListCtrl extends Controller {
         return Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
           return {name: sortMethod.configuration.groupingName(groupKey), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
         });
+        } catch (err) {
+          ProfileUtils.showError();
+          Meteor.call('email.withError', {err);
+          return [];
+        }
       },
       incompleteCount() {
         return Tasks.find({
@@ -158,28 +164,33 @@ export default class TodosListCtrl extends Controller {
   }
 
   addTask(newTask) {
+    try {
       Meteor.call('tasks.insert', {
       	task: newTask,
       	time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format(),
       	receiver: $('.typeahead').typeahead('getActive').id
       	});
-
-      // Clear form
-
-      this.newTask = '';
-      this.setUntouchedAndPristine(this, 'newTask');
-      this.runParsers(this, 'newTask', this.newTask);
-      this.newReceiver = '';
-      this.setUntouchedAndPristine(this, 'newReceiver');
-      this.runParsers(this, 'newReceiver', this.newReceiver);
-      $('.typeahead').val(''); //TODO: clears form but not model
-      this.newDate = '';
-      this.setUntouchedAndPristine(this, 'newDate');
-      this.runParsers(this, 'newDate', this.newDate);
-      this.newTime = '';
-      this.setUntouchedAndPristine(this, 'newTime');
-      this.runParsers(this, 'newTime', this.newTime);
+    } catch (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
     }
+
+    // Clear form
+
+    this.newTask = '';
+    this.setUntouchedAndPristine(this, 'newTask');
+    this.runParsers(this, 'newTask', this.newTask);
+    this.newReceiver = '';
+    this.setUntouchedAndPristine(this, 'newReceiver');
+    this.runParsers(this, 'newReceiver', this.newReceiver);
+    $('.typeahead').val(''); //TODO: clears form but not model
+    this.newDate = '';
+    this.setUntouchedAndPristine(this, 'newDate');
+    this.runParsers(this, 'newDate', this.newDate);
+    this.newTime = '';
+    this.setUntouchedAndPristine(this, 'newTime');
+    this.runParsers(this, 'newTime', this.newTime);
+  }
 
   setChecked(task) {
 		// Set the checked property to the opposite of its current value
