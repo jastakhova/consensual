@@ -32,6 +32,11 @@ var ProfileUtils = {
       return null;
     }
     return task.activity.sort(function(x, y) {return ProfileUtils.comparator(y.time, x.time);})[0].time;
+  },
+
+  showError(message) {
+    $('.notification').removeClass("hidden");
+    $('#notificationMessage').text(message);
   }
 };
 

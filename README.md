@@ -30,7 +30,7 @@ Thanks for your support!
 - Notifications in mobile version
 - Poll for new FB friend images without requiring logout/login.
 - Full text agreement search
-- Add user profile page
+- Add user profile page (+ unsubscribe)
 
 #### Known Issues
 - Hamburger menu in upper right of mobile view does nothing. What should it do?

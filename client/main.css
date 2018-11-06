@@ -100,3 +100,14 @@
   border-left: 6px solid transparent;
   content: '';
 }
+
+.notification {
+  position: absolute;
+  z-index: 5;
+  padding: 25px;
+  width: 100%;
+}
+
+.hidden {
+  visibility: hidden;
+}
