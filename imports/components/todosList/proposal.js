@@ -8,7 +8,7 @@ export default class ProposalCtrl extends Controller {
   constructor() {
     super(...arguments);
 
-    this.subscribe('tasks');
+    this.handleTasks = this.subscribe('tasks');
 
     if (Meteor.userId()) {
 			this.subscribe('alltaskpartners');
@@ -25,16 +25,18 @@ export default class ProposalCtrl extends Controller {
     this.acknowledgeLabel = 'Acknowledge';
     this.needsToApproveStatusChange = false;
 
-    var foundTask = Tasks.findOne({_id: this.proposalId});
-    if (!foundTask) {
-      this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
-    }
-
     this.helpers({
       data() {
-        if (!foundTask) {
+        if (!this.handleTasks.ready()) {
           return {};
         }
+
+        var foundTask = Tasks.findOne({_id: this.proposalId});
+        if (!foundTask) {
+          this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
+          return {};
+        }
+
         var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
         var id2user = ProfileUtils.createMapFromList(users, "_id");
         foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
