@@ -81,7 +81,7 @@
               </button>
             </div>
             <div ng-show="proposal.editingLocation">
-              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field>
+              <input type="text" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field>
               <button ng-disabled="editProposalForm.editLocation.$invalid" type="submit" ng-click="proposal.saveLocation(proposal.data.location)" class="btn btn-info btn-fill">Save</button>
             </div>
           </div>
@@ -103,7 +103,7 @@
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
-            <textarea style="padding-left: 30px;" ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
+            <textarea style="padding-left: 30px;" ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
             </textarea>
           </div>
           <button ng-show="!proposal.editingDescription" rel="tooltip" title="Edit" ng-click="proposal.flipDescriptionEditingStatus()" class="btn btn-danger btn-simple btn-xs">
@@ -136,12 +136,12 @@
               <hr style="margin-top: 10px">
             </div>
             <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px;text-align: right;">
-              <textarea placeholder="Enter your comment..." style="padding-left: 30px; text-align: right;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field></textarea>
+              <textarea placeholder="Enter your comment..." style="padding-left: 30px; text-align: right;" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field></textarea>
               <button ng-disabled="editProposalForm.addComment.$pristine || editProposalForm.addComment.$invalid" type="submit" ng-click="proposal.addComment()" class="btn btn-info btn-fill" style="margin-bottom: 15px;">Add comment</button>
             </div>
             <div class="content pre-scrollable" ng-show="proposal.commentsShowed">
               <div ng-repeat="comment in proposal.data.comments | orderBy:'-time'">
-                <div class="alert alert-info col-md-8 col-md-offset-{{comment.author === proposal.currentUser ? '4' : '0'}}" style="margin-bottom: 0px; {{comment.author === proposal.currentUser ? '' : 'background-color: #4091e2'}}">
+                <div class="alert alert-info col-md-8 col-md-offset-{{comment.author === proposal.currentUser ? '4' : '0'}}" style="margin-bottom: 0px; {{comment.author === proposal.currentUser ? '' : 'background-color: #4091e2;'}} white-space: pre-wrap;">
                   <span>{{comment.text}}</span>
                 </div>
                 <div class="col-md-3 col-md-offset-{{comment.author === proposal.currentUser ? '9' : '5'}}" style="margin-bottom: 20px; color: #9A9A9A; text-align: right;">

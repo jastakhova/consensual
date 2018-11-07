@@ -392,7 +392,7 @@ if (Meteor.isServer) {
                 }).filter(u => u.length > 0).join('');
               } else {
                 var lastActivity = fieldGroup.sort(function(a1, a2) {return a2.doneAt - a1.doneAt;})[0];
-                return "A " + fieldGroup[0].entity + " was " + fieldGroup[0].verb + (fieldGroup.length > 1 ? " (and not even once)" : (": \"" + lastActivity.newValue) + "\"") + ".<br/>" ;
+                return "A " + fieldGroup[0].entity + " was " + fieldGroup[0].verb + (fieldGroup.length > 1 ? " (and more than once)" : (": \"" + lastActivity.newValue) + "\"") + ".<br/>" ;
               }
             }).filter(u => u.length > 0);
             var multipleChanges = taskGroup.length > 1;

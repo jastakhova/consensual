@@ -32,9 +32,7 @@ Thanks for your support!
 - Notifications in mobile version [mobile]
 
 #### Known Issues
-- I want to be able to hit enter for a newline when editing an agreement (Yulia) **Work In Progress**
-- Proposal description shouldn't be a disabled textarea
-- Activity log doesn't open when new record appears from other person
+- Activity log doesn't open when new record appears from other person (Yulia) **Work In Progress**
 - Comments block CSS doesn't look nice when there is no comments
 - It's not obvious what are you about to approve
 - Error handling saves empty object to log
@@ -42,6 +40,7 @@ Thanks for your support!
 - Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
 - Date should not wrap...and there should be a min width for the date picker
 - Description field should be taller on web (not sure how it is on mobile) [mobile]
+- Proposal description shouldn't be a disabled textarea [needs discussion]
 
 ### Beta Release (v1): 2019 Q1
 - Start and end dates (ranges)
