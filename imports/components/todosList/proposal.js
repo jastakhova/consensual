@@ -64,7 +64,7 @@ export default class ProposalCtrl extends Controller {
         return foundTask;
         } catch (err) {
           ProfileUtils.showError();
-          Meteor.call('email.withError', {error: err});
+          Meteor.call('email.withError', err);
           return {};
         }
       }
@@ -124,34 +124,29 @@ export default class ProposalCtrl extends Controller {
   }
 
   saveTime() {
-    try {
-      this.newDateTime = moment.utc(new Date(this.selectedDate + ' ' + this.selectedTime)).format();
-      Meteor.call('tasks.updateTime', this.proposalId, moment.utc(this.previousDateTime).format(), this.newDateTime,
-        Intl.DateTimeFormat().resolvedOptions().timeZone);
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', {error: err});
-    }
+    this.newDateTime = moment.utc(new Date(this.selectedDate + ' ' + this.selectedTime)).format();
+    Meteor.call('tasks.updateTime',
+        this.proposalId,
+        moment.utc(this.previousDateTime).format(),
+        this.newDateTime,
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+        ProfileUtils.processMeteorResult);
     this.flipTimeEditingStatus();
   }
 
   saveLocation(location) {
-    try {
-      Meteor.call('tasks.updateLocation', this.proposalId, location);
-     } catch (err) {
-       ProfileUtils.showError();
-       Meteor.call('email.withError', err);
-     }
+    Meteor.call('tasks.updateLocation',
+      this.proposalId,
+      location,
+      ProfileUtils.processMeteorResult);
     this.flipLocationEditingStatus();
   }
 
   saveDescription(description) {
-    try {
-      Meteor.call('tasks.updateDescription', this.proposalId, description);
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.updateDescription',
+      this.proposalId,
+      description,
+      ProfileUtils.processMeteorResult);
     this.flipDescriptionEditingStatus();
   }
 
@@ -193,48 +188,36 @@ export default class ProposalCtrl extends Controller {
   }
 
   approveTask() {
-    try {
-      Meteor.call('tasks.updateStatuses', this.proposalId, 'green', this.needsToApproveStatusChange);
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.updateStatuses',
+      this.proposalId,
+      'green',
+      this.needsToApproveStatusChange,
+      ProfileUtils.processMeteorResult);
   }
 
   markTaskAsDone() {
-    try {
-      Meteor.call('tasks.changeTaskStatus', this.proposalId, 'done');
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.changeTaskStatus',
+      this.proposalId,
+      'done',
+      ProfileUtils.processMeteorResult);
   }
 
   markTaskAsCancelled() {
-    try {
-      Meteor.call('tasks.changeTaskStatus', this.proposalId, 'cancelled');
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.changeTaskStatus',
+      this.proposalId,
+      'cancelled',
+      ProfileUtils.processMeteorResult);
   }
 
   markTaskAsReopened() {
-    try {
-      Meteor.call('tasks.changeTaskStatus', this.proposalId, 'open');
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.changeTaskStatus',
+      this.proposalId,
+      'open',
+      ProfileUtils.processMeteorResult);
   }
 
   addComment() {
-    try {
-      Meteor.call('tasks.addComment', this.proposalId, this.comment);
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.addComment', this.proposalId, this.comment, ProfileUtils.processMeteorResult);
     this.comment = '';
     this.setPristineAndUntouched(this, 'addComment');
   }

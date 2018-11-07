@@ -25,8 +25,14 @@
 
 <div class="wrapper">
 
+  <script>
+    function hide() {
+      $('.notification').addClass("hidden");
+    }
+  </script>
+
   <div class="alert alert-danger notification hidden" style="padding: 25px;">
-    <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+    <button type="button" aria-hidden="true" class="close" onclick="hide()">
       <i class="pe-7s-close"></i>
     </button>
     <span><b>Error - </b><span id="notificationMessage"></span></span>

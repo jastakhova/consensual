@@ -35,8 +35,17 @@ var ProfileUtils = {
   },
 
   showError(message) {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0;
     $('.notification').removeClass("hidden");
     $('#notificationMessage').text(message ? message : "An inner error occurred. We are already working on a fix. Please try to use the service later.");
+  },
+
+  processMeteorResult(err, res) {
+    if (err) {
+      ProfileUtils.showError();
+      Meteor.call('email.withError', err);
+    }
   }
 };
 

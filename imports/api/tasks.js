@@ -71,7 +71,7 @@ Meteor.methods({
       archived: false
     });
 
-    notifyOnNewValue(newTask, newTask.receiver, "created", "agreement", text);
+    notifyOnNewValue(newTask, newTask.receiver, "created", "agreement", newTask.task);
   },
   // NOT USED but preserved for future.
   // SHOULD contain notification functionality
@@ -277,20 +277,23 @@ Meteor.methods({
     notifyOnActivity(task, activity);
   },
   'email.send' (to, subject, text) {
+    var options = {
+        to,
+        'from': 'Team Consensual <team.consensual@gmail.com>',
+        subject
+    };
+    if (text && text.startsWith("<html>")) {
+      options.html = text;
+    } else {
+      options.text = text;
+    }
     if (Meteor.isServer) {
-      Email.send(
-        {
-          to,
-          'from': 'Team Consensual <team.consensual@gmail.com>',
-          subject,
-          html: text
-        }
-      );
+      Email.send(options);
     }
   },
   'email.withError'(error) {
-    console.log(error);
-    Meteor.call('email.send', 'Team Consensual <team.consensual@gmail.com>', "New Error " + error.message, error.stack);
+    Meteor.call('email.send', 'Team Consensual <team.consensual@gmail.com>', "New Error " + error.message,
+      "Error occurred for " + getName(Meteor.user()) + " (" + Meteor.userId() + "). Proceed to " + process.env.ROOT_URL);
   }
 });
 

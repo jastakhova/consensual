@@ -125,7 +125,7 @@ export default class TodosListCtrl extends Controller {
         });
         } catch (err) {
           ProfileUtils.showError();
-          Meteor.call('email.withError', {error : err});
+          Meteor.call('email.withError', err);
           return [];
         }
       },
@@ -164,16 +164,11 @@ export default class TodosListCtrl extends Controller {
   }
 
   addTask(newTask) {
-    try {
-      Meteor.call('tasks.insert', {
-      	task: newTask,
-      	time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format(),
-      	receiver: $('.typeahead').typeahead('getActive').id
-      	});
-    } catch (err) {
-      ProfileUtils.showError();
-      Meteor.call('email.withError', err);
-    }
+    Meteor.call('tasks.insert', {
+      task: newTask,
+      time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format(),
+      receiver: $('.typeahead').typeahead('getActive').id
+      }, ProfileUtils.processMeteorResult);
 
     // Clear form
 
