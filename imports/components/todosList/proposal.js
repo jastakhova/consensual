@@ -11,7 +11,7 @@ export default class ProposalCtrl extends Controller {
     this.handleTasks = this.subscribe('tasks');
 
     if (Meteor.userId()) {
-			this.subscribe('alltaskpartners');
+			this.subscribe('allusers');
 		}
 
     this.proposalId = this.$stateParams.proposalId;
@@ -46,7 +46,7 @@ export default class ProposalCtrl extends Controller {
         this.previousDateTime = moment(foundTask.eta).format();
         this.currentUserIsInDoubt = Meteor.userId() === foundTask.authorId && foundTask.authorStatus === 'yellow' ||
           Meteor.userId() === foundTask.receiverId && foundTask.receiverStatus === 'yellow';
-        this.activityShowed = this.activityShowed === null && this.currentUserIsInDoubt || this.activityShowed;
+        this.activityShowed = !this.activityShowed && this.currentUserIsInDoubt || this.activityShowed;
         foundTask.comments.forEach(function(obj) {
           obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
         });
@@ -54,7 +54,8 @@ export default class ProposalCtrl extends Controller {
         var recentStatusChangeActivity = foundTask.activity
           .sort(function(record1, record2) {return ProfileUtils.comparator(record2.time, record1.time);})
           .filter(function(record) {return record.field === 'status' && (record.newValue === 'Done' || record.newValue === 'Cancelled');});
-        if (foundTask.status != 'open' && !foundTask.archived && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
+        if (recentStatusChangeActivity.length > 0 && foundTask.status != 'open' && !foundTask.archived
+          && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
           this.acknowledgeLabel = 'Acknowledge task status change to ' + foundTask.status;
           this.needsToApproveStatusChange = true;
         }
@@ -63,6 +64,7 @@ export default class ProposalCtrl extends Controller {
         foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
         return foundTask;
         } catch (err) {
+          console.log(err);
           ProfileUtils.showError();
           Meteor.call('email.withError', err);
           return {};

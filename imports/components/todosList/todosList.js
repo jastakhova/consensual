@@ -16,7 +16,6 @@ export default class TodosListCtrl extends Controller {
     this.handleTasks = this.subscribe('tasks');
 
     this.handleAllUsers = this.subscribe('allusers');
-    this.handleAllTaskPartners = this.subscribe('alltaskpartners');
 
     this.hideCompleted = false;
 
@@ -88,7 +87,7 @@ export default class TodosListCtrl extends Controller {
         }
 
         var suggest = getSuggest();
-        if (this.handleAllUsers.ready() && this.handleAllTaskPartners.ready()) {
+        if (this.handleAllUsers.ready()) {
           $(".typeahead").typeahead({ source: suggest, autoSelect: false});
         }
 

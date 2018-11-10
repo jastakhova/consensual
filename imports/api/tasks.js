@@ -306,23 +306,10 @@ if (Meteor.isServer) {
       return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
     });
 
-    Meteor.publish("alltaskpartners",
-      function () {
-      	var authorIds = Tasks.find({receiverId: this.userId})
-      		.fetch()
-      		.map(x => {return x.authorId;});
-        var receiverIds = Tasks.find({authorId: this.userId})
-        	.fetch()
-        	.map(x => {return x.receiverId;});
-        return Meteor.users.find({$or: [{_id: {$in: receiverIds}}, {_id: {$eq: this.userId}}, {_id: {$in: authorIds}}]},
-          {fields: {"services.facebook.accessToken": 1, "services.facebook.id": 1}});
-      }
-    );
-
     Meteor.publish("allusers",
     	function () {
           	return Meteor.users.find({},
-              {fields: {"username": 1, "profile.name" : 1}});
+              {fields: {"username": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.id": 1}});
           }
     );
 
