@@ -111,3 +111,11 @@
 .hidden {
   visibility: hidden;
 }
+
+.nav > li.only-mobile  {
+  display: none;
+}
+
+.nav-open .nav > li.only-mobile  {
+  display: inline;
+}
