@@ -54,9 +54,17 @@ Meteor.methods({
     }
 
     var receiver = Meteor.users.findOne({_id: newTask.receiver});
+    var maxTitleLength = 20;
+    var titleIndex = Math.min(maxTitleLength, newTask.task.length);
+    var newLineIndex = newTask.task.indexOf("\n");
+    if (newLineIndex > 0) {
+      titleIndex = Math.min(titleIndex, newLineIndex);
+    }
+    var newTitle = newTask.task.slice(0, titleIndex) + (newTask.task.length !== titleIndex ? "..." : "");
 
     Tasks.insert({
       text: newTask.task,
+      title: newTitle,
       eta: new Date(moment(newTask.time).format()).getTime(),
       authorId: Meteor.userId(),
       authorName: getName(Meteor.user()),
@@ -177,6 +185,38 @@ Meteor.methods({
     Tasks.update(taskId, {
       $set: {
         text: newDescription,
+        activity: task.activity,
+        authorStatus: newAuthorStatus,
+        receiverStatus: newReceiverStatus
+      }
+    });
+
+    notifyOnActivity(task, activity);
+  },
+  'tasks.updateTitle' (taskId, newTitle) {
+    check(taskId, String);
+    check(newTitle, String);
+
+    const task = Tasks.findOne(taskId);
+    if (newTitle === task.title) {
+      return;
+    }
+
+    var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
+    var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'title',
+       oldValue: task.title,
+       newValue: newTitle,
+       time: new Date().getTime()
+     };
+
+    task.activity.push(activity);
+    Tasks.update(taskId, {
+      $set: {
+        title: newTitle,
         activity: task.activity,
         authorStatus: newAuthorStatus,
         receiverStatus: newReceiverStatus

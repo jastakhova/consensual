@@ -18,6 +18,7 @@ export default class ProposalCtrl extends Controller {
     this.editingTime = false;
     this.editingLocation = false;
     this.editingDescription = false;
+    this.editingTitle = false;
     this.currentUser = Meteor.userId();
     this.currentUserIsInDoubt = false;
     this.commentsShowed = true;
@@ -105,6 +106,10 @@ export default class ProposalCtrl extends Controller {
 		return this.status(task.receiverStatus);
 	}
 
+	flipTitleEditingStatus() {
+    this.editingTitle = !this.editingTitle;
+  }
+
 	flipTimeEditingStatus() {
     this.editingTime = !this.editingTime;
   }
@@ -150,6 +155,14 @@ export default class ProposalCtrl extends Controller {
       description,
       ProfileUtils.processMeteorResult);
     this.flipDescriptionEditingStatus();
+  }
+
+  saveTitle(title) {
+    Meteor.call('tasks.updateTitle',
+      this.proposalId,
+      title,
+      ProfileUtils.processMeteorResult);
+    this.flipTitleEditingStatus();
   }
 
   showDatePicker() {

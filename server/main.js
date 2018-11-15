@@ -5,7 +5,8 @@ Migrations = [
   '1539727846000',
   '1540240902000',
   '1540319678000',
-  '1540929490000'
+  '1540929490000',
+  '1542315428741'
 ];
 
 Meteor.methods({
@@ -91,6 +92,29 @@ Meteor.methods({
           comments: task.comments
         }
       });
+    }
+  },
+  'Migrations.1542315428741' () {
+    // 1. Added: title:
+    //            default 20-character prefix of 'text'
+
+    tasks = Tasks.find();
+    var maxTitleLength = 20;
+
+    for (let task of tasks) {
+      if (!task.title) {
+        var titleIndex = Math.min(maxTitleLength, task.text.length);
+        var newLineIndex = task.text.indexOf("\n");
+        if (newLineIndex > 0) {
+          titleIndex = Math.min(titleIndex, newLineIndex);
+        }
+        var newTitle = task.text.slice(0, titleIndex) + (task.text.length !== titleIndex ? "..." : "");
+        Tasks.update({_id: task._id}, {
+          $set: {
+            title: newTitle
+          }
+        });
+      }
     }
   }
 });

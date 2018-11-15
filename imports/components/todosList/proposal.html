@@ -103,6 +103,17 @@
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
+            <div class="header-title">Title</div>
+            <input type="text" style="padding-left: 30px;" ng-disabled="!proposal.editingTitle" class="form-control form-group" ng-keydown="$event.keyCode === 13 && proposal.saveTitle(proposal.data.title)" ng-model="proposal.data.title" name="editTitle" required-field/>
+          </div>
+          <button ng-show="!proposal.editingTitle" rel="tooltip" title="Edit" ng-click="proposal.flipTitleEditingStatus()" class="btn btn-danger btn-simple btn-xs">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button ng-show="proposal.editingTitle" ng-disabled="editProposalForm.editTitle.$invalid" type="submit" ng-click="proposal.saveTitle(proposal.data.title)" class="btn btn-info btn-fill">Save</button>
+        </div>
+        <div class="row" style="margin-top: 30px">
+          <div class="col-md-8">
+            <div class="header-title">Description</div>
             <textarea style="padding-left: 30px;" ng-disabled="!proposal.editingDescription" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
             </textarea>
           </div>
