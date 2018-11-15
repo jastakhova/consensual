@@ -130,6 +130,8 @@ export default class TodosListCtrl extends Controller {
 
           x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
           x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
+          x.fromCurrentUser = x.authorId === Meteor.userId() && x.authorId != x.receiverId;
+          x.toCurrentUser = x.receiverId === Meteor.userId() && x.authorId != x.receiverId;
           return x;
         }
 

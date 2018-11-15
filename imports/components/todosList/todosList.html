@@ -135,14 +135,16 @@
                 <td>
                   {{task.time}}
                 </td>
-                <td>
+                <td ng-show="task.toCurrentUser == task.fromCurrentUser">
+                  self agreement
+                </td>
+                <td ng-show="task.toCurrentUser">
+                  from
                   <img class="avatar border-gray" src="{{task.authorPicture}}" alt="..."/>
                   {{task.authorName}}
                 </td>
-                <td>
-                  >
-                </td>
-                <td>
+                <td ng-show="task.fromCurrentUser">
+                  to
                   <img class="avatar border-gray" src="{{task.receiverPicture}}" alt="..."/>
                   {{task.receiverName}}
                 </td>

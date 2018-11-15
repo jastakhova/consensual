@@ -2291,6 +2291,7 @@ fieldset[disabled] .btn-neutral.active {
     height: 30px;
     overflow: hidden;
     border-radius: 50%;
+    margin-left: 5px;
     margin-right: 5px;
 }
 
