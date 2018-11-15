@@ -56,7 +56,8 @@ export default class TodosListCtrl extends Controller {
         d.setTime(groupField);
         return moment(d).format("DD MMM");
       }}},
-      {name: "By Assignee", configuration: {sort: "receiverId", grouping: function(task) {return (task.receiverId === Meteor.userId()? "1" : "2") + task.receiverName;}, groupingName: function(group) {return group.slice(1);}}},
+      // "By assignee" takes bigger space and overflows the allocated space
+      {name: "By Who", configuration: {sort: "receiverId", grouping: function(task) {return (task.receiverId === Meteor.userId()? "1" : "2") + task.receiverName;}, groupingName: function(group) {return group.slice(1);}}},
     ];
 
     var requestedSort = this.sorts.filter(s => s.name === this.$state.params.group);
