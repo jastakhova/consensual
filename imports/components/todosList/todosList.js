@@ -20,6 +20,7 @@ export default class TodosListCtrl extends Controller {
     this.hideCompleted = false;
 
     this.proposingInProgress = false;
+    this.filtersOpen = false;
 
     const nextMidnight = new Date(moment().format());
     nextMidnight.setHours(24, 0, 0, 0);
@@ -63,6 +64,34 @@ export default class TodosListCtrl extends Controller {
 
     this.currentSort = requestedSort.length > 0 ? requestedSort[0] : this.sorts[0];
     this.currentFilter = requestedFilter.length > 0 ? requestedFilter[0] : this.filters[0];
+
+    this.adjustFilters = function() {
+      // the first filter (index == 0) is not shown and has top == 0
+      var filters = $("#filters").find($("button.filterToggle")).slice(1);
+      var firstRowTop = $(filters[0]).offset().top;
+      var hasHidden = false;
+      var filterToggleControl = $($("#filters").find($("a.btn-more"))[0]);
+      var filtersOpen = filterToggleControl.text().startsWith("Less");
+      filters.each(function(index, element) {
+        $(element).css("display", "inline"); // not shown elements have top coordinate as 0
+        var endOfBlock = $($(element).parent()).offset().left + $($(element).parent()).width() - 130;
+        var notAtTheEndOfBlock = endOfBlock > $(element).offset().left + $(element).width();
+        var firstRow = $(element).offset().top === firstRowTop && !hasHidden && (notAtTheEndOfBlock || index === filters.length - 1);
+        var wasShown = firstRow || filtersOpen;
+        $(element).css("display", wasShown ? "inline" : "none");
+        hasHidden = hasHidden || !firstRow;
+      });
+
+      if (hasHidden) { // show control
+        $($("#filters").find($("a.btn-more"))[0]).removeClass("hidden");
+      } else if (!filterToggleControl.hasClass("hidden")) { // hide control
+        filterToggleControl.addClass("hidden");
+      }
+    };
+
+    $(window).resize(this.adjustFilters);
+    $("#filters").resize(this.adjustFilters);
+    $(document).ready(this.adjustFilters);
 
     this.helpers({
       tasks() {
@@ -143,7 +172,7 @@ export default class TodosListCtrl extends Controller {
 
   selectSort(sortToggle) {
     this.currentSort = sortToggle;
-    this.$state.go('tab.todo', {'filter': this.currentFilter.name, 'group' : sortToggle.name});
+    this.$state.go('tab.todo', {'filter': this.currentFilter.name, 'group' : sortToggle.name}, {notify: false});
   }
 
   applyFilter(filterToggle) {
@@ -151,7 +180,7 @@ export default class TodosListCtrl extends Controller {
       filterToggle = this.filters[0];
     }
     this.currentFilter = filterToggle;
-    this.$state.go('tab.todo', {'filter': filterToggle.name, 'group' : this.currentSort.name});
+    this.$state.go('tab.todo', {'filter': filterToggle.name, 'group' : this.currentSort.name}, {notify: false});
   }
 
   logout() {
@@ -202,6 +231,12 @@ export default class TodosListCtrl extends Controller {
 	flipProposingStatus() {
 		this.proposingInProgress = !this.proposingInProgress;
 	}
+
+	flipFiltersStatus() {
+    this.filtersOpen = !this.filtersOpen;
+    $($("#filters").find($("a.btn-more"))[0]).text(this.filtersOpen ? "Less..." : "More...");
+    this.adjustFilters();
+  }
 
 	runParsers(controller, fieldName, newValue) {
 	  controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0].$parsers.forEach(function(x) {x(newValue);});
