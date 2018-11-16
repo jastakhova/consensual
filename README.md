@@ -24,11 +24,12 @@ Thanks for your support!
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
 - Prettify mobile version (Yulia) **Work In Progress**
-- Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking)
-- Icons don't appear under consensual domain (this is also because of domain cloaking, as above)
+- Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
+- Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
 - Full text agreement search
 - Add user profile page (+ unsubscribe)
-- Notifications in mobile version [mobile]
+- Assign tasks to people not yet registered
+- Assess current state of the app (Yulia)
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments
@@ -41,6 +42,7 @@ Thanks for your support!
 - Proposal description shouldn't be a disabled textarea [needs discussion]
 
 ### Beta Release (v1): 2019 Q1
+- Notifications [app]
 - Start and end dates (ranges)
 - Ability to mark tasks as 'In Progress'
 - Allow unassigned agreements
