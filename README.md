@@ -23,13 +23,12 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
-- Prettify mobile version (Yulia) **Work In Progress**
-- Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
-- Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
+- Assess current state of the app (Yulia) **Work In Progress**
+- Assign tasks to people not yet registered
 - Full text agreement search
 - Add user profile page (+ unsubscribe)
-- Assign tasks to people not yet registered
-- Assess current state of the app (Yulia)
+- Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
+- Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments

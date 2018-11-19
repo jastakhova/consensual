@@ -8,7 +8,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Proposal</a>
+          <a class="navbar-brand" href="#">Proposal{{proposal.data.authorId === proposal.data.receiverId ? " (self-assigned)" : ""}}</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
@@ -31,23 +31,23 @@
       <div class="container-fluid">
         <form name="editProposalForm">
         <div class="row">
-          <div class="col-md-2 center">
+          <div class="col-md-2 col-xs-6 col-sm-3 center" ng-show="proposal.data.authorId != proposal.data.receiverId">
             <div class="header-title">Author</div>
             <span class="grey"> {{proposal.authorStatus(proposal.data)}}</span>
             <div>
               <img class="avatar-big border-gray {{proposal.data.authorStatus}}-glow" src="{{proposal.data.authorPicture}}" alt="..."/>
             </div>
-            <a href=""><h5 class="title same-line">{{proposal.data.authorName}}</h5></a>
+            <a href=""><h5 class="title same-line">{{proposal.currentUser === proposal.data.authorId ? "You" : proposal.data.authorName}}</h5></a>
           </div>
-          <div class="col-md-2 center">
+          <div class="col-md-2 col-xs-6 col-sm-3 center" ng-show="proposal.data.authorId != proposal.data.receiverId">
             <div class="header-title">Receiver</div>
             <span class="grey"> {{proposal.receiverStatus(proposal.data)}}</span>
             <div>
               <img class="avatar-big border-gray {{proposal.data.receiverStatus}}-glow" src="{{proposal.data.receiverPicture}}" alt="..."/>
             </div>
-            <a href=""><h5 class="title same-line">{{proposal.data.receiverName}}</h5></a>
+            <a href=""><h5 class="title same-line">{{proposal.currentUser === proposal.data.receiverId ? "You" : proposal.data.receiverName}}</h5></a>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2 col-xs-6 col-sm-3 lower">
             <div class="header-title">ETA:</div>
             <span ng-show="!proposal.editingTime">{{proposal.data.ETA}}
               <button rel="tooltip" title="Edit" ng-click="proposal.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
@@ -85,7 +85,7 @@
               <button ng-disabled="editProposalForm.editLocation.$invalid" type="submit" ng-click="proposal.saveLocation(proposal.data.location)" class="btn btn-info btn-fill">Save</button>
             </div>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2 col-xs-6 col-sm-3 lower">
             <button ng-show="proposal.data.status != 'open'" style="margin-bottom: 10px; border-width: 1px; border-color: brown; color: brown" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsReopened()">
               <i class="pe-7s-refresh"></i>
               Reopen
