@@ -181,7 +181,7 @@ AccountsTemplates.configure({
     //confirmPassword: true,
     //continuousValidation: false,
     //displayFormLabels: false,
-    //forbidClientAccountCreation: false,
+    forbidClientAccountCreation: true,
     //formValidationFeedback: true,
     //homeRoutePath: 'paaths',
     //showAddRemoveServices: false,

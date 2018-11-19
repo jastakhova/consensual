@@ -119,3 +119,11 @@
 .nav-open .nav > li.only-mobile  {
   display: inline;
 }
+
+.at-pwd-form {
+  display: none;
+}
+
+.at-sep {
+  display: none;
+}

@@ -55,7 +55,10 @@ Thanks for your support!
 - Multiparty agreements
 - Repeating and scheduled tasks
 - Browse "offers" (open/unassigned standing agreements)
-- Description field should accept markdown
+- Description field should accept markdown, checkboxes
+- Adding images
+- Free text for estimates (e.g. "in 2 weeks", "tomorrow")
+- Preset agreements to start new client?
 
 
 ### Bugs & Mysteries
