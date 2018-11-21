@@ -29,6 +29,9 @@ Thanks for your support!
 - Add user profile page (+ unsubscribe)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
+- Single field add item
+- Free text for estimates (e.g. "in 2 weeks", "tomorrow")
+- Description field should accept markdown, checkboxes
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments
@@ -40,7 +43,17 @@ Thanks for your support!
 - Description field should be taller on web (not sure how it is on mobile) [mobile]
 - Proposal description shouldn't be a disabled textarea [needs discussion]
 
-### Beta Release (v1): 2019 Q1
+### Kickstarter Campaign: 2019 Q1
+- Identity/Logo
+- Video(s)
+- About Us Page
+- Blog
+- Instagram
+- Marketing
+-- Social Media
+-- Meetups
+
+### Beta Release (v1): 2019 Q2
 - Notifications [app]
 - Start and end dates (ranges)
 - Ability to mark tasks as 'In Progress'
@@ -49,16 +62,22 @@ Thanks for your support!
 - Allow receiver to delegate fulfillment
 - Integration with Google Calendar
 - Integration with iCal
+- Single field, multi-line entry for multiple items
+- Repeating and scheduled tasks
+- Adding images
+- Agreement witness(es)
+- Electronic signatures
+- Scaling architecture
+
+### Series A Funding Round: 2019 Q3
+- Networking
 
 ### Future Releases: No ETA
 - Multiparty agreements
-- Repeating and scheduled tasks
+- Dependencies and subtasks
 - Browse "offers" (open/unassigned standing agreements)
-- Description field should accept markdown, checkboxes
-- Adding images
-- Free text for estimates (e.g. "in 2 weeks", "tomorrow")
-- Preset agreements to start new client?
-
+- Social Karma
+- Arbitration
 
 ### Bugs & Mysteries
 - Date picker sometimes freezes (not sure how to reproduce)
