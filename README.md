@@ -23,25 +23,30 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
-- Assess current state of the app (Yulia) **Work In Progress**
-- Assign tasks to people not yet registered
-- Full text agreement search
-- Add user profile page (+ unsubscribe)
+- Assess current state of the app (Yulia) **Work In Progress** ETA: Nov 27th (was blocked by Xcode 10 update)
+- Assign tasks to people not yet registered (estimate: 1 day) **Work In Progress** ETA: Nov 26th
+- Full text agreement search (estimate: 1 day)
+- Add user profile page (+ unsubscribe) (estimate: 2 days)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
 - Single field add item
 - Free text for estimates (e.g. "in 2 weeks", "tomorrow")
 - Description field should accept markdown, checkboxes
+- Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
+- proposal page should be opened by the click on the whole row in todo list
+- Add time for activity records. Add activity on creation of task
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments
 - It's not obvious what are you about to approve
 - Error handling saves empty object to log
-- Hamburger menu in upper right of mobile view does nothing. What should it do? [mobile]
 - Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
 - Date should not wrap...and there should be a min width for the date picker
 - Description field should be taller on web (not sure how it is on mobile) [mobile]
-- Proposal description shouldn't be a disabled textarea [needs discussion]
+- Proposal description shouldn't be a disabled textarea. They are not bright enough
+- Done and cancelled agreements are not shown anywhere in todo list view
+- Side menu should be closed when "Tasks" link is clicked
+- ETA is seen as creation date and is set by people to NOW
 
 ### Kickstarter Campaign: 2019 Q1
 - Identity/Logo
