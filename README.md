@@ -35,6 +35,9 @@ Thanks for your support!
 - Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
 - proposal page should be opened by the click on the whole row in todo list
 - Add time for activity records. Add activity on creation of task
+- Limitation for how many people you can invite
+- If the person was already invited
+- Input error check for inviting
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments
@@ -154,6 +157,7 @@ $ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.
 meteor mongo
 >> db.<table>.find() - show the whole table
 >> db.<table>.find().pretty() - you can make it pretty
+>> db.<table>.remove({}) - removes all records
 ```
 
 ### Sources

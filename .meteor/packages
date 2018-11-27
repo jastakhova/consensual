@@ -33,6 +33,6 @@ blaze
 useraccounts:core
 useraccounts:ionic
 mrt:moment-timezone
+email@1.2.3
 twbs:bootstrap
 jquery
-email@1.2.3

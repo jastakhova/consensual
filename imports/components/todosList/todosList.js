@@ -1,4 +1,4 @@
-import { Tasks } from '../../api/tasks.js';
+import { Tasks, Invitees } from '../../api/tasks.js';
 import moment from 'moment';
 import { Controller } from 'angular-ecmascript/module-helpers';
 import DateTimePicker from 'date-time-picker';
@@ -14,6 +14,7 @@ export default class TodosListCtrl extends Controller {
   	this.scope = arguments[0];
 
     this.handleTasks = this.subscribe('tasks');
+    this.handleInvitees = this.subscribe('invitees');
 
     this.handleAllUsers = this.subscribe('allusers');
 
@@ -21,6 +22,7 @@ export default class TodosListCtrl extends Controller {
 
     this.proposingInProgress = false;
     this.filtersOpen = false;
+    this.newInvitee = {};
 
     const nextMidnight = new Date(moment().format());
     nextMidnight.setHours(24, 0, 0, 0);
@@ -69,6 +71,9 @@ export default class TodosListCtrl extends Controller {
     this.adjustFilters = function() {
       // the first filter (index == 0) is not shown and has top == 0
       var filters = $("#filters").find($("button.filterToggle")).slice(1);
+      if (filters.length == 0) {
+        return;
+      }
       var firstRowTop = $(filters[0]).offset().top;
       var hasHidden = false;
       var filterToggleControl = $($("#filters").find($("a.btn-more"))[0]);
@@ -96,7 +101,7 @@ export default class TodosListCtrl extends Controller {
 
     this.helpers({
       tasks() {
-        if (!this.handleTasks.ready()) {
+        if (!this.handleTasks.ready() || !this.handleInvitees.ready()) {
           return [];
         }
 
@@ -104,7 +109,8 @@ export default class TodosListCtrl extends Controller {
       	var selector = this.getReactively("currentFilter");
       	var sortMethod = this.getReactively("currentSort");
 
-      	var id2user = ProfileUtils.createMapFromList(Meteor.users.find().fetch(), "_id");
+        var users = Meteor.users.find().fetch().concat(Invitees.find().fetch());
+      	var id2user = ProfileUtils.createMapFromList(users, "_id");
 
 				function getSuggest() {
 					var suggest = [];
@@ -155,6 +161,7 @@ export default class TodosListCtrl extends Controller {
           return {name: sortMethod.configuration.groupingName(groupKey), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
         });
         } catch (err) {
+          console.log(err);
           ProfileUtils.showError();
           Meteor.call('email.withError', err);
           return [];
@@ -198,7 +205,7 @@ export default class TodosListCtrl extends Controller {
     Meteor.call('tasks.insert', {
       task: newTask,
       time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format(),
-      receiver: $('.typeahead').typeahead('getActive').id
+      receiver: $('.typeahead').typeahead('getActive') ? $('.typeahead').typeahead('getActive').id : this.newReceiverId
       }, ProfileUtils.processMeteorResult);
 
     // Clear form
@@ -214,6 +221,7 @@ export default class TodosListCtrl extends Controller {
     this.setUntouchedAndPristine(this, 'newDate');
     this.runParsers(this, 'newDate', this.newDate);
     this.newTime = '';
+    this.newInvitee = {};
     this.setUntouchedAndPristine(this, 'newTime');
     this.runParsers(this, 'newTime', this.newTime);
   }
@@ -318,6 +326,27 @@ export default class TodosListCtrl extends Controller {
 			controller.scope.$apply();
 			timePicker.destroy();
 		});
+	}
+
+	inviteNewPerson() {
+	  var to = this.newInvitee;
+	  var controller = this;
+	  Meteor.call('email.invite', to, function(error, result) {
+      Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] =
+        {id: result, name: to.name};
+
+      $(".typeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
+      controller.newReceiver = to.name;
+      controller.newReceiverId = result;
+      $('.typeahead').val(to.name);
+      if ($('.typeahead').typeahead('getActive')) {
+        $('.typeahead').typeahead('getActive').id = result;
+        $('.typeahead').typeahead('getActive').name = to.name;
+      }
+
+      controller.setViewValue(controller, 'newReceiver', to.name, 'click');
+      controller.runParsers(controller, 'newReceiver', controller.newReceiver);
+    });
 	}
 }
 

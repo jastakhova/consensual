@@ -8,6 +8,7 @@ import { Promise } from 'meteor/promise';
 
 export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
+export const Invitees = new Mongo.Collection('invitees');
 
 // available where Tasks is imported
 datetimeDisplayFormat = "MMM DD, YYYY, h:mm A";
@@ -53,7 +54,12 @@ Meteor.methods({
       throw new Meteor.Error('not-authorized');
     }
 
-    var receiver = Meteor.users.findOne({_id: newTask.receiver});
+    if (!Meteor.isServer) {
+      return;
+    }
+
+    var receiver = Meteor.users.findOne({_id: newTask.receiver}) || Invitees.findOne({_id: newTask.receiver});
+    console.log(receiver);
     var maxTitleLength = 20;
     var titleIndex = Math.min(maxTitleLength, newTask.task.length);
     var newLineIndex = newTask.task.indexOf("\n");
@@ -61,8 +67,7 @@ Meteor.methods({
       titleIndex = Math.min(titleIndex, newLineIndex);
     }
     var newTitle = newTask.task.slice(0, titleIndex) + (newTask.task.length !== titleIndex ? "..." : "");
-
-    Tasks.insert({
+    var createdTask = {
       text: newTask.task,
       title: newTitle,
       eta: new Date(moment(newTask.time).format()).getTime(),
@@ -77,9 +82,11 @@ Meteor.methods({
       comments: [],
       status: 'open',
       archived: false
-    });
+    };
 
-    notifyOnNewValue(newTask, newTask.receiver, "created", "agreement", newTask.task);
+    var id = Tasks.insert(createdTask);
+    createdTask['_id'] = id;
+    notifyOnNewValue(createdTask, newTask.receiver, "created", "agreement", newTask.task);
   },
   // NOT USED but preserved for future.
   // SHOULD contain notification functionality
@@ -332,8 +339,28 @@ Meteor.methods({
     }
   },
   'email.withError'(error) {
-    Meteor.call('email.send', 'Team Consensual <team.consensual@gmail.com>', "New Error " + error.message,
-      "Error occurred for " + getName(Meteor.user()) + " (" + Meteor.userId() + "). Proceed to " + process.env.ROOT_URL);
+    if (Meteor.user()) {
+      Meteor.call('email.send', 'Team Consensual <team.consensual@gmail.com>', "New Error " + error.message,
+        "Error occurred for " + getName(Meteor.user()) + " (" + Meteor.userId() + "). Proceed to " + process.env.ROOT_URL);
+    }
+  },
+  'email.invite'(to) {
+    check(to.name, String);
+    check(to.email, String);
+
+    if (Meteor.user()) {
+      Meteor.call('email.send', to.name + ' <' + to.email + '>',
+        "Invitation to join Consensual from " + Meteor.user().profile.name,
+        "<html><body>Hi!<br/>" + Meteor.user().profile.name + " invites you to join Consensual app. Proceed to " + process.env.ROOT_URL +
+            ".</body></html>");
+
+      return Invitees.insert({
+         invitorId: Meteor.userId(),
+         username: to.name,
+         creationTime: new Date(moment().format()).getTime(),
+         email: to.email
+       });
+    }
   }
 });
 
@@ -344,6 +371,10 @@ if (Meteor.isServer) {
     // Only publish tasks that are public or belong to the current user
     Meteor.publish('tasks', function tasksPublication() {
       return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
+    });
+
+    Meteor.publish('invitees', function inviteesPublication() {
+      return Invitees.find({invitorId: this.userId});
     });
 
     Meteor.publish("allusers",

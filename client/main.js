@@ -156,11 +156,7 @@ consensual.directive('contactsOnly', function() {
             valid = true;
           }
         }
-        if (valid) {
-          mCtrl.$setValidity('contacts-only', true);
-        } else {
-          mCtrl.$setValidity('contacts-only', false);
-        }
+        mCtrl.$setValidity('contacts-only', valid);
         return value;
       }
       mCtrl.$parsers.push(contactsOnly);

@@ -131,3 +131,15 @@
 .lower {
   margin-top: 20px;
 }
+
+.alternative-action {
+  color: #B8B8B8;
+  text-align: right;
+  text-decoration-style: dashed;
+  text-decoration-line: underline;
+  padding-top: 5px;
+}
+
+.link {
+  cursor: pointer;
+}
