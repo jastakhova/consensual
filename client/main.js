@@ -6,6 +6,7 @@ import angularMeteor from 'angular-meteor';
 import moment from 'moment';
 import todosList from '../imports/components/todosList/todosList';
 import '../imports/startup/accounts-config.js';
+import { Accounts } from 'meteor/accounts-base';
 import 'angular-animate';
 import 'angular-sanitize';
 import 'angular-ui-router';
@@ -211,3 +212,7 @@ if (Meteor.isCordova) {
 } else {
   angular.element(document).ready(onReady);
 }
+
+Accounts.onLogin(function(event) {
+  Meteor.call('invitees.register');
+});

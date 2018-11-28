@@ -361,6 +361,30 @@ Meteor.methods({
          email: to.email
        });
     }
+  },
+  'invitees.register' () {
+    var user = Meteor.user();
+    if (user && user.services && user.services.facebook && user.services.facebook.email && Meteor.isServer) {
+      var email = user.services.facebook.email;
+      var newUserId = Meteor.userId();
+
+      Invitees.find({email}).fetch().forEach(invitee => {
+        Tasks.update({authorId: invitee._id}, {
+          $set: {
+              authorId: newUserId
+            }
+          }, { multi: true });
+        Tasks.update({receiverId: invitee._id}, {
+          $set: {
+              receiverId: newUserId
+            }
+          }, { multi: true });
+      });
+
+      Invitees.remove({email});
+
+      // TODO: let the invitors know
+    }
   }
 });
 

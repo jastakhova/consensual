@@ -23,9 +23,7 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
-- Assess current state of the app (Yulia) **Work In Progress** ETA: Nov 27th (was blocked by Xcode 10 update)
-- Assign tasks to people not yet registered (estimate: 1 day) **Work In Progress** ETA: Nov 26th
-- Full text agreement search (estimate: 1 day)
+- Full text agreement search (estimate: 1 day) **Work In Progress** ETA: Nov 28th
 - Add user profile page (+ unsubscribe) (estimate: 2 days)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
@@ -38,6 +36,7 @@ Thanks for your support!
 - Limitation for how many people you can invite
 - If the person was already invited
 - Input error check for inviting
+- Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update)
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments
@@ -76,6 +75,7 @@ Thanks for your support!
 - Agreement witness(es)
 - Electronic signatures
 - Scaling architecture
+- Let invitors know that their invitees joined
 
 ### Series A Funding Round: 2019 Q3
 - Networking

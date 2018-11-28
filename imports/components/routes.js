@@ -48,7 +48,6 @@ export default class RoutesConfig extends Config {
       });
 
     this.$urlRouterProvider.otherwise('tab/todo');
-
   }
 }
 
