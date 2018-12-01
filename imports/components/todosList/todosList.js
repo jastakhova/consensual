@@ -212,6 +212,10 @@ export default class TodosListCtrl extends Controller {
     return ProfileUtils.picture(Meteor.user());
   }
 
+  gotoProposal(taskId) {
+    this.$state.go('tab.proposal', {'proposalId': taskId});
+  }
+
   addTask(newTask) {
     Meteor.call('tasks.insert', {
       task: newTask,

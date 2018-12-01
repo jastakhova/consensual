@@ -22,23 +22,23 @@ Thanks for your support!
 ## Roadmap
 
 ### Alpha Release (v0): 2018 Q4
-#### Active ToDo
+#### Active ToDo (2 weeks)
 - Required fields disable add-proposal on second run (estimate: 1 day) **Work In Progress** ETA: Dec 2nd
 - Add user profile page (+ unsubscribe) (estimate: 2 days)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
-- Single field add item
-- Free text for estimates (e.g. "in 2 weeks", "tomorrow")
-- Description field should accept markdown, checkboxes
+- Single field add item (estimate: 1 day)
+- Free text for estimates (e.g. "in 2 weeks", "tomorrow") (estimate: 1 day)
+- Description field should accept markdown, checkboxes (estimate: 1 day)
 - Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
-- proposal page should be opened by the click on the whole row in todo list
-- Add time for activity records. Add activity on creation of task
-- Limitation for how many people you can invite
-- If the person was already invited
-- Input error check for inviting
+- Add time for activity records. Add activity on creation of task (estimate: 2h)
+- Limitation for how many people you can invite (estimate: 2h)
+- If the person was already invited (estimate: 2h)
+- Input error check for inviting (estimate: 4h)
 - Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update)
-- clear the search
-- client side search (not regexp)
+- clear the search (estimate: 2h)
+- client side search (not regexp) (estimate: 2 days)
+- By who should sort by assignee and author
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments

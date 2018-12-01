@@ -126,7 +126,7 @@
           <div class="table-full-width">
             <table class="table">
               <tbody>
-              <tr ng-repeat="task in taskList.tasks" style="background-color: {{task.toCurrentUser ? 'white' : (task.fromCurrentUser ? 'rgba(0,0,0,.1)' : 'rgba(0,0,0,.05)')}}">
+              <tr ng-repeat="task in taskList.tasks" style="background-color: {{task.toCurrentUser ? 'white' : (task.fromCurrentUser ? 'rgba(0,0,0,.1)' : 'rgba(0,0,0,.05)')}}" ng-click="todoList.gotoProposal(task._id)" class="link">
                 <td>
                   <a href="#!/tab/proposal/{{task._id}}"><i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i></a>
                 </td>
