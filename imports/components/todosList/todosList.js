@@ -23,6 +23,8 @@ export default class TodosListCtrl extends Controller {
     this.proposingInProgress = false;
     this.filtersOpen = false;
     this.newInvitee = {};
+    this.searchEdit = false;
+    this.search = "";
 
     const nextMidnight = new Date(moment().format());
     nextMidnight.setHours(24, 0, 0, 0);
@@ -97,7 +99,7 @@ export default class TodosListCtrl extends Controller {
 
     $(window).resize(this.adjustFilters);
     $("#filters").resize(this.adjustFilters);
-    $(document).ready(this.adjustFilters);
+    var filterAdjustingWasMade = false;
 
     this.helpers({
       tasks() {
@@ -105,9 +107,15 @@ export default class TodosListCtrl extends Controller {
           return [];
         }
 
+        if (!filterAdjustingWasMade) {
+          this.adjustFilters();
+          filterAdjustingWasMade = true;
+        }
+
         try {
       	var selector = this.getReactively("currentFilter");
       	var sortMethod = this.getReactively("currentSort");
+      	var searchValue = this.getReactively("search");
 
         var users = Meteor.users.find().fetch().concat(Invitees.find().fetch());
       	var id2user = ProfileUtils.createMapFromList(users, "_id");
@@ -141,7 +149,7 @@ export default class TodosListCtrl extends Controller {
           return x;
         }
 
-        if (sortMethod.groups && selector.name === this.filters[0].name) {
+        if (sortMethod.groups && selector.name === this.filters[0].name && searchValue === "") {
           var groups = sortMethod.groups.map(sortGroup => {
             var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
             return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length, sliced: tasks.length > sortGroup.limit, appliedFilter: sortGroup.appliedFilter};
@@ -155,7 +163,10 @@ export default class TodosListCtrl extends Controller {
         }
 
         var sortingField = sortMethod.configuration.sort;
-        var tasks = Tasks.find(selector.selector, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
+        searchValue = searchValue.replace(/\W/g, "");
+        var searchRegex = new RegExp(searchValue, "i");
+        var selectorWithSearch = searchValue === "" ? selector.selector : {$and: [selector.selector, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
+        var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
         return Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
           return {name: sortMethod.configuration.groupingName(groupKey), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
@@ -242,6 +253,10 @@ export default class TodosListCtrl extends Controller {
 	flipProposingStatus() {
 		this.proposingInProgress = !this.proposingInProgress;
 	}
+
+	flipSearchEditing() {
+    this.searchEdit = true;
+  }
 
 	flipFiltersStatus() {
     this.filtersOpen = !this.filtersOpen;

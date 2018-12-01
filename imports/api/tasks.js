@@ -397,16 +397,16 @@ if (Meteor.isServer) {
       return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
     });
 
-    Meteor.publish('invitees', function inviteesPublication() {
-      return Invitees.find({invitorId: this.userId});
-    });
+  Meteor.publish('invitees', function inviteesPublication() {
+    return Invitees.find({invitorId: this.userId});
+  });
 
-    Meteor.publish("allusers",
-    	function () {
-          	return Meteor.users.find({},
-              {fields: {"username": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.id": 1}});
-          }
-    );
+  Meteor.publish("allusers",
+    function () {
+          return Meteor.users.find({},
+            {fields: {"username": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.id": 1}});
+        }
+  );
 
     Meteor.setInterval(function() {
       console.log("Starting sending cycle...");

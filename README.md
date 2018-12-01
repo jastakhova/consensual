@@ -23,7 +23,7 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Active ToDo
-- Full text agreement search (estimate: 1 day) **Work In Progress** ETA: Nov 28th
+- Required fields disable add-proposal on second run (estimate: 1 day) **Work In Progress** ETA: Dec 2nd
 - Add user profile page (+ unsubscribe) (estimate: 2 days)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
@@ -37,6 +37,8 @@ Thanks for your support!
 - If the person was already invited
 - Input error check for inviting
 - Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update)
+- clear the search
+- client side search (not regexp)
 
 #### Known Issues
 - Comments block CSS doesn't look nice when there is no comments
