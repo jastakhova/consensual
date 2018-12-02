@@ -219,7 +219,7 @@ export default class TodosListCtrl extends Controller {
   addTask(newTask) {
     Meteor.call('tasks.insert', {
       task: newTask,
-      time: moment.utc(new Date(this.newDate + ' ' + this.newTime)).format(),
+      time: moment(this.newDate + ' ' + this.newTime, "MM-DD-YYYY HH:mm").utc().format(),
       receiver: $('.typeahead').typeahead('getActive') ? $('.typeahead').typeahead('getActive').id : this.newReceiverId
       }, ProfileUtils.processMeteorResult);
 
