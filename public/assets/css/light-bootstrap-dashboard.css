@@ -1114,7 +1114,6 @@ fieldset[disabled] .btn-neutral.active {
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
     background-color: #F5F5F5;
     color: #888888;
-    cursor: not-allowed;
 }
 
 .input-group-btn .btn {

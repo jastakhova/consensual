@@ -106,8 +106,8 @@ export default class ProposalCtrl extends Controller {
 		return this.status(task.receiverStatus);
 	}
 
-	flipTitleEditingStatus() {
-    this.editingTitle = !this.editingTitle;
+	flipTitleEditingStatus(newOne) {
+    this.editingTitle = newOne ? newOne : !this.editingTitle;
   }
 
 	flipTimeEditingStatus() {
@@ -118,8 +118,8 @@ export default class ProposalCtrl extends Controller {
     this.editingLocation = !this.editingLocation;
   }
 
-  flipDescriptionEditingStatus() {
-    this.editingDescription = !this.editingDescription;
+  flipDescriptionEditingStatus(newOne) {
+    this.editingDescription = newOne ? newOne : !this.editingDescription;
   }
 
   flipActivityShowingStatus() {
