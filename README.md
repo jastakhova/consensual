@@ -22,8 +22,17 @@ Thanks for your support!
 ## Roadmap
 
 ### Alpha Release (v0): 2018 Q4
+#### Urgent tasks
+- Time is opening up on any field edit
+- required field rules on second task addition
+- Suggest on mobile device click
+- Title and description are ugly in proposal page
+- What to o if email of invitee doesn’t match?
+- Some facebook accounts doesn’t show email 
+
 #### Active ToDo (2 weeks)
 - Required fields disable add-proposal on second run (estimate: 1 day) **Work In Progress** ETA: Dec 2nd
+- In mobile acknowledge should be with other action buttons and rename the button (estimate: 1h)
 - Add user profile page (+ unsubscribe) (estimate: 2 days)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
@@ -41,6 +50,7 @@ Thanks for your support!
 - By who should sort by assignee and author
 
 #### Known Issues
+- discuss roles (witness, who is assignee, etc)
 - Comments block CSS doesn't look nice when there is no comments
 - It's not obvious what are you about to approve
 - Error handling saves empty object to log

@@ -358,7 +358,7 @@ Meteor.methods({
          invitorId: Meteor.userId(),
          username: to.name,
          creationTime: new Date(moment().format()).getTime(),
-         email: to.email
+         email: to.email.toLowerCase()
        });
     }
   },
@@ -367,8 +367,11 @@ Meteor.methods({
     if (user && user.services && user.services.facebook && user.services.facebook.email && Meteor.isServer) {
       var email = user.services.facebook.email;
       var newUserId = Meteor.userId();
+      console.log("Should register new invitee " + newUserId + " ?..");
 
       Invitees.find({email}).fetch().forEach(invitee => {
+        console.log("Merging invitee " + invitee._id + " to " + newUserId);
+
         Tasks.update({authorId: invitee._id}, {
           $set: {
               authorId: newUserId
