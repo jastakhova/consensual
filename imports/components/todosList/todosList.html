@@ -34,12 +34,12 @@
           <span class="title" style="padding-left:5px">Add a new proposal...</span>
         </div>
         <div class="content" ng-show="todoList.proposingInProgress">
-          <form name="addTaskForm" ng-submit="todoList.addTask(todoList.newTask)">
+          <form name="addTaskForm" ng-submit="todoList.addTask(todoList.newTask)" autocomplete="off">
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
                   <label>Proposal body</label>
-                  <textarea rows="5" name="newTask" ng-model="todoList.newTask" class="form-control" placeholder="Describe your proposal" required-field></textarea>
+                  <textarea rows="5" name="newTask" ng-model="todoList.newTask" class="form-control" placeholder="Describe your proposal" required minlength='1'></textarea>
                 </div>
               </div>
             </div>
@@ -47,8 +47,9 @@
             <div class="row">
               <div class="col-md-5">
                 <div class="form-group">
-                  <label>Receiver</label><input name="autocompleteOff" style="visibility:hidden;">
-                  <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" autocomplete="off" required-field contacts-only>
+                  <label>Receiver</label>
+                  <input type="text" name="autocompleteOff1" autocomplete="off" style="display:none;">
+                  <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
                   <div class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to register</div>
                 </div>
               </div>
@@ -57,7 +58,7 @@
                   <label>Date</label>
                   <div class="form-group" ng-click="todoList.showDatePicker()">
                     <div class="input-group">
-                      <input type="text" name="newDate" class="form-control" ng-model="todoList.newDate" readonly required-field>
+                      <input type="text" name="newDate" class="form-control" ng-model="todoList.newDate" readonly required minlength='1'>
                       <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                     </div>
                   </div>
@@ -68,7 +69,7 @@
                   <label>Time</label>
                   <div class="form-group" ng-click="todoList.showTimePicker()">
                     <div class="input-group">
-                      <input type="text" name="newTime" class="form-control" ng-model="todoList.newTime" readonly required-field>
+                      <input type="text" name="newTime" class="form-control" ng-model="todoList.newTime" readonly required minlength='1'>
                       <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
                     </div>
                   </div>
@@ -158,20 +159,22 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-body card" style="box-shadow: none; margin-bottom: 0px; padding-bottom: 0px;">
-            <form>
+            <form autocomplete="off">
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group">
-                    <label>Name</label><input name="autocompleteOff" style="visibility:hidden;">
-                    <input type="text" name="name" ng-model="todoList.newInvitee.name" class="form-control" placeholder="Invitee's full name" autocomplete="off">
+                    <label>Name</label>
+                    <input type="text" name="autocompleteOff12" style="display:none;">
+                    <input type="text" ng-model="todoList.newInvitee.name" class="form-control" placeholder="Invitee's full name" autocomplete="nope" autofill="off"/>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group">
-                    <label>Email</label><input name="autocompleteOff" style="visibility:hidden;">
-                    <input type="text" name="email" ng-model="todoList.newInvitee.email" class="form-control" placeholder="Invitee's email" autocomplete="off">
+                    <label>Email</label>
+                    <input type="text" name="autocompleteOff13" style="display:none;">
+                    <input type="text" ng-model="todoList.newInvitee.email" class="form-control" placeholder="Invitee's email" autocomplete="nope" autofill="off"/>
                   </div>
                 </div>
               </div>

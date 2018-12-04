@@ -23,11 +23,10 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Urgent tasks
-- required field rules on second task addition
 - Suggest on mobile device click
 - Title and description are ugly in proposal page
-- What to o if email of invitee doesn’t match?
-- Some facebook accounts doesn’t show email 
+- What to do if email of invitee doesn’t match? - send inviteeId in the link to Consensual from email
+- Some facebook accounts doesn’t show email  - why?
 
 #### Active ToDo (2 weeks)
 - Required fields disable add-proposal on second run (estimate: 1 day) **Work In Progress** ETA: Dec 2nd

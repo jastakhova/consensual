@@ -224,21 +224,14 @@ export default class TodosListCtrl extends Controller {
       }, ProfileUtils.processMeteorResult);
 
     // Clear form
-
     this.newTask = '';
-    this.setUntouchedAndPristine(this, 'newTask');
-    this.runParsers(this, 'newTask', this.newTask);
+    this.$scope.addTaskForm.$setPristine();
+    this.$scope.addTaskForm.$setUntouched();
     this.newReceiver = '';
-    this.setUntouchedAndPristine(this, 'newReceiver');
-    this.runParsers(this, 'newReceiver', this.newReceiver);
     $('.typeahead').val(''); //TODO: clears form but not model
     this.newDate = '';
-    this.setUntouchedAndPristine(this, 'newDate');
-    this.runParsers(this, 'newDate', this.newDate);
     this.newTime = '';
     this.newInvitee = {};
-    this.setUntouchedAndPristine(this, 'newTime');
-    this.runParsers(this, 'newTime', this.newTime);
   }
 
   setChecked(task) {
