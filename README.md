@@ -23,8 +23,6 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Urgent tasks
-- Suggest on mobile device click
-- Title and description are ugly in proposal page
 - What to do if email of invitee doesn’t match? - send inviteeId in the link to Consensual from email
 - Some facebook accounts doesn’t show email  - why?
 
@@ -46,6 +44,9 @@ Thanks for your support!
 - clear the search (estimate: 2h)
 - client side search (not regexp) (estimate: 2 days)
 - By who should sort by assignee and author
+- Not obvious how to make self-agreements
+- Not obvious what to put into Receivers input (someone tried email)
+- Browser suggest in different browsers (gathering statistical data so far from users)
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)
