@@ -29,7 +29,8 @@
 
     <div class="content">
       <div class="container-fluid">
-        <form name="editProposalForm">
+        <form name="editProposalForm" autocomplete="off">
+        <button class="hidden">Receives Enter key for the form and does nothing</button>
         <div class="row">
           <div class="col-md-2 col-xs-6 col-sm-3 center" ng-show="proposal.data.authorId != proposal.data.receiverId">
             <div class="header-title">Author</div>
@@ -49,7 +50,7 @@
           </div>
           <div class="col-md-2 col-xs-6 col-sm-3 lower">
             <span class="header-title">ETA:</span>
-            <button ng-show="!proposal.editingTime" rel="tooltip" title="Edit" ng-click="proposal.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
+            <button type="button" ng-show="!proposal.editingTime" rel="tooltip" title="Edit" ng-click="proposal.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
             <div ng-show="!proposal.editingTime">{{proposal.data.ETA}}
@@ -74,26 +75,26 @@
               </div>
             </div>
             <div class="header-title" style="margin-top: 20px">Location:
-              <button rel="tooltip" title="{{proposal.editingLocation ? 'Save' : 'Edit'}}" ng-click="proposal.editingLocation ? proposal.saveLocation(proposal.data.location) : proposal.flipLocationEditingStatus()" class="btn {{proposal.editingLocation ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
+              <button type="button" rel="tooltip" title="{{proposal.editingLocation ? 'Save' : 'Edit'}}" ng-click="proposal.editingLocation ? proposal.saveLocation(proposal.data.location) : proposal.flipLocationEditingStatus()" class="btn {{proposal.editingLocation ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
                 <i class="fa fa-edit"></i>
               </button>
             </div>
             <div ng-show="!proposal.editingLocation">{{proposal.data.location}}</div>
             <div ng-show="proposal.editingLocation">
-              <input type="text" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field>
+              <input type="text" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field autocomplete="off">
             </div>
           </div>
           <div class="col-md-2 col-xs-6 col-sm-3 lower">
-            <button ng-show="proposal.data.status != 'open'" style="margin-bottom: 10px; border-width: 1px; border-color: brown; color: brown" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsReopened()">
+            <button type="button" ng-show="proposal.data.status != 'open'" style="margin-bottom: 10px; border-width: 1px; border-color: brown; color: brown" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsReopened()">
               <i class="pe-7s-refresh"></i>
               Reopen
             </button>
-            <button ng-show="proposal.data.status != 'done' && !proposal.data.archived" style="margin-bottom: 10px; border-width: 1px; border-color: green; color: green" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsDone()">
+            <button type="button" ng-show="proposal.data.status != 'done' && !proposal.data.archived" style="margin-bottom: 10px; border-width: 1px; border-color: green; color: green" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsDone()">
               <i class="pe-7s-like2"></i>
               Done
             </button>
             <br/>
-            <button ng-show="proposal.data.status != 'cancelled' && !proposal.data.archived" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsCancelled()">
+            <button type="button" ng-show="proposal.data.status != 'cancelled' && !proposal.data.archived" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsCancelled()">
               <i class="pe-7s-trash"></i>
               Cancel
             </button>
@@ -102,18 +103,18 @@
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
             <span class="header-title">Title</span>&nbsp;
-            <button rel="tooltip" title="{{proposal.editingTitle ? 'Save' : 'Edit'}}" ng-click="proposal.editingTitle ? proposal.saveTitle(proposal.data.title) : proposal.flipTitleEditingStatus()" ng-disabled="proposal.editingTitle && editProposalForm.editTitle.$invalid" class="btn {{proposal.editingTitle ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
+            <button type="button" rel="tooltip" title="{{proposal.editingTitle ? 'Save' : 'Edit'}}" ng-click="proposal.editingTitle ? proposal.saveTitle(proposal.data.title) : proposal.flipTitleEditingStatus()" ng-disabled="proposal.editingTitle && editProposalForm.editTitle.$invalid" class="btn {{proposal.editingTitle ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa {{proposal.editingTitle ? 'fa-check-square': 'fa-edit'}}"></i>
             </button>
             <div ng-click="proposal.flipTitleEditingStatus(true)">
-            <input type="text" style="padding-left: 30px;" ng-readonly="!proposal.editingTitle" class="form-control form-group {{proposal.editingTitle ? '' : 'link'}}" ng-keydown="$event.keyCode === 13 && proposal.saveTitle(proposal.data.title)" ng-model="proposal.data.title" name="editTitle" required-field/>
+            <input type="text" style="padding-left: 30px;" ng-readonly="!proposal.editingTitle" class="form-control form-group {{proposal.editingTitle ? '' : 'link'}}" ng-keydown="$event.keyCode === 13 && proposal.saveTitle(proposal.data.title)" ng-model="proposal.data.title" name="editTitle" required-field autocomplete="off"/>
             </div>
           </div>
         </div>
         <div class="row" style="margin-top: 30px">
           <div class="col-md-8">
             <span class="header-title">Description</span>&nbsp;
-            <button rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription(proposal.data.text) : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
+            <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription(proposal.data.text) : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
             <div ng-click="proposal.flipDescriptionEditingStatus(true)">
@@ -123,7 +124,7 @@
           </div>
         </div>
         <div class="row" ng-show="proposal.currentUserIsInDoubt" style="margin-bottom: 20px; margin-left: 2px">
-          <button type="submit" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">{{proposal.acknowledgeLabel}}</button>
+          <button type="button" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">{{proposal.acknowledgeLabel}}</button>
         </div>
         <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.activity.length > 0">
           <div class="card col-md-8">
@@ -148,7 +149,7 @@
             </div>
             <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px;text-align: right;">
               <textarea placeholder="Enter your comment..." style="padding-left: 30px; text-align: right;" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field></textarea>
-              <button ng-disabled="editProposalForm.addComment.$pristine || editProposalForm.addComment.$invalid" type="submit" ng-click="proposal.addComment()" class="btn btn-info btn-fill" style="margin-bottom: 15px;">Add comment</button>
+              <button ng-disabled="editProposalForm.addComment.$pristine || editProposalForm.addComment.$invalid" type="button" ng-click="proposal.addComment()" class="btn btn-info btn-fill" style="margin-bottom: 15px;">Add comment</button>
             </div>
             <div class="content pre-scrollable" ng-show="proposal.commentsShowed">
               <div ng-repeat="comment in proposal.data.comments | orderBy:'-time'">

@@ -134,11 +134,7 @@ consensual.directive('requiredField', function() {
         mCtrl.$setValidity('required-field', false);
       }
       function requiredField(value) {
-        if (value !== "") {
-          mCtrl.$setValidity('required-field', true);
-        } else {
-          mCtrl.$setValidity('required-field', false);
-        }
+        mCtrl.$setValidity('required-field', (value !== ""));
         return value;
       }
       mCtrl.$parsers.push(requiredField);

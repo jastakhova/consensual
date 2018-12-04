@@ -23,7 +23,6 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Urgent tasks
-- Time is opening up on any field edit
 - required field rules on second task addition
 - Suggest on mobile device click
 - Title and description are ugly in proposal page
