@@ -67,6 +67,14 @@ Meteor.methods({
       titleIndex = Math.min(titleIndex, newLineIndex);
     }
     var newTitle = newTask.task.slice(0, titleIndex) + (newTask.task.length !== titleIndex ? "..." : "");
+
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'agreement',
+       time: new Date().getTime()
+     };
+
     var createdTask = {
       text: newTask.task,
       title: newTitle,
@@ -78,7 +86,7 @@ Meteor.methods({
       authorStatus: 'green',
       receiverStatus: Meteor.userId() === newTask.receiver ? 'green' : 'yellow',
       location: '...',
-      activity: [],
+      activity: [activity],
       comments: [],
       status: 'open',
       archived: false

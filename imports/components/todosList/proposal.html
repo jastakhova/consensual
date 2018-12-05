@@ -137,7 +137,7 @@
             <div class="content" ng-show="proposal.activityShowed">
               <hr style="margin-top: 10px">
               <div ng-repeat="activityRecord in proposal.data.activity | orderBy:'-time'">
-                <b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }}</b> changed <b>{{activityRecord.field}}</b> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.
+                <b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }}</b> {{activityRecord.field === 'agreement' ? 'created this ' : 'changed'}} <b>{{activityRecord.field}}</b><span ng-show="activityRecord.oldValue"> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.</span>
               </div>
             </div>
           </div>

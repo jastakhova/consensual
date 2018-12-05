@@ -59,6 +59,10 @@ None
 - In a small font inform users what Shift+Enter will do
 - Search should include author and receivers name
 - Better title extraction (break on words and longer)
+- Approve logic is not well understood by ppl
+- Render external and internal links
+- Investigate process for getting approval to query friends list from Facebook
+- Redesign email texts
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)
