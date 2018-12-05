@@ -158,7 +158,6 @@ consensual.directive('contactsOnly', function() {
       }
       mCtrl.$parsers.push(contactsOnly);
       element.on('blur', function() {
-        console.log(element);
         mCtrl.$setViewValue(this.value, 'blur');
       });
     }

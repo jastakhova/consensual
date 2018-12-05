@@ -23,13 +23,11 @@ Thanks for your support!
 
 ### Alpha Release (v0): 2018 Q4
 #### Urgent tasks
-- What to do if email of invitee doesn’t match? - send inviteeId in the link to Consensual from email
-- Some facebook accounts doesn’t show email  - why?
+None
 
 #### Active ToDo (2 weeks)
-- Required fields disable add-proposal on second run (estimate: 1 day) **Work In Progress** ETA: Dec 2nd
 - In mobile acknowledge should be with other action buttons and rename the button (estimate: 1h)
-- Add user profile page (+ unsubscribe) (estimate: 2 days)
+- Add user profile page (+ unsubscribe + email) (estimate: 2 days)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
 - Single field add item (estimate: 1 day)
@@ -47,6 +45,7 @@ Thanks for your support!
 - Not obvious how to make self-agreements
 - Not obvious what to put into Receivers input (someone tried email)
 - Browser suggest in different browsers (gathering statistical data so far from users)
+- Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)
