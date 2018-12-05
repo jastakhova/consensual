@@ -23,7 +23,7 @@ export default class ProposalCtrl extends Controller {
     this.currentUserIsInDoubt = false;
     this.commentsShowed = true;
     this.comment = '';
-    this.acknowledgeLabel = 'Acknowledge';
+    this.acknowledgeLabel = 'Approve';
     this.needsToApproveStatusChange = false;
 
     this.helpers({

@@ -27,10 +27,13 @@ None
 
 #### Active ToDo (2 weeks)
 - In mobile acknowledge should be with other action buttons and rename the button (estimate: 1h)
-- Add user profile page (+ unsubscribe + email) (estimate: 2 days)
+- Add user profile page (+ unsubscribe + email + logout) (estimate: 2 days)
+- Cntrl click should open a new tab
+- No suggest to all users - only to ones that you have already tasks with + invite users you already know
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
 - Single field add item (estimate: 1 day)
+- Suggest in photoes to whom to assign the task
 - Free text for estimates (e.g. "in 2 weeks", "tomorrow") (estimate: 1 day)
 - Description field should accept markdown, checkboxes (estimate: 1 day)
 - Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
@@ -46,6 +49,16 @@ None
 - Not obvious what to put into Receivers input (someone tried email)
 - Browser suggest in different browsers (gathering statistical data so far from users)
 - Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
+- Make the column width equal between different tasks lists on the main page
+- Calendar dialog shouldn't have Save button but save on the choice of the date
+- Not redirect to Open filter when nothing for today, act as in Inbox with empty list
+- Profile pages of other people
+- Links under profile pics on proposal pages should lead to profile pages
+- Should comments and activity log be alighed in one UI component?
+- When agreement was created provide a link to it
+- In a small font inform users what Shift+Enter will do
+- Search should include author and receivers name
+- Better title extraction (break on words and longer)
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)

@@ -54,7 +54,7 @@ export default class TodosListCtrl extends Controller {
             }
             return task1.receiverId === Meteor.userId() ? -1 : 1;
           }},
-        ], configuration: {sort: "eta", grouping: function(task) {return "Tasks";}, groupingName: function(group) {return group;}}},
+        ], configuration: {sort: "eta", grouping: function(task) {return "Agreements";}, groupingName: function(group) {return group;}}},
       {name: "By Time", configuration: {sort: "eta", grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();}, groupingName: function(groupField) {
         var d = new Date();
         d.setTime(groupField);
