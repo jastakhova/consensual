@@ -39,6 +39,19 @@ export default class ProposalCtrl extends Controller {
           return {};
         }
 
+        var currentTime = moment();
+        var formatTime = function(ts) {
+          var timeObj = moment(ts);
+          if (timeObj.year() !== currentTime.year()) {
+            return timeObj.format("YYYY");
+          }
+          if (timeObj.month() !== currentTime.month() || timeObj.day() !== currentTime.day()) {
+            return timeObj.format("MMM Do");
+          }
+
+          return timeObj.format("h:mm a");
+        }
+
         var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();
         var id2user = ProfileUtils.createMapFromList(users, "_id");
         foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
@@ -51,6 +64,8 @@ export default class ProposalCtrl extends Controller {
         foundTask.comments.forEach(function(obj) {
           obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
         });
+
+        foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
 
         var recentStatusChangeActivity = foundTask.activity
           .sort(function(record1, record2) {return ProfileUtils.comparator(record2.time, record1.time);})
