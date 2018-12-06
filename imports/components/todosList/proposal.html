@@ -126,7 +126,10 @@
           </div>
         </div>
         <div class="row" ng-show="proposal.currentUserIsInDoubt" style="margin-bottom: 20px; margin-left: 2px">
-          <button type="button" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">{{proposal.acknowledgeLabel}}</button>
+          <div class="col-md-8" style="padding-left: 0px">
+          <div class="col-xs-4 col-sm-2 col-md-2 col-lg-1" style="padding-left: 0px"><button type="button" style="background-color: #18ce0f" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">{{proposal.acknowledgeLabel}}</button></div>
+          <div class="col-xs-8 col-sm-10 col-md-10 col-lg-11" style="color: grey">[ check last changes at Activity log and comments down the page ]</div>
+          </div>
         </div>
         <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.activity.length > 0">
           <div class="card col-md-8">
