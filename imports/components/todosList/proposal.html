@@ -79,7 +79,7 @@
                 <i class="fa fa-edit"></i>
               </button>
             </div>
-            <div ng-show="!proposal.editingLocation" ng-click="proposal.flipLocationEditingStatus()">{{proposal.data.location}}</div>
+            <div ng-show="!proposal.editingLocation" ng-click="proposal.flipLocationEditingStatus()" style="word-wrap:break-word">{{proposal.data.location}}</div>
             <div ng-show="proposal.editingLocation">
               <input type="text" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field autocomplete="off">
             </div>
@@ -106,7 +106,7 @@
             <button type="button" rel="tooltip" title="{{proposal.editingTitle ? 'Save' : 'Edit'}}" ng-click="proposal.editingTitle ? proposal.saveTitle(proposal.data.title) : proposal.flipTitleEditingStatus()" ng-disabled="proposal.editingTitle && editProposalForm.editTitle.$invalid" class="btn {{proposal.editingTitle ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa {{proposal.editingTitle ? 'fa-check-square': 'fa-edit'}}"></i>
             </button>
-            <div ng-show="!proposal.editingTitle" ng-click="proposal.flipTitleEditingStatus()">{{proposal.data.title}}</div>
+            <div ng-show="!proposal.editingTitle" ng-click="proposal.flipTitleEditingStatus()" style="word-wrap:break-word">{{proposal.data.title}}</div>
             <div ng-show="proposal.editingTitle">
               <input type="text" style="padding-left: 30px;" ng-readonly="!proposal.editingTitle" class="form-control form-group {{proposal.editingTitle ? '' : 'link'}}" ng-keydown="$event.keyCode === 13 && proposal.saveTitle(proposal.data.title)" ng-model="proposal.data.title" name="editTitle" required-field autocomplete="off"/>
             </div>
@@ -118,7 +118,7 @@
             <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription(proposal.data.text) : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
-            <div ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus()">{{proposal.data.text}}</div>
+            <div ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus()" style="word-wrap:break-word">{{proposal.data.text}}</div>
             <div ng-show="proposal.editingDescription">
               <textarea style="padding-left: 30px;" ng-readonly="!proposal.editingDescription" class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
               </textarea>
@@ -141,7 +141,7 @@
               <hr style="margin-top: 10px">
               <div class="row" ng-repeat="activityRecord in proposal.data.activity | orderBy:'-time'">
                 <span class="col-md-2 col-lg-2 col-sm-1 col-xs-3" style="padding-left: 0px; padding-right: 0px; max-width: 70px; color: grey">{{activityRecord.formattedTime}}</span>
-                <span class="col-md-10 col-lg-10 col-sm-11 col-xs-9"><b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }} </b>
+                <span style="word-wrap:break-word" class="col-md-10 col-lg-10 col-sm-11 col-xs-9"><b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }} </b>
                   {{activityRecord.field === 'agreement' ? 'created this ' : (activityRecord.field === 'status' && !activityRecord.oldValue ? activityRecord.newValue : 'changed')}}
                   <b ng-show="activityRecord.field !== 'status' || activityRecord.oldValue"> {{activityRecord.field}}</b>
                   <span ng-show="activityRecord.oldValue"> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.</span>
