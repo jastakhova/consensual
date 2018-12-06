@@ -45,11 +45,12 @@ export default class ProposalCtrl extends Controller {
           if (timeObj.year() !== currentTime.year()) {
             return timeObj.format("YYYY");
           }
+
           if (timeObj.month() !== currentTime.month() || timeObj.day() !== currentTime.day()) {
             return timeObj.format("MMM Do");
           }
 
-          return timeObj.format("h:mm a");
+          return timeObj.format("hh:mm a");
         }
 
         var users = Meteor.users.find({$or: [{_id: foundTask.authorId}, {_id: foundTask.receiverId}]}).fetch();

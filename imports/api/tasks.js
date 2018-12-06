@@ -257,15 +257,14 @@ Meteor.methods({
 
     function verbalize(status) {
       if (!archive) {
-        return 'green' === status ? 'Approved' : 'Under Consideration';
+        return 'green' === status ? 'approved the agreement' : 'Under Consideration';
       }
-      return ('green' === status ? 'Confirmed ': '') + task.status;
+      return ('green' === status ? 'confirmed status change to ': '') + task.status;
     }
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
        field: 'status',
-       oldValue: verbalize(oldValue),
        newValue: verbalize(status),
        time: new Date().getTime()
      };
@@ -318,7 +317,7 @@ Meteor.methods({
        time: new Date().getTime()
      };
 
-    task.activity.push();
+    task.activity.push(activity);
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
@@ -474,19 +473,18 @@ if (Meteor.isServer) {
               if (fieldGroup[0].verb === "created") {
                 return "created";
               }
-              if (fieldGroup[0].oldValue && fieldGroup[0].entity !== "status") {
-                return fieldGroup.map(function(activity) {
+              var possiblyStatusUpdates = [];
+              if (fieldGroup[0].entity === "status" && fieldGroup.filter(x => !x.oldValue).length > 0) {
+                possiblyStatusUpdates.push("The agreement was approved.<br/>");
+              }
+              return possiblyStatusUpdates.concat(fieldGroup.filter(x => x.oldValue).map(function(activity) {
                   var field = activity.entity;
                   if (activity.entity === "time") field = "eta";
                   if (activity.entity === "description") field = "text";
                   var newValue = activity.timezone ? moment.tz(activity.newValue, activity.timezone).format("HH:mm MM-DD-YYYY") : activity.newValue;
-                  return (task[field] === activity.newValue) ?
+                  return (task[field].toLowerCase() === activity.newValue.toLowerCase()) ?
                     capitalize(activity.entity) + " was changed to '" + newValue + "'.<br/>" : "";
-                }).filter(u => u.length > 0).join('');
-              } else {
-                var lastActivity = fieldGroup.sort(function(a1, a2) {return a2.doneAt - a1.doneAt;})[0];
-                return "A " + fieldGroup[0].entity + " was " + fieldGroup[0].verb + (fieldGroup.length > 1 ? " (and more than once)" : (": \"" + lastActivity.newValue) + "\"") + ".<br/>" ;
-              }
+                }).filter(u => u.length > 0)).join('');
             }).filter(u => u.length > 0);
             var multipleChanges = taskGroup.length > 1;
             if (updates.includes('created')) {

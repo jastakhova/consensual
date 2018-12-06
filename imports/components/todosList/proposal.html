@@ -137,8 +137,12 @@
             <div class="content" ng-show="proposal.activityShowed">
               <hr style="margin-top: 10px">
               <div class="row" ng-repeat="activityRecord in proposal.data.activity | orderBy:'-time'">
-                <span class="col-md-2 col-lg-2 col-sm-1 col-xs-3" style="padding-left: 0px; padding-right: 0px">{{activityRecord.formattedTime}}</span>
-                <span class="col-md-10 col-lg-10 col-sm-11 col-xs-9"><b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }}</b> {{activityRecord.field === 'agreement' ? 'created this ' : 'changed'}} <b>{{activityRecord.field}}</b><span ng-show="activityRecord.oldValue"> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.</span></span>
+                <span class="col-md-2 col-lg-2 col-sm-1 col-xs-3" style="padding-left: 0px; padding-right: 0px; max-width: 70px; color: grey">{{activityRecord.formattedTime}}</span>
+                <span class="col-md-10 col-lg-10 col-sm-11 col-xs-9"><b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }} </b>
+                  {{activityRecord.field === 'agreement' ? 'created this ' : (activityRecord.field === 'status' && !activityRecord.oldValue ? activityRecord.newValue : 'changed')}}
+                  <b ng-show="activityRecord.field !== 'status' || activityRecord.oldValue"> {{activityRecord.field}}</b>
+                  <span ng-show="activityRecord.oldValue"> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.</span>
+                </span>
               </div>
             </div>
           </div>
