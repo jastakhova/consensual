@@ -135,6 +135,9 @@ export default class ProposalCtrl extends Controller {
   }
 
   flipDescriptionEditingStatus(newOne) {
+    if (!this.editingDescription) {
+      $($('textarea')[0]).height($($('pre')[0]).height());
+    }
     this.editingDescription = newOne ? newOne : !this.editingDescription;
   }
 

@@ -476,7 +476,9 @@ if (Meteor.isServer) {
               var possiblyStatusUpdates = [];
               if (fieldGroup[0].entity === "status") {
                 var lastActivity = fieldGroup.filter(x => !x.oldValue).sort(function(a1, a2) {return a2.doneAt - a1.doneAt;})[0];
-                possiblyStatusUpdates.push(actorName + " " + lastActivity.newValue + ".<br/>");
+                if (lastActivity) {
+                  possiblyStatusUpdates.push(actorName + " " + lastActivity.newValue + ".<br/>");
+                }
               }
               return possiblyStatusUpdates.concat(fieldGroup.filter(x => x.oldValue).map(function(activity) {
                   var field = activity.entity;

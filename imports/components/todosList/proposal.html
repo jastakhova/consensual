@@ -81,7 +81,7 @@
             </div>
             <div ng-show="!proposal.editingLocation" ng-click="proposal.flipLocationEditingStatus()" style="word-wrap:break-word">{{proposal.data.location}}</div>
             <div ng-show="proposal.editingLocation">
-              <input type="text" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field autocomplete="off">
+              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field autocomplete="off">
             </div>
           </div>
           <div class="col-md-2 col-xs-6 col-sm-3 lower">
@@ -118,9 +118,9 @@
             <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription(proposal.data.text) : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
-            <div ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus()" style="word-wrap:break-word">{{proposal.data.text}}</div>
+            <pre ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus()">{{proposal.data.text}}</pre>
             <div ng-show="proposal.editingDescription">
-              <textarea style="padding-left: 30px;" ng-readonly="!proposal.editingDescription" class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
+              <textarea ng-readonly="!proposal.editingDescription" class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
               </textarea>
             </div>
           </div>
@@ -158,7 +158,7 @@
               <hr style="margin-top: 10px">
             </div>
             <div class="content" ng-show="proposal.commentsShowed" style="padding-top: 0px;text-align: right;">
-              <textarea placeholder="Enter your comment..." style="padding-left: 30px; text-align: right;" class="form-control form-group" ng-keyup="$event.keyCode === 13 && !$event.shiftKey && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field></textarea>
+              <textarea placeholder="Enter your comment..." style="padding-left: 30px; text-align: right;" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && proposal.addComment()" ng-model="proposal.comment" name="addComment" required-field></textarea>
               <button ng-disabled="editProposalForm.addComment.$pristine || editProposalForm.addComment.$invalid" type="button" ng-click="proposal.addComment()" class="btn btn-info btn-fill" style="margin-bottom: 15px;">Add comment</button>
             </div>
             <div class="content pre-scrollable" ng-show="proposal.commentsShowed">
