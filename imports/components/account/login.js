@@ -7,7 +7,7 @@ export default class LoginCtrl extends Controller {
 
         this.helpers({
             data() {
-                return [];
+                return Meteor.userId();
             }
         });
     }

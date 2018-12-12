@@ -74,7 +74,7 @@
                 <button ng-disabled="editProposalForm.editDate.$invalid || editProposalForm.editTime.$invalid" type="submit" ng-click="proposal.saveTime()" class="btn btn-info btn-fill">Save</button>
               </div>
             </div>
-            <div class="header-title" style="margin-top: 20px">Location:
+            <div class="header-title" style="margin-top: 20px">Place:&nbsp;
               <button type="button" rel="tooltip" title="{{proposal.editingLocation ? 'Save' : 'Edit'}}" ng-click="proposal.editingLocation ? proposal.saveLocation(proposal.data.location) : proposal.flipLocationEditingStatus()" class="btn {{proposal.editingLocation ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
                 <i class="fa fa-edit"></i>
               </button>

@@ -26,7 +26,7 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- In mobile acknowledge should be with other action buttons and rename the button (estimate: 1h)
+- Problem with surprise closing of the add-proposal form when clicking on the browser suggest (Rose and others can reproduce)
 - Add user profile page (+ unsubscribe + email + logout) (estimate: 2 days)
 - Cntrl click should open a new tab
 - No suggest to all users - only to ones that you have already tasks with + invite users you already know
@@ -63,6 +63,7 @@ None
 - Render external and internal links
 - Investigate process for getting approval to query friends list from Facebook
 - Redesign email texts
+- Associating images (or files) with the agreement
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)

@@ -411,6 +411,13 @@ if (Meteor.isServer) {
     return Invitees.find({invitorId: this.userId});
   });
 
+  Meteor.publish("currentuser",
+      function () {
+            return Meteor.users.find({_id: this.userId},
+              {fields: {"username": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.id": 1}});
+          }
+    );
+
   Meteor.publish("allusers",
     function () {
           return Meteor.users.find({},

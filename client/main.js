@@ -19,6 +19,7 @@ import { Template } from 'meteor/templating';
 import TodosListCtrl from '../imports/components/todosList/todosList';
 import ProposalCtrl from '../imports/components/todosList/proposal';
 import LoginCtrl from '../imports/components/account/login';
+import ProfileCtrl from '../imports/components/account/profile';
 import NotFoundCtrl from '../imports/components/account/notfound';
 import RoutesConfig from '../imports/components/routes';
 
@@ -196,6 +197,7 @@ new Loader(App)
 	.load(TodosListCtrl)
 	.load(ProposalCtrl)
   .load(LoginCtrl)
+  .load(ProfileCtrl)
   .load(NotFoundCtrl)
 	.load(RoutesConfig);
 
