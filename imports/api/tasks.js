@@ -17,6 +17,10 @@ function getName(user) {
   return user.username ? user.username : user.profile.name;
 }
 
+function getEmail(user) {
+  return user.email ? user.email : user.services.facebook.email;
+}
+
 function notifyOnNewValue(task, receiver, verb, entity, newValue, oldValue, timezone) {
   if (task.authorId !== task.receiverId) {
     Emails.insert({
@@ -330,6 +334,16 @@ Meteor.methods({
 
     notifyOnActivity(task, activity);
   },
+  'users.updateName' (name) {
+    check(name, String);
+
+    Meteor.users.update({_id: Meteor.userId()}, { $set: { username: name }});
+  },
+  'users.updateEmail' (email) {
+    check(email, String);
+
+    Meteor.users.update({_id: Meteor.userId()}, { $set: { email }});
+  },
   'email.send' (to, subject, text) {
     var options = {
         to,
@@ -357,8 +371,8 @@ Meteor.methods({
 
     if (Meteor.user()) {
       Meteor.call('email.send', to.name + ' <' + to.email + '>',
-        "Invitation to join Consensual from " + Meteor.user().profile.name,
-        "<html><body>Hi!<br/>" + Meteor.user().profile.name + " invites you to join Consensual app. Proceed to " + process.env.ROOT_URL +
+        "Invitation to join Consensual from " + getName(Meteor.user()),
+        "<html><body>Hi!<br/>" + getName(Meteor.user()) + " invites you to join Consensual app. Proceed to " + process.env.ROOT_URL +
             ".</body></html>");
 
       return Invitees.insert({
@@ -414,7 +428,7 @@ if (Meteor.isServer) {
   Meteor.publish("currentuser",
       function () {
             return Meteor.users.find({_id: this.userId},
-              {fields: {"username": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.id": 1}});
+              {fields: {"username": 1, "email" : 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.email": 1, "services.facebook.id": 1}});
           }
     );
 
@@ -464,8 +478,8 @@ if (Meteor.isServer) {
 
       emails.forEach(function(record) {
         var receiver = id2user.get(record._id);
-        if (receiver && receiver.services && receiver.services.facebook && receiver.services.facebook.email) {
-          var receiverEmail = receiver.services.facebook.email;
+        if (receiver && receiver.services && receiver.services.facebook && getEmail(receiver)) {
+          var receiverEmail = getEmail(receiver);
           var receiverName = getName(receiver);
 
           console.log("Sending mail to " + receiverName + " at " + receiverEmail);

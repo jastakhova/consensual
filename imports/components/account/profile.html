@@ -38,7 +38,7 @@
             </div>
           </div>
           <div class="col-md-10 col-xs-6 col-sm-9 lower">
-            <div class="header-title" style="margin-top: 20px">Name:
+            <div class="header-title">Name:
               <button type="button" rel="tooltip" title="{{profile.editingName ? 'Save' : 'Edit'}}" ng-click="profile.editingName ? profile.saveName(profile.data.name) : profile.flipNameEditingStatus()" class="btn {{profile.editingName ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
                 <i class="fa fa-edit"></i>
               </button>
@@ -47,15 +47,17 @@
             <div ng-show="profile.editingName">
               <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && profile.saveName(profile.data.name)" ng-model="profile.data.name" name="editName" required-field autocomplete="off">
             </div>
-            <!--<div class="header-title" style="margin-top: 20px">Location:-->
-              <!--<button type="button" rel="tooltip" title="{{proposal.editingLocation ? 'Save' : 'Edit'}}" ng-click="proposal.editingLocation ? proposal.saveLocation(proposal.data.location) : proposal.flipLocationEditingStatus()" class="btn {{proposal.editingLocation ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">-->
-                <!--<i class="fa fa-edit"></i>-->
-              <!--</button>-->
-            <!--</div>-->
-            <!--<div ng-show="!proposal.editingLocation" ng-click="proposal.flipLocationEditingStatus()" style="word-wrap:break-word">{{proposal.data.location}}</div>-->
-            <!--<div ng-show="proposal.editingLocation">-->
-              <!--<input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && proposal.saveLocation(proposal.data.location)" ng-model="proposal.data.location" name="editLocation" required-field autocomplete="off">-->
-            <!--</div>-->
+          </div>
+          <div class="col-md-10 col-xs-6 col-sm-9 lower">
+            <div class="header-title">Email:
+              <button type="button" rel="tooltip" title="{{profile.editingEmail ? 'Save' : 'Edit'}}" ng-click="profile.editingEmail ? profile.saveEmail(profile.data.email) : profile.flipEmailEditingStatus()" class="btn {{profile.editingEmail ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
+                <i class="fa fa-edit"></i>
+              </button>
+            </div>
+            <div ng-show="!profile.editingEmail" ng-click="profile.flipEmailEditingStatus()" style="word-wrap:break-word">{{profile.data.email}}</div>
+            <div ng-show="profile.editingEmail">
+              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && profile.saveEmail(profile.data.email)" ng-model="profile.data.email" name="editEmail" required-field autocomplete="off">
+            </div>
           </div>
         </div>
       </form>

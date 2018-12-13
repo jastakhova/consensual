@@ -26,7 +26,6 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- Problem with surprise closing of the add-proposal form when clicking on the browser suggest (Rose and others can reproduce)
 - Add user profile page (+ unsubscribe + email + logout) (estimate: 2 days)
 - Cntrl click should open a new tab
 - No suggest to all users - only to ones that you have already tasks with + invite users you already know

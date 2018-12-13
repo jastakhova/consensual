@@ -124,7 +124,7 @@ export default class TodosListCtrl extends Controller {
 					var suggest = [];
 					var suggestSize = 0;
 					Object.keys(id2user).forEach(function(key) {
-							suggest[suggestSize++] = {id: key, name: (id2user[key].profile ? id2user[key].profile.name : id2user[key].username)};
+							suggest[suggestSize++] = {id: key, name: ProfileUtils.getName(id2user[key])};
 					});
 					Meteor.settings.public.contacts = suggest;
 					return suggest;

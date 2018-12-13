@@ -46,6 +46,14 @@ var ProfileUtils = {
       ProfileUtils.showError();
       Meteor.call('email.withError', err);
     }
+  },
+
+  getName(user) {
+    return user.username ? user.username : user.profile.name;
+  },
+
+  getEmail(user) {
+    return user.email ? user.email : user.services.facebook.email;
   }
 };
 

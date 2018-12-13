@@ -13,10 +13,6 @@ export default class ProfileCtrl extends Controller {
         this.editingName = false;
         this.editingEmail = false;
 
-        function getName(user) {
-          return user.username ? user.username : user.profile.name;
-        }
-
         this.helpers({
             data() {
               if (!this.userHandle || !this.userHandle.ready()) {
@@ -24,7 +20,8 @@ export default class ProfileCtrl extends Controller {
               }
 
               return {
-                name: getName(Meteor.user()),
+                name: ProfileUtils.getName(Meteor.user()),
+                email: ProfileUtils.getEmail(Meteor.user()),
                 user: Meteor.user(),
                 picture: ProfileUtils.picture(Meteor.user())
               };
@@ -40,12 +37,18 @@ export default class ProfileCtrl extends Controller {
       this.editingName = !this.editingName;
     }
 
+    flipEmailEditingStatus() {
+      this.editingEmail = !this.editingEmail;
+    }
+
     saveName(name) {
-//      Meteor.call('tasks.updateLocation',
-//        this.proposalId,
-//        location,
-//        ProfileUtils.processMeteorResult);
+      Meteor.call('users.updateName', name);
       this.flipNameEditingStatus();
+    }
+
+    saveEmail(email) {
+      Meteor.call('users.updateEmail', email);
+      this.flipEmailEditingStatus();
     }
 }
 
