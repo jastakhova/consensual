@@ -493,6 +493,8 @@ if (Meteor.isServer) {
             var task = id2task.get(taskId);
             var actorName = getName(id2user.get(taskGroup[0].actor));
             var link = process.env.ROOT_URL + "/#!/tab/proposal/" + taskId;
+            var href = "<a href=\"" + link + "\">'" + task.title + "'</a>";
+
             var updates = Object.values(_.groupBy(taskGroup, g => g.verb + g.entity)).map(function(fieldGroup) {
               if (fieldGroup[0].verb === "created") {
                 return "created";
@@ -515,11 +517,10 @@ if (Meteor.isServer) {
             }).filter(u => u.length > 0);
             var multipleChanges = taskGroup.length > 1;
             if (updates.includes('created')) {
-              return "<br/>" + actorName + " created a new agreement "
-                         + "<a href=\"" + link + "\">'" + id2task.get(taskGroup[0].task).text + "'</a>.";
+              return "<br/>" + actorName + " created a new agreement " + href + ".";
             }
             return "<br/>New update" + (multipleChanges ? "s" : "") + " from " + actorName
-                     + " for agreement <a href=\"" + link + "\">'" + id2task.get(taskGroup[0].task).text + "'</a>.<br/>" + updates.join('');
+                     + " for agreement " + href + ".<br/>" + updates.join('');
           });
 
           var activityToSend = record.emails[0];
