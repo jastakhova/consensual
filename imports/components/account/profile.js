@@ -19,9 +19,16 @@ export default class ProfileCtrl extends Controller {
                 return {};
               }
 
+              var subscribed = Meteor.user().subscribed;
+              if (typeof Meteor.user().subscribed === 'undefined') {
+                this.saveSubscription(true);
+                subscribed = true;
+              }
+
               return {
                 name: ProfileUtils.getName(Meteor.user()),
                 email: ProfileUtils.getEmail(Meteor.user()),
+                subscribed: subscribed,
                 user: Meteor.user(),
                 picture: ProfileUtils.picture(Meteor.user())
               };
@@ -39,6 +46,10 @@ export default class ProfileCtrl extends Controller {
 
     flipEmailEditingStatus() {
       this.editingEmail = !this.editingEmail;
+    }
+
+    saveSubscription(subscribed) {
+      Meteor.call('users.subscribe', subscribed);
     }
 
     saveName(name) {

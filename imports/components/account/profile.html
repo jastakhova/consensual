@@ -60,6 +60,19 @@
             </div>
           </div>
         </div>
+        <div class="row">
+          Currently {{profile.data.subscribed ? '' : 'not '}}subscribed to receive email notifications for:
+          <ul style="margin-top: 10px">
+            <li>new agreements</li>
+            <li>agreement details changes</li>
+            <li>agreement status change</li>
+            <li>agreement approval</li>
+            <li>new comments on agreements</li>
+          </ul>
+          <a href="" ng-click="profile.saveSubscription(!profile.data.subscribed)" style="border-color: #9A9A9A; border-width: 1px; color: #9A9A9A; margin-bottom: 10px; margin-right: 10px;" class="btn btn-round btn-social btn-outline">
+            {{profile.data.subscribed ? 'Unsubscribe' : 'Subscribe'}}
+          </a>
+        </div>
       </form>
     </div>
   </div>

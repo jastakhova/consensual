@@ -344,6 +344,9 @@ Meteor.methods({
 
     Meteor.users.update({_id: Meteor.userId()}, { $set: { email }});
   },
+  'users.subscribe' (subscribed) {
+    Meteor.users.update({_id: Meteor.userId()}, { $set: { subscribed }});
+  },
   'email.send' (to, subject, text) {
     var options = {
         to,
@@ -428,7 +431,7 @@ if (Meteor.isServer) {
   Meteor.publish("currentuser",
       function () {
             return Meteor.users.find({_id: this.userId},
-              {fields: {"username": 1, "email" : 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.email": 1, "services.facebook.id": 1}});
+              {fields: {"username": 1, "email" : 1, "subscribed": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.email": 1, "services.facebook.id": 1}});
           }
     );
 
