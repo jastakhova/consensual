@@ -25,6 +25,8 @@ export default class TodosListCtrl extends Controller {
     this.newInvitee = {};
     this.searchEdit = false;
     this.search = "";
+    this.popularUsers = [];
+    this.timeOptions = [{name: 'tomorrow', addedCount: 1, unit: 'days'}, {name: 'next week', addedCount: 7, unit: 'days'}, {name: 'whenever', addedCount: 3, unit: 'months'}];
 
     const nextMidnight = new Date(moment().format());
     nextMidnight.setHours(24, 0, 0, 0);
@@ -110,6 +112,14 @@ export default class TodosListCtrl extends Controller {
         if (!filterAdjustingWasMade) {
           this.adjustFilters();
           filterAdjustingWasMade = true;
+          var popularUsers = this.popularUsers;
+          Meteor.call('users.getPopular', 3, function(err, result) {
+            result.forEach(r => {
+              r.picture = ProfileUtils.picture(r);
+              r.name = ProfileUtils.getName(r);
+              popularUsers.push(r);
+            });
+          });
         }
 
         try {
@@ -130,9 +140,9 @@ export default class TodosListCtrl extends Controller {
 					return suggest;
         }
 
-        var suggest = getSuggest();
-        if (this.handleAllUsers.ready()) {
-          $(".typeahead").typeahead({ source: suggest, autoSelect: false});
+        this.suggest = getSuggest();
+        if (this.handleAllUsers.ready() && this.getReactively("proposingInProgress")) {
+          $(".typeahead").typeahead({ source: this.suggest, autoSelect: false});
         }
 
         function isNumeric(value) {
@@ -248,7 +258,39 @@ export default class TodosListCtrl extends Controller {
 	}
 
 	flipProposingStatus() {
+	  if (!this.proposingInProgress) {
+      $('.hideOnTask').addClass('hidden');
+    }
+
 		this.proposingInProgress = !this.proposingInProgress;
+	}
+
+	setReceiver(user) {
+	  if (!user) {
+	    user = this.currentUser;
+	  }
+	  this.newReceiver = user.name ? user.name : ProfileUtils.getName(user);
+    this.newReceiverId = user._id;
+    $('.typeahead').val(this.newReceiver);
+    if ($('.typeahead').typeahead('getActive')) {
+      $('.typeahead').typeahead('getActive').id = this.newReceiverId;
+      $('.typeahead').typeahead('getActive').name = this.newReceiver;
+    }
+
+    this.setViewValue(this, 'newReceiver', this.newReceiver, 'click');
+    this.runParsers(this, 'newReceiver', this.newReceiver);
+	}
+
+	setTimeOption(timeOption) {
+	  var chosenTime = moment().add(timeOption.addedCount, timeOption.unit);
+
+	  this.newDate = chosenTime.format('MM-DD-YYYY');
+	  this.setViewValue(this, 'newDate', this.newDate, 'click', true);
+    this.runParsers(this, 'newDate', this.newDate);
+
+    this.newTime = chosenTime.format('HH:mm');
+    this.setViewValue(this, 'newTime', this.newTime, 'click', true);
+    this.runParsers(this, 'newTime', this.newTime);
 	}
 
 	flipSearchEditing() {
@@ -262,7 +304,8 @@ export default class TodosListCtrl extends Controller {
   }
 
 	runParsers(controller, fieldName, newValue) {
-	  controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0].$parsers.forEach(function(x) {x(newValue);});
+	  controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0]
+	    .$parsers.forEach(function(x) {x(newValue);});
 	}
 
 	setUntouchedAndPristine(controller, fieldName) {
@@ -272,9 +315,11 @@ export default class TodosListCtrl extends Controller {
     fieldCtrl.$setValidity('', false);
   }
 
-  setViewValue(controller, fieldName, fieldValue, eventName) {
+  setViewValue(controller, fieldName, fieldValue, eventName, noSet) {
     var fieldCtrl = controller.$scope.addTaskForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
-    fieldCtrl.$setViewValue(fieldValue, eventName);
+    if (!noSet) {
+      fieldCtrl.$setViewValue(fieldValue, eventName);
+    }
     fieldCtrl.$setTouched();
     fieldCtrl.$setDirty();
   }

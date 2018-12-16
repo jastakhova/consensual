@@ -26,42 +26,38 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- Cntrl click should open a new tab (estimate: 1h)
-- No suggest to all users - only to ones that you have already tasks with + invite users you already know (estimate: 1 day)
+- [logic debt] No suggest to all users - only to ones that you have already tasks with + invite users you already know (estimate: 1 day, Dec 16th)
+- [ui debt] Description field should accept markdown, checkboxes (estimate: 1 day, Dec 17th)
+- [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 18th)
+- [error handling] If the person was already invited (estimate: 2h, Dec 18th)
+- [error handling] Input error check for inviting (estimate: 4h, Dec 18th)
+- [app] Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update, Dec 19th)
+- [app] Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
+- [ui] clear the search (estimate: 2h)
+- [logic] client side search (not regexp) (estimate: 2 days)
+- [logic] By who should sort by assignee and author
+- [ui] Not obvious how to make self-agreements
+- [ui] Not obvious what to put into Receivers input (someone tried email)
+- [ui bug] Browser suggest in different browsers (gathering statistical data so far from users)
+- [logic debt] Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
+- [ui] Make the column width equal between different tasks lists on the main page
+- [ui] Calendar dialog shouldn't have Save button but save on the choice of the date
+- [logic] Not redirect to Open filter when nothing for today, act as in Inbox with empty list
+- [feature] Profile pages of other people
+- [ui] Links under profile pics on proposal pages should lead to profile pages
+- [talk] Should comments and activity log be alighed in one UI component?
+- [ui] When agreement was created provide a link to it
+- [ui] In a small font inform users what Shift+Enter will do
+- [logic] Search should include author and receivers name
+- [logic] Better title extraction (break on words and longer)
+- [talk] Approve logic is not well understood by ppl
+- [ui] Render external and internal links
+- [research] Investigate process for getting approval to query friends list from Facebook
+- [design] Redesign email texts
+- [feature] Associating images (or files) with the agreement
+- [ui] Ctrl click should open a new tab (estimate: 1h)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
-- Single field add item (estimate: 1 day)
-- Suggest in photoes to whom to assign the task
-- Free text for estimates (e.g. "in 2 weeks", "tomorrow") (estimate: 1 day)
-- Description field should accept markdown, checkboxes (estimate: 1 day)
-- Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
-- Add time for activity records. Add activity on creation of task (estimate: 2h)
-- Limitation for how many people you can invite (estimate: 2h)
-- If the person was already invited (estimate: 2h)
-- Input error check for inviting (estimate: 4h)
-- Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update)
-- clear the search (estimate: 2h)
-- client side search (not regexp) (estimate: 2 days)
-- By who should sort by assignee and author
-- Not obvious how to make self-agreements
-- Not obvious what to put into Receivers input (someone tried email)
-- Browser suggest in different browsers (gathering statistical data so far from users)
-- Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
-- Make the column width equal between different tasks lists on the main page
-- Calendar dialog shouldn't have Save button but save on the choice of the date
-- Not redirect to Open filter when nothing for today, act as in Inbox with empty list
-- Profile pages of other people
-- Links under profile pics on proposal pages should lead to profile pages
-- Should comments and activity log be alighed in one UI component?
-- When agreement was created provide a link to it
-- In a small font inform users what Shift+Enter will do
-- Search should include author and receivers name
-- Better title extraction (break on words and longer)
-- Approve logic is not well understood by ppl
-- Render external and internal links
-- Investigate process for getting approval to query friends list from Facebook
-- Redesign email texts
-- Associating images (or files) with the agreement
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)

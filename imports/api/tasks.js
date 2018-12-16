@@ -412,28 +412,68 @@ Meteor.methods({
 
       // TODO: let the invitors know
     }
+  },
+  'users.getPopular' (size) {
+    if (!Meteor.isServer) {
+      return [];
+    }
+    var receivers = Promise.await(Tasks.rawCollection().aggregate([
+          { $match: { $and: [{authorId: Meteor.userId()}, {receiverId: {$ne: Meteor.userId()}}]}},
+          {
+          $group: {
+            _id: "$receiverId",
+            count: { $sum: 1 },
+            emails: { $push: "$$ROOT" }
+          }},
+          {$sort:{count: -1}},
+          {$limit: size}]).toArray()).map(r => r._id);
+
+     if (receivers.length < size) {
+      receivers = receivers.concat(Promise.await(Tasks.rawCollection().aggregate([
+                { $match: { $and: [
+                    {receiverId: Meteor.userId()},
+                    { authorId: {$nin: receivers } },
+                    { authorId: {$ne: Meteor.userId() } }
+                    ]}},
+                {
+                $group: {
+                  _id: "$authorId",
+                  count: { $sum: 1 },
+                  emails: { $push: "$$ROOT" }
+                }},
+                {$sort:{count: -1}},
+                {$limit: (size - receivers.length)}
+            ]).toArray()).map(r => r._id));
+     }
+
+    if (receivers.length < size) {
+      var mainUsers = ["Julia Astakhova", "Day Waterbury"];
+      receivers = receivers.concat(Meteor.users.find({ $and: [{'profile.name': {$in: mainUsers}}, {_id: {$nin: receivers}}]})
+        .sort( { 'profile.name': 1 } )
+        .limit(size - receivers.length).fetch().map(r => r._id));
+    }
+
+    return Meteor.users.find({_id: {$in: receivers}}).fetch();
   }
 });
 
 if (Meteor.isServer) {
   process.env.MAIL_URL = "smtps://team.consensual%40gmail.com:team11223344556677@smtp.gmail.com:465/";
 
-  // This code only runs on the server
-    // Only publish tasks that are public or belong to the current user
-    Meteor.publish('tasks', function tasksPublication() {
-      return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
-    });
+  Meteor.publish('tasks', function tasksPublication() {
+    return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
+  });
 
   Meteor.publish('invitees', function inviteesPublication() {
     return Invitees.find({invitorId: this.userId});
   });
 
   Meteor.publish("currentuser",
-      function () {
-            return Meteor.users.find({_id: this.userId},
-              {fields: {"username": 1, "email" : 1, "subscribed": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.email": 1, "services.facebook.id": 1}});
-          }
-    );
+    function () {
+          return Meteor.users.find({_id: this.userId},
+            {fields: {"username": 1, "email" : 1, "subscribed": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.email": 1, "services.facebook.id": 1}});
+        }
+  );
 
   Meteor.publish("allusers",
     function () {

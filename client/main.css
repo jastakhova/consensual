@@ -151,3 +151,14 @@ pre {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
+.circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  padding-top: 4px;
+  text-align: center;
+  color: white;
+  background-color: rgb(29,199,234,.6);
+}

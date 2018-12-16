@@ -28,62 +28,65 @@
 <div class="content">
   <div class="container-fluid">
     <div class="row">
-      <div class="card">
-        <div class="header link" style="{{todoList.proposingInProgress ? '':'padding-bottom:15px;'}};" ng-click="todoList.flipProposingStatus()">
-          <i class="pe-7s-{{todoList.proposingInProgress ? 'close-circle': 'plus'}}"></i>
-          <span class="title" style="padding-left:5px">Add a new proposal...</span>
-        </div>
-        <div class="content" ng-show="todoList.proposingInProgress">
-          <form name="addTaskForm" ng-submit="todoList.addTask(todoList.newTask)" autocomplete="off">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>Proposal body</label>
-                  <textarea rows="5" name="newTask" ng-model="todoList.newTask" class="form-control" placeholder="Describe your proposal" required minlength='1'></textarea>
-                </div>
+      <div class="card content" style="padding: 15px">
+        <form name="addTaskForm" ng-submit="todoList.addTask(todoList.newTask)" autocomplete="off">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>What do you want to propose?</label>
+                <input type="text" name="autocompleteOff10" autocomplete="off" style="display:none;">
+                <!-- ng-if is not used for the input as there is a lag on flip after the focus event -->
+                <input type="text" ng-model="todoList.newTask" class="form-control hideOnTask" placeholder="Anything..." autocomplete="off" autofill="off" ng-focus="todoList.flipProposingStatus()"/>
+                <!-- ng-if is used instead of ng-show to prevent lag in hiding on the page load -->
+                <textarea ng-if="todoList.proposingInProgress" rows="5" name="newTask" ng-model="todoList.newTask" class="form-control" placeholder="Describe your proposal" required minlength='1'></textarea>
               </div>
             </div>
+          </div>
 
-            <div class="row">
-              <div class="col-md-5">
-                <div class="form-group">
-                  <label>Receiver</label>
-                  <input type="text" name="autocompleteOff1" autocomplete="off" style="display:none;">
-                  <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="To whom" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
-                  <div class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to register</div>
-                </div>
+          <div ng-if="todoList.proposingInProgress">
+            <div class="form-group">
+              <label>To whom?</label><br/>
+              <input type="text" name="autocompleteOff1" autocomplete="off" style="display:none;">
+              <div class="col-md-3" style="margin: 8px 0px">
+                <img ng-repeat="popularUser in todoList.popularUsers" class="avatar border-gray link" src="{{popularUser.picture}}" alt="{{popularUser.name}}" title="{{popularUser.name}}" ng-click="todoList.setReceiver(popularUser)"/>
+                <span class="circle link" ng-click="todoList.setReceiver()">self</span>
+                <span style="margin: 0px 10px">or</span>
               </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Date</label>
-                  <div class="form-group" ng-click="todoList.showDatePicker()">
-                    <div class="input-group">
-                      <input type="text" name="newDate" class="form-control" ng-model="todoList.newDate" readonly required minlength='1'>
-                      <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
-                    </div>
+              <div class="col-md-9">
+                <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="Start entering the name" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
+                <div class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>
+              </div>
+            </div>
+            <label>When do you need it?</label><br/>
+            <div style="text-align: center" class="col-md-4 col-sm-4 col-xs-4 alternative-action link" ng-repeat="timeOption in todoList.timeOptions" ng-click="todoList.setTimeOption(timeOption)">{{timeOption.name}}</div>
+            <br/>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Date</label>
+                <div class="form-group" ng-click="todoList.showDatePicker()">
+                  <div class="input-group">
+                    <input type="text" name="newDate" class="form-control" ng-model="todoList.newDate" readonly required minlength='1'>
+                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                   </div>
                 </div>
               </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Time</label>
-                  <div class="form-group" ng-click="todoList.showTimePicker()">
-                    <div class="input-group">
-                      <input type="text" name="newTime" class="form-control" ng-model="todoList.newTime" readonly required minlength='1'>
-                      <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
-                    </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Time</label>
+                <div class="form-group" ng-click="todoList.showTimePicker()">
+                  <div class="input-group">
+                    <input type="text" name="newTime" class="form-control" ng-model="todoList.newTime" readonly required minlength='1'>
+                    <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
                   </div>
                 </div>
               </div>
-
-              <div class="col-md-2">
-                <button style="margin-top:25px" type="submit" onclick="this.focus();" class="btn btn-info btn-fill pull-right" ng-disabled="addTaskForm.newTask.$pristine || addTaskForm.newTask.$invalid || addTaskForm.newReceiver.$pristine || addTaskForm.newReceiver.$invalid || addTaskForm.newDate.$pristine  || addTaskForm.newDate.$invalid || addTaskForm.newTime.$pristine || addTaskForm.newTime.$invalid">Send the proposal</button>
-              </div>
             </div>
+            <button style="margin-top:25px" type="submit" onclick="this.focus();" class="btn btn-info btn-fill pull-right" ng-disabled="addTaskForm.newTask.$pristine || addTaskForm.newTask.$invalid || addTaskForm.newReceiver.$pristine || addTaskForm.newReceiver.$invalid || addTaskForm.newDate.$pristine  || addTaskForm.newDate.$invalid || addTaskForm.newTime.$pristine || addTaskForm.newTime.$invalid">Send the proposal</button>
+          </div>
 
-            <div class="clearfix"></div>
-          </form>
-        </div>
+          <div class="clearfix"></div>
+        </form>
       </div>
     </div>
     <div class="row">
