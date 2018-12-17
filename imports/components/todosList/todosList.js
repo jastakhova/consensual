@@ -28,6 +28,8 @@ export default class TodosListCtrl extends Controller {
     this.popularUsers = [];
     this.timeOptions = [{name: 'tomorrow', addedCount: 1, unit: 'days'}, {name: 'next week', addedCount: 7, unit: 'days'}, {name: 'whenever', addedCount: 3, unit: 'months'}];
 
+    this.allUsers = [];
+
     const nextMidnight = new Date(moment().format());
     nextMidnight.setHours(24, 0, 0, 0);
     const prevMidnight = new Date(moment().format());
@@ -127,8 +129,19 @@ export default class TodosListCtrl extends Controller {
       	var sortMethod = this.getReactively("currentSort");
       	var searchValue = this.getReactively("search");
 
-        var users = Meteor.users.find().fetch().concat(Invitees.find().fetch());
-      	var id2user = ProfileUtils.createMapFromList(users, "_id");
+      	function getConnectedPeople() {
+      	  var connectedUsers = new Set();
+          Tasks.find({$or: [{authorId: Meteor.userId()}, {receiverId: Meteor.userId()}]}).fetch().forEach(task => {
+            connectedUsers.add(task.authorId);
+            connectedUsers.add(task.receiverId);
+          });
+
+          return Invitees.find().fetch().concat(Meteor.users.find({$or: [{_id: {$in: Array.from(connectedUsers)}}, foundersFilter]},
+            {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1}}).fetch());
+      	}
+
+      	var id2user = ProfileUtils.createMapFromList(getConnectedPeople(), "_id");
+      	this.allUsers = Meteor.users.find({}, {"username": 1, "profile.name" : 1}).fetch();
 
 				function getSuggest() {
 					var suggest = [];
@@ -140,9 +153,8 @@ export default class TodosListCtrl extends Controller {
 					return suggest;
         }
 
-        this.suggest = getSuggest();
         if (this.handleAllUsers.ready() && this.getReactively("proposingInProgress")) {
-          $(".typeahead").typeahead({ source: this.suggest, autoSelect: false});
+          $(".typeahead").typeahead({ source: getSuggest(), autoSelect: false});
         }
 
         function isNumeric(value) {
@@ -388,22 +400,70 @@ export default class TodosListCtrl extends Controller {
 	inviteNewPerson() {
 	  var to = this.newInvitee;
 	  var controller = this;
-	  Meteor.call('email.invite', to, function(error, result) {
-      Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] =
-        {id: result, name: to.name};
 
+	  function addNewPersonToSuggest(id, name) {
       $(".typeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
-      controller.newReceiver = to.name;
-      controller.newReceiverId = result;
-      $('.typeahead').val(to.name);
+      controller.newReceiver = name;
+      controller.newReceiverId = id;
+      $('.typeahead').val(name);
       if ($('.typeahead').typeahead('getActive')) {
-        $('.typeahead').typeahead('getActive').id = result;
-        $('.typeahead').typeahead('getActive').name = to.name;
+        $('.typeahead').typeahead('getActive').id = id;
+        $('.typeahead').typeahead('getActive').name = name;
       }
 
-      controller.setViewValue(controller, 'newReceiver', to.name, 'click');
+      controller.setViewValue(controller, 'newReceiver', name, 'click');
       controller.runParsers(controller, 'newReceiver', controller.newReceiver);
-    });
+	  }
+
+	  if (this.newInvitee.found) {
+	    addNewPersonToSuggest(this.newInvitee.found._id, this.newInvitee.found.name);
+	  } else {
+      Meteor.call('email.invite', to, function(error, result) {
+        Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: result, name:  to.name};
+
+        addNewPersonToSuggest(result, to.name);
+      });
+    }
+	}
+
+	suggestKeyEntered() {
+	  var suggest = $('.typeahead').val().toLowerCase();
+	  if (suggest.length < 5) {
+	    return;
+	  }
+
+	  var initialLength = Meteor.settings.public.contacts.length;
+	  var uniqueUsers = new Set(Meteor.settings.public.contacts.map(u => u.id));
+
+	  this.allUsers
+	    .filter(u => ProfileUtils.getName(u).toLowerCase().includes(suggest) && !uniqueUsers.has(u._id))
+	    .forEach(u => {
+	        Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: u._id, name: ProfileUtils.getName(u)}
+        }
+      );
+
+	  if (initialLength !== Meteor.settings.public.contacts.length) {
+	    $(".typeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
+	  }
+	}
+
+	findInvitee() {
+	  if (!this.newInvitee.name) {
+	    this.newInvitee.name = "";
+	  }
+
+	  if (!this.newInvitee.email) {
+      this.newInvitee.email = "";
+    }
+
+	  var filtered = this.allUsers.filter(u => ProfileUtils.getName(u).toLowerCase() === this.newInvitee.name.toLowerCase()
+	    || ProfileUtils.getEmail(u).toLowerCase() === this.newInvitee.email.toLowerCase());
+
+	  this.newInvitee.found = filtered.length > 0 ? filtered[0] : undefined;
+	  if (this.newInvitee.found) {
+	    this.newInvitee.found.name = ProfileUtils.getName(this.newInvitee.found);
+	    this.newInvitee.found.picture = ProfileUtils.picture(this.newInvitee.found);
+	  }
 	}
 }
 

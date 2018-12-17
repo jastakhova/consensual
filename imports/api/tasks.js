@@ -13,6 +13,8 @@ export const Invitees = new Mongo.Collection('invitees');
 // available where Tasks is imported
 datetimeDisplayFormat = "MMM DD, YYYY, h:mm A";
 
+foundersFilter = {'profile.name': {$in: ["Julia Astakhova", "Day Waterbury"]}};
+
 function getName(user) {
   return user.username ? user.username : user.profile.name;
 }
@@ -447,8 +449,7 @@ Meteor.methods({
      }
 
     if (receivers.length < size) {
-      var mainUsers = ["Julia Astakhova", "Day Waterbury"];
-      receivers = receivers.concat(Meteor.users.find({ $and: [{'profile.name': {$in: mainUsers}}, {_id: {$nin: receivers}}]})
+      receivers = receivers.concat(Meteor.users.find({ $and: [foundersFilter, {_id: {$nin: receivers}}]})
         .sort( { 'profile.name': 1 } )
         .limit(size - receivers.length).fetch().map(r => r._id));
     }
@@ -471,14 +472,14 @@ if (Meteor.isServer) {
   Meteor.publish("currentuser",
     function () {
           return Meteor.users.find({_id: this.userId},
-            {fields: {"username": 1, "email" : 1, "subscribed": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.email": 1, "services.facebook.id": 1}});
+            {fields: {"username": 1, "email" : 1, "subscribed": 1, "profile.name" : 1, "services.facebook.email": 1, "services.facebook.id": 1}});
         }
   );
 
   Meteor.publish("allusers",
     function () {
           return Meteor.users.find({},
-            {fields: {"username": 1, "profile.name" : 1, "services.facebook.accessToken": 1, "services.facebook.id": 1}});
+            {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1, "email": 1, "services.facebook.email": 1}});
         }
   );
 

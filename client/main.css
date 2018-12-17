@@ -138,6 +138,8 @@
   text-decoration-style: dashed;
   text-decoration-line: underline;
   padding-top: 5px;
+  -webkit-text-decoration-line: underline;
+  -webkit-text-decoration-style: dashed;
 }
 
 .link {

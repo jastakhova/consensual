@@ -26,7 +26,6 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- [logic debt] No suggest to all users - only to ones that you have already tasks with + invite users you already know (estimate: 1 day, Dec 16th)
 - [ui debt] Description field should accept markdown, checkboxes (estimate: 1 day, Dec 17th)
 - [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 18th)
 - [error handling] If the person was already invited (estimate: 2h, Dec 18th)
@@ -58,6 +57,7 @@ None
 - [ui] Ctrl click should open a new tab (estimate: 1h)
 - Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
 - Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
+- [logical debt] Duplicate names case issues for suggest and invitee selection
 
 #### Known Issues
 - discuss roles (witness, who is assignee, etc)
@@ -193,3 +193,7 @@ meteor mongo
 
 ### Forums
 * Meteor: https://forums.meteor.com
+
+### To use in future
+* Mail service: www.mailgun.com/‎
+* Markdown: https://simplemde.com/

@@ -53,7 +53,7 @@
                 <span style="margin: 0px 10px">or</span>
               </div>
               <div class="col-md-9">
-                <input type="text" name="newReceiver" ng-model="todoList.newReceiver" class="form-control typeahead" data-provide="typeahead" placeholder="Start entering the name" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
+                <input type="text" name="newReceiver" ng-model="todoList.newReceiver" ng-keyup="todoList.suggestKeyEntered()" class="form-control typeahead" data-provide="typeahead" placeholder="Start entering the name" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
                 <div class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>
               </div>
             </div>
@@ -168,7 +168,7 @@
                   <div class="form-group">
                     <label>Name</label>
                     <input type="text" name="autocompleteOff12" style="display:none;">
-                    <input type="text" ng-model="todoList.newInvitee.name" class="form-control" placeholder="Invitee's full name" autocomplete="nope" autofill="off"/>
+                    <input type="text" ng-model="todoList.newInvitee.name" ng-keyup="todoList.findInvitee()" class="form-control" placeholder="Invitee's full name" autocomplete="nope" autofill="off"/>
                   </div>
                 </div>
               </div>
@@ -177,15 +177,22 @@
                   <div class="form-group">
                     <label>Email</label>
                     <input type="text" name="autocompleteOff13" style="display:none;">
-                    <input type="text" ng-model="todoList.newInvitee.email" class="form-control" placeholder="Invitee's email" autocomplete="nope" autofill="off"/>
+                    <input type="text" ng-model="todoList.newInvitee.email" ng-keyup="todoList.findInvitee()" class="form-control" placeholder="Invitee's email" autocomplete="nope" autofill="off"/>
                   </div>
+                </div>
+              </div>
+              <div ng-show="todoList.newInvitee.found" class="row">
+                <div class="col-sm-12 alert alert-info" style="text-align: center;">
+                  We found
+                  <img class="avatar border-gray" src="{{todoList.newInvitee.found.picture}}" alt="{{todoList.newInvitee.found.name}}" title="{{todoList.newInvitee.found.name}}"/>
+                  {{todoList.newInvitee.found.name}}
                 </div>
               </div>
             </form>
           </div>
           <div class="modal-footer" style="border-top: none; padding-top: 0px'">
             <button type="button" class="btn btn-link btn-simple" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-link btn-simple" data-dismiss="modal" ng-click="todoList.inviteNewPerson()">Send invite</button>
+            <button type="button" class="btn btn-link btn-simple" data-dismiss="modal" ng-click="todoList.inviteNewPerson()">{{todoList.newInvitee.found ? 'Connect' : 'Send invite'}}</button>
           </div>
         </div>
       </div>
