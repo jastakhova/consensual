@@ -115,12 +115,12 @@
         <div class="row" style="margin-top: 30px; margin-bottom: 20px">
           <div class="col-md-8">
             <span class="header-title" style="font-size: 16px">Description</span>&nbsp;
-            <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription(proposal.data.text) : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
+            <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription() : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
-            <pre ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus()">{{proposal.data.text}}</pre>
+            <div class="pre" ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus(proposal.data.text)"></div>
             <div ng-show="proposal.editingDescription">
-              <textarea ng-readonly="!proposal.editingDescription" class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && proposal.saveDescription(proposal.data.text)" ng-model="proposal.data.text" name="editDescription" required-field>
+              <textarea class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" ng-model="proposal.data.text" name="editDescription">
               </textarea>
             </div>
           </div>

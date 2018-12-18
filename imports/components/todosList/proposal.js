@@ -3,6 +3,7 @@ import { Tasks } from '../../api/tasks.js';
 import ProfileUtils from './profile.js';
 import DateTimePicker from 'date-time-picker';
 import { Tracker } from 'meteor/tracker'
+import SimpleMDE from 'simplemde/dist/simplemde.min.js'
 
 export default class ProposalCtrl extends Controller {
   constructor() {
@@ -25,6 +26,7 @@ export default class ProposalCtrl extends Controller {
     this.comment = '';
     this.acknowledgeLabel = 'Approve';
     this.needsToApproveStatusChange = false;
+    this.editor = undefined;
 
     this.helpers({
       data() {
@@ -79,6 +81,8 @@ export default class ProposalCtrl extends Controller {
 
         foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
         foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
+
+        $('div.pre').html(SimpleMDE.prototype.markdown(foundTask.text));
         return foundTask;
         } catch (err) {
           console.log(err);
@@ -134,11 +138,35 @@ export default class ProposalCtrl extends Controller {
     this.editingLocation = !this.editingLocation;
   }
 
-  flipDescriptionEditingStatus(newOne) {
-    if (!this.editingDescription) {
-      $($('textarea')[0]).height($($('pre')[0]).height());
+  flipDescriptionEditingStatus(text) {
+    this.editingDescription = !this.editingDescription;
+
+    if (!this.editor && this.editingDescription) {
+      var editor = {tool: new SimpleMDE({autosave: { enabled: true, uniqueId: "MyUniqueID", delay: 1000}}), changed: false};
+      this.editor = editor;
+      var controller = this;
+
+      Meteor.setInterval(function() {
+        if (editor.changed) {
+          controller.saveDescription();
+          editor.changed = false;
+        }
+      }, 60*1000 /* 1 minute interval */);
+
+      this.editor.tool.codemirror.on("change", function() {
+      	editor.changed = true;
+      });
+
+      // fixing SimpleMDE bug
+      $('.fa-eye').click(function(event) {
+        var mistypedClass = "no-disableactivated";
+        if ($(event.target).hasClass(mistypedClass)) {
+          $(event.target).removeClass(mistypedClass);
+          $(event.target).addClass("no-disable");
+          $(event.target).addClass("activated");
+        }
+      });
     }
-    this.editingDescription = newOne ? newOne : !this.editingDescription;
   }
 
   flipActivityShowingStatus() {
@@ -169,12 +197,14 @@ export default class ProposalCtrl extends Controller {
     this.flipLocationEditingStatus();
   }
 
-  saveDescription(description) {
+  saveDescription() {
+    var description = this.editor.tool.value();
     Meteor.call('tasks.updateDescription',
       this.proposalId,
       description,
       ProfileUtils.processMeteorResult);
-    this.flipDescriptionEditingStatus();
+    $('div.pre').html(SimpleMDE.prototype.markdown(description));
+    this.flipDescriptionEditingStatus(description);
   }
 
   saveTitle(title) {
