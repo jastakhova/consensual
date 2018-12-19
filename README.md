@@ -26,7 +26,6 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- [error handling] Input error check for inviting (estimate: 4h, Dec 19th)
 - [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 19th)
 - [app] Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update, Dec 20th)
 - [app] Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
@@ -58,6 +57,7 @@ None
 - [feature] Related agreements: Dependencies, subtasks, and subsequents
 - [feature] Associating images (or files) with the agreement
 - [talk] Should comments and activity log be aligned in one UI component?
+- [tech debt] non-reacheable email of invitee is ignored
 
 #### Known Issues
 - Discuss roles (witness, who is assignee, etc)
