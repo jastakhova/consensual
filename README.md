@@ -26,13 +26,11 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- [ui debt] Description field should accept markdown, checkboxes (estimate: 1 day, Dec 18th)
-- [talk] Approve logic is not well understood by ppl
-- [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 19th)
-- [error handling] If the person was already invited (estimate: 2h, Dec 19th)
 - [error handling] Input error check for inviting (estimate: 4h, Dec 19th)
+- [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 19th)
 - [app] Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update, Dec 20th)
 - [app] Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
+- [talk] Approve logic is not well understood by ppl
 - [ui] clear the search (estimate: 2h)
 - [logic] client side search (not regexp) (estimate: 2 days)
 - [logic] By who should sort by assignee and author

@@ -29,6 +29,7 @@ export default class TodosListCtrl extends Controller {
     this.timeOptions = [{name: 'tomorrow', addedCount: 1, unit: 'days'}, {name: 'next week', addedCount: 7, unit: 'days'}, {name: 'whenever', addedCount: 3, unit: 'months'}];
 
     this.allUsers = [];
+    this.invitees = [];
 
     const nextMidnight = new Date(moment().format());
     nextMidnight.setHours(24, 0, 0, 0);
@@ -125,18 +126,19 @@ export default class TodosListCtrl extends Controller {
       	var sortMethod = this.getReactively("currentSort");
       	var searchValue = this.getReactively("search");
 
-      	function getConnectedPeople() {
+      	function getConnectedPeople(controller) {
       	  var connectedUsers = new Set();
           Tasks.find({$or: [{authorId: Meteor.userId()}, {receiverId: Meteor.userId()}]}).fetch().forEach(task => {
             connectedUsers.add(task.authorId);
             connectedUsers.add(task.receiverId);
           });
 
-          return Invitees.find().fetch().concat(Meteor.users.find({$or: [{_id: {$in: Array.from(connectedUsers)}}, foundersFilter]},
+          controller.invitees = Invitees.find().fetch();
+          return controller.invitees.concat(Meteor.users.find({$or: [{_id: {$in: Array.from(connectedUsers)}}, foundersFilter]},
             {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1}}).fetch());
       	}
 
-      	var id2user = ProfileUtils.createMapFromList(getConnectedPeople(), "_id");
+      	var id2user = ProfileUtils.createMapFromList(getConnectedPeople(this), "_id");
       	this.allUsers = Meteor.users.find({}, {"username": 1, "profile.name" : 1}).fetch();
 
 				function getSuggest() {
@@ -452,13 +454,21 @@ export default class TodosListCtrl extends Controller {
       this.newInvitee.email = "";
     }
 
-	  var filtered = this.allUsers.filter(u => ProfileUtils.getName(u).toLowerCase() === this.newInvitee.name.toLowerCase()
-	    || ProfileUtils.getEmail(u).toLowerCase() === this.newInvitee.email.toLowerCase());
+    function findAlreadyExisting(invitee, collection, nameSuffix) {
+      var filtered = collection.filter(u => ProfileUtils.getName(u).toLowerCase() === invitee.name.toLowerCase()
+        || ProfileUtils.getEmail(u).toLowerCase() === invitee.email.toLowerCase());
 
-	  this.newInvitee.found = filtered.length > 0 ? filtered[0] : undefined;
-	  if (this.newInvitee.found) {
-	    this.newInvitee.found.name = ProfileUtils.getName(this.newInvitee.found);
-	    this.newInvitee.found.picture = ProfileUtils.picture(this.newInvitee.found);
+      invitee.found = filtered.length > 0 ? filtered[0] : undefined;
+      if (invitee.found) {
+        invitee.found.nameToShow = ProfileUtils.getName(invitee.found) + nameSuffix;
+        invitee.found.name = ProfileUtils.getName(invitee.found);
+        invitee.found.picture = ProfileUtils.picture(invitee.found);
+      }
+      return invitee.found;
+    }
+
+	  if (!findAlreadyExisting(this.newInvitee, this.allUsers, "")) {
+	    findAlreadyExisting(this.newInvitee, this.invitees, " (already invited)");
 	  }
 	}
 }
