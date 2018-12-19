@@ -117,10 +117,10 @@ consensual.run(['$ionicHistory', '$state', '$rootScope', function ($ionicHistory
     $state.go("login");
   }
 
-//  $rootScope.$on('$stateChangeStart', function(event, toState, fromState) {
-//    console.log('from/to', fromState, toState);
-//  });
-//
+  $rootScope.$on('$stateChangeStart', function(event, toState, fromState) {
+    Meteor.clearInterval(Meteor.settings.public.autoSaveIntervalHandle);
+  });
+
 //  $rootScope.$on('$stateChangeSuccess', function(event, toState) {
 //    console.log('success ', toState);
 //  });

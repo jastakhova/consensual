@@ -146,7 +146,7 @@ export default class ProposalCtrl extends Controller {
       this.editor = editor;
       var controller = this;
 
-      Meteor.setInterval(function() {
+      Meteor.settings.public.autoSaveIntervalHandle = Meteor.setInterval(function() {
         if (editor.changed) {
           controller.saveDescription();
           editor.changed = false;
