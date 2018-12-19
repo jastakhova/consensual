@@ -52,11 +52,7 @@ export default class TodosListCtrl extends Controller {
           {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[4]},
           {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5, appliedFilter: this.filters[3]},
           {name: "Today", selector: {status: "open", eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
-            if (task1.receiverId === Meteor.userId() && task2.receiverId === Meteor.userId() ||
-                task1.receiverId !== Meteor.userId() && task2.receiverId !== Meteor.userId()) {
-              return ProfileUtils.comparator(task1.eta, task2.eta);
-            }
-            return task1.receiverId === Meteor.userId() ? -1 : 1;
+            return ProfileUtils.comparator(task1.eta, task2.eta);
           }},
         ], configuration: {sort: "eta", grouping: function(task) {return "Agreements";}, groupingName: function(group) {return group;}}},
       {name: "By Time", configuration: {sort: "eta", grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();}, groupingName: function(groupField) {
