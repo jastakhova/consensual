@@ -22,7 +22,11 @@ export default class TodosListCtrl extends Controller {
 
     this.proposingInProgress = false;
     this.filtersOpen = false;
+
     this.newInvitee = {};
+    this.invitationLimitReached = false;
+    this.invitationLimit = 15;
+
     this.searchEdit = false;
     this.search = "";
     this.popularUsers = [];
@@ -35,6 +39,7 @@ export default class TodosListCtrl extends Controller {
     nextMidnight.setHours(24, 0, 0, 0);
     const prevMidnight = new Date(moment().format());
     prevMidnight.setHours(0, 0, 0, 0);
+    const dayAgo = new Date(moment().subtract({ hours: 24}).format());
 
     this.filters = [
         {name: "All", selector: {archived: false}},
@@ -140,6 +145,7 @@ export default class TodosListCtrl extends Controller {
 
       	var id2user = ProfileUtils.createMapFromList(getConnectedPeople(this), "_id");
       	this.allUsers = Meteor.users.find({}, {"username": 1, "profile.name" : 1}).fetch();
+      	this.invitationLimitReached = this.invitees.filter(i => dayAgo.getTime() <= i.creationTime).length >= this.invitationLimit;
 
 				function getSuggest() {
 					var suggest = [];

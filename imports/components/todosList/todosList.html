@@ -54,10 +54,10 @@
               </div>
               <div class="col-md-9">
                 <input type="text" name="newReceiver" ng-model="todoList.newReceiver" ng-keyup="todoList.suggestKeyEntered()" class="form-control typeahead" data-provide="typeahead" placeholder="Start entering the name" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
-                <div class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>
+                <div ng-hide="todoList.invitationLimitReached" class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>
               </div>
             </div>
-            <label>When do you need it?</label><br/>
+            <label style="text-align: left; width: 100%">When do you need it?</label><br/>
             <div style="text-align: center" class="col-md-4 col-sm-4 col-xs-4 alternative-action link" ng-repeat="timeOption in todoList.timeOptions" ng-click="todoList.setTimeOption(timeOption)">{{timeOption.name}}</div>
             <br/>
             <div class="col-md-3">

@@ -118,7 +118,9 @@ consensual.run(['$ionicHistory', '$state', '$rootScope', function ($ionicHistory
   }
 
   $rootScope.$on('$stateChangeStart', function(event, toState, fromState) {
-    Meteor.clearInterval(Meteor.settings.public.autoSaveIntervalHandle);
+    if (Meteor.settings.public.autoSaveIntervalHandle) {
+      Meteor.clearInterval(Meteor.settings.public.autoSaveIntervalHandle);
+    }
   });
 
 //  $rootScope.$on('$stateChangeSuccess', function(event, toState) {
