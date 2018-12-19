@@ -26,17 +26,16 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- [ui debt] Description field should accept markdown, checkboxes (estimate: 1 day, Dec 17th)
-- [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 18th)
-- [error handling] If the person was already invited (estimate: 2h, Dec 18th)
-- [error handling] Input error check for inviting (estimate: 4h, Dec 18th)
-- [app] Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update, Dec 19th)
+- [ui debt] Description field should accept markdown, checkboxes (estimate: 1 day, Dec 18th)
+- [talk] Approve logic is not well understood by ppl
+- [security debt] Limitation for how many people you can invite (estimate: 2h, Dec 19th)
+- [error handling] If the person was already invited (estimate: 2h, Dec 19th)
+- [error handling] Input error check for inviting (estimate: 4h, Dec 19th)
+- [app] Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update, Dec 20th)
 - [app] Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
 - [ui] clear the search (estimate: 2h)
 - [logic] client side search (not regexp) (estimate: 2 days)
 - [logic] By who should sort by assignee and author
-- [ui] Not obvious how to make self-agreements
-- [ui] Not obvious what to put into Receivers input (someone tried email)
 - [ui bug] Browser suggest in different browsers (gathering statistical data so far from users)
 - [logic debt] Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
 - [ui] Make the column width equal between different tasks lists on the main page
@@ -44,29 +43,32 @@ None
 - [logic] Not redirect to Open filter when nothing for today, act as in Inbox with empty list
 - [feature] Profile pages of other people
 - [ui] Links under profile pics on proposal pages should lead to profile pages
-- [talk] Should comments and activity log be alighed in one UI component?
 - [ui] When agreement was created provide a link to it
 - [ui] In a small font inform users what Shift+Enter will do
 - [logic] Search should include author and receivers name
 - [logic] Better title extraction (break on words and longer)
-- [talk] Approve logic is not well understood by ppl
 - [ui] Render external and internal links
 - [research] Investigate process for getting approval to query friends list from Facebook
 - [design] Redesign email texts
-- [feature] Associating images (or files) with the agreement
 - [ui] Ctrl click should open a new tab (estimate: 1h)
-- Make responsive layouts render properly on mobile devices (DNS issue; i.e. domain cloaking) (Day)
-- Icons don't appear under consensual domain (this is also because of domain cloaking, as above) (Day)
-- [logical debt] Duplicate names case issues for suggest and invitee selection
+- [logic debt] Duplicate names case issues for suggest and invitee selection
+- [feature] Repeating/recurring agreements (discuss implementation)
+- [feature] Ability to create proposal/agreement templates so you can send it multiple people
+- [feature] Reassignment/delegation of agreements; this would allow us to start with self-assignment and later reassign
+- [feature] Actively disagree, break, rescind agreement
+- [feature] Decline to negotiate agreement (let's discuss this)
+- [feature] Related agreements: Dependencies, subtasks, and subsequents
+- [feature] Associating images (or files) with the agreement
+- [talk] Should comments and activity log be aligned in one UI component?
 
 #### Known Issues
-- discuss roles (witness, who is assignee, etc)
+- Discuss roles (witness, who is assignee, etc)
 - Comments block CSS doesn't look nice when there is no comments
 - It's not obvious what are you about to approve
 - Error handling saves empty object to log
 - Functions showDatePicker and showTimePicker are duplicated on proposal and todos, we may wish to DRY this up
 - Date should not wrap...and there should be a min width for the date picker
-- Description field should be taller on web (not sure how it is on mobile) [mobile]
+- [mobile] Description field should be taller on web (not sure how it is on mobile)
 - Proposal description shouldn't be a disabled textarea. They are not bright enough
 - Done and cancelled agreements are not shown anywhere in todo list view
 - Side menu should be closed when "Tasks" link is clicked
@@ -83,7 +85,7 @@ None
 -- Meetups
 
 ### Beta Release (v1): 2019 Q2
-- Notifications [app]
+- [app] Notifications
 - Start and end dates (ranges)
 - Ability to mark tasks as 'In Progress'
 - Allow unassigned agreements
