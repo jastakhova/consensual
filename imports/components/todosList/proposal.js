@@ -167,6 +167,10 @@ export default class ProposalCtrl extends Controller {
         }
       });
     }
+
+    if (this.editingDescription) {
+      this.editor.tool.value(text);
+    }
   }
 
   flipActivityShowingStatus() {

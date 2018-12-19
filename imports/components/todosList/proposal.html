@@ -115,12 +115,12 @@
         <div class="row" style="margin-top: 30px; margin-bottom: 20px">
           <div class="col-md-8">
             <span class="header-title" style="font-size: 16px">Description</span>&nbsp;
-            <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription() : proposal.flipDescriptionEditingStatus()" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
+            <button type="button" rel="tooltip" title="{{proposal.editingDescription ? 'Save' : 'Edit'}}" ng-click="proposal.editingDescription ? proposal.saveDescription() : proposal.flipDescriptionEditingStatus(proposal.data.text)" ng-disabled="proposal.editingDescription && editProposalForm.editDescription.$invalid" class="btn {{proposal.editingDescription ? 'btn-success' : 'btn-danger'}} btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
             <div class="pre" ng-show="!proposal.editingDescription" ng-click="proposal.flipDescriptionEditingStatus(proposal.data.text)"></div>
             <div ng-show="proposal.editingDescription">
-              <textarea class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" ng-model="proposal.data.text" name="editDescription">
+              <textarea class="form-control form-group {{proposal.editingDescription ? '' : 'link'}}" name="editDescription">
               </textarea>
             </div>
           </div>
