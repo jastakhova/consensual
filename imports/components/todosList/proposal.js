@@ -142,7 +142,7 @@ export default class ProposalCtrl extends Controller {
     this.editingDescription = !this.editingDescription;
 
     if (!this.editor && this.editingDescription) {
-      var editor = {tool: new SimpleMDE({autosave: { enabled: true, uniqueId: "MyUniqueID", delay: 1000}}), changed: false};
+      var editor = {tool: new SimpleMDE({autosave: { enabled: true, uniqueId: "MyUniqueID", delay: 1000}, spellChecker: false }), changed: false};
       this.editor = editor;
       var controller = this;
 
