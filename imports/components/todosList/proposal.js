@@ -148,7 +148,7 @@ export default class ProposalCtrl extends Controller {
 
       Meteor.settings.public.autoSaveIntervalHandle = Meteor.setInterval(function() {
         if (editor.changed) {
-          controller.saveDescription();
+          controller.saveDescription(auto=true);
           editor.changed = false;
         }
       }, 60*1000 /* 1 minute interval */);
@@ -201,14 +201,16 @@ export default class ProposalCtrl extends Controller {
     this.flipLocationEditingStatus();
   }
 
-  saveDescription() {
+  saveDescription(auto=false) {
     var description = this.editor.tool.value();
     Meteor.call('tasks.updateDescription',
       this.proposalId,
       description,
       ProfileUtils.processMeteorResult);
-    $('div.pre').html(SimpleMDE.prototype.markdown(description));
-    this.flipDescriptionEditingStatus(description);
+    if (!auto) {
+      $('div.pre').html(SimpleMDE.prototype.markdown(description));
+      this.flipDescriptionEditingStatus(description);
+    }
   }
 
   saveTitle(title) {
