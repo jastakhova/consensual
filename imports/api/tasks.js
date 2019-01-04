@@ -552,7 +552,8 @@ if (Meteor.isServer) {
                   if (activity.entity === "time") field = "eta";
                   if (activity.entity === "description") field = "text";
                   var newValue = activity.timezone ? moment.tz(activity.newValue, activity.timezone).format("HH:mm MM-DD-YYYY") : activity.newValue;
-                  return (task[field].toLowerCase() === activity.newValue.toLowerCase()) ?
+                  return (((typeof task[field] === 'string' || task[field] instanceof String) && task[field].toLowerCase() === activity.newValue.toLowerCase())
+                  || (task[field] === activity.newValue)) ?
                     capitalize(activity.entity) + " was changed to '" + newValue + "'.<br/>" : "";
                 }).filter(u => u.length > 0)).join('');
             }).filter(u => u.length > 0);
