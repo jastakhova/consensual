@@ -449,7 +449,10 @@ Meteor.methods({
      }
 
     if (receivers.length < size) {
-      receivers = receivers.concat(Meteor.users.find({ $and: [foundersFilter, {_id: {$nin: receivers}}]})
+      var founders = Meteor.users.find({ $and: [foundersFilter, {_id: {$nin: receivers}}]});
+      console.log("So the founders list was:");
+      console.log(founders);
+      receivers = receivers.concat(founders
         .sort( { 'profile.name': 1 } )
         .limit(size - receivers.length).fetch().map(r => r._id));
     }
