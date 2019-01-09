@@ -86,9 +86,13 @@ export default class ProposalCtrl extends Controller {
 
         var markdown = this.markdown;
 
-        $($("textarea[name='editDescription']")[0]).markdown({autofocus:false, savable:false, onPreview: function(e) {
-          return markdown(e.getContent());
-        }});
+        $($("textarea[name='editDescription']")[0]).markdown({autofocus:false, savable:false,
+          onPreview: function(e) {
+            return markdown(e.getContent());
+          },
+          onShow: function(e) {
+            e.setContent(foundTask.text);
+          }});
 
         $('div.pre').html(markdown(foundTask.text));
 
