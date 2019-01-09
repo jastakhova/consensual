@@ -26,7 +26,8 @@ Thanks for your support!
 None
 
 #### Active ToDo (2 weeks)
-- [app] Assess current state of the app (Yulia) ETA: Dec 10th (was blocked by Xcode 10 update, Dec 20th)
+- [bug] Re-enable MDE ETA: Jan 9th
+- [app] Assess current state of the app ETA: Jan 11th
 - [app] Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
 - [talk] Approve logic is not well understood by ppl
 - [ui] clear the search (estimate: 2h)

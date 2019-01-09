@@ -167,3 +167,15 @@ div.pre {
   color: white;
   background-color: rgb(29,199,234,.6);
 }
+
+div.md-editor {
+  margin-left: 1px;
+}
+
+div.md-editor>div.md-preview {
+      border-bottom: none;
+}
+
+div.md-editor>textarea {
+      border-bottom: none;
+}

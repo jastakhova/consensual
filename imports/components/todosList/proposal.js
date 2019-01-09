@@ -3,7 +3,9 @@ import { Tasks } from '../../api/tasks.js';
 import ProfileUtils from './profile.js';
 import DateTimePicker from 'date-time-picker';
 import { Tracker } from 'meteor/tracker'
-import SimpleMDE from 'simplemde/dist/simplemde.min.js'
+import {parse} from 'markdown/lib/index'
+import marked from 'marked'
+import 'bootstrap-markdown/js/bootstrap-markdown'
 
 export default class ProposalCtrl extends Controller {
   constructor() {
@@ -82,8 +84,14 @@ export default class ProposalCtrl extends Controller {
         foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.authorId]);
         foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiverId]);
 
-        // commented out to disable markdown
-//        $('div.pre').html(SimpleMDE.prototype.markdown(foundTask.text));
+        var markdown = this.markdown;
+
+        $($("textarea[name='editDescription']")[0]).markdown({autofocus:false, savable:false, onPreview: function(e) {
+          return markdown(e.getContent());
+        }});
+
+        $('div.pre').html(markdown(foundTask.text));
+
         return foundTask;
         } catch (err) {
           console.log(err);
@@ -94,6 +102,11 @@ export default class ProposalCtrl extends Controller {
       }
     });
   }
+
+  markdown(text) {
+    return marked(text, { breaks: true });
+  }
+
   display(value) {
     return (moment(new Date(value)).isValid() ? moment(new Date(value)).format(datetimeDisplayFormat) : value);
   }
@@ -139,48 +152,9 @@ export default class ProposalCtrl extends Controller {
     this.editingLocation = !this.editingLocation;
   }
 
-  flipDescriptionEditingStatus(newOne) {
-    if (!this.editingDescription) {
-      $($('textarea')[0]).height($($('pre')[0]).height());
-    }
-    this.editingDescription = newOne ? newOne : !this.editingDescription;
+  flipDescriptionEditingStatus(text) {
+    this.editingDescription = !this.editingDescription;
   }
-
-// commented out to disable markdown
-//  flipDescriptionEditingStatus(text) {
-//    this.editingDescription = !this.editingDescription;
-//
-//    if (!this.editor && this.editingDescription) {
-//      var editor = {tool: new SimpleMDE({autosave: { enabled: true, uniqueId: "MyUniqueID", delay: 1000}, spellChecker: false }), changed: false};
-//      this.editor = editor;
-//      var controller = this;
-//
-//      Meteor.settings.public.autoSaveIntervalHandle = Meteor.setInterval(function() {
-//        if (editor.changed) {
-//          controller.saveDescription(auto=true);
-//          editor.changed = false;
-//        }
-//      }, 60*1000 /* 1 minute interval */);
-//
-//      this.editor.tool.codemirror.on("change", function() {
-//      	editor.changed = true;
-//      });
-//
-//      // fixing SimpleMDE bug
-//      $('.fa-eye').click(function(event) {
-//        var mistypedClass = "no-disableactivated";
-//        if ($(event.target).hasClass(mistypedClass)) {
-//          $(event.target).removeClass(mistypedClass);
-//          $(event.target).addClass("no-disable");
-//          $(event.target).addClass("activated");
-//        }
-//      });
-//    }
-//
-//    if (this.editingDescription) {
-//      this.editor.tool.value(text);
-//    }
-//  }
 
   flipActivityShowingStatus() {
     this.activityShowed = !this.activityShowed;
@@ -210,26 +184,15 @@ export default class ProposalCtrl extends Controller {
     this.flipLocationEditingStatus();
   }
 
-  saveDescription(description) {
+  saveDescription() {
+    var description = $('textarea[name="editDescription"]').val();
     Meteor.call('tasks.updateDescription',
       this.proposalId,
       description,
       ProfileUtils.processMeteorResult);
-    this.flipDescriptionEditingStatus();
+    $('div.pre').html(this.markdown(description));
+    this.flipDescriptionEditingStatus(description);
   }
-
-// commented out to disable markdown
-//  saveDescription(auto=false) {
-//    var description = this.editor.tool.value();
-//    Meteor.call('tasks.updateDescription',
-//      this.proposalId,
-//      description,
-//      ProfileUtils.processMeteorResult);
-//    if (!auto) {
-//      $('div.pre').html(SimpleMDE.prototype.markdown(description));
-//      this.flipDescriptionEditingStatus(description);
-//    }
-//  }
 
   saveTitle(title) {
     Meteor.call('tasks.updateTitle',
