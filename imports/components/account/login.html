@@ -4,7 +4,21 @@
         <div class="row">
           <div class="card">
             <div class="content picker-container">
-              <blaze-template name="atForm" replace></blaze-template>
+              <div ng-hide="login.isNativeApp">
+                <blaze-template name="atForm" replace ></blaze-template>
+              </div>
+              <div class="list" ng-show="login.isNativeApp && !login.data">
+                <div class="center item item-divider">
+                  <h4 class="title">Sign In</h4>
+                </div>
+                <div class="at-oauth">
+                  <div class="item center">
+                    <button ng-click="login.login()" class="btn btn-info btn-fill button button-block at-social-btn" id="at-facebook" name="facebook">
+                      <i class="icon ion-social-facebook"></i> Sign In with Facebook
+                    </button>
+                  </div>
+                </div>
+              </div>
               <a style="text-align: center;" ng-show="login.data" href="#!/tab/todo">
                 <p>Go to the main page</p>
               </a>

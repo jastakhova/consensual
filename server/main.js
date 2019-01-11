@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../imports/api/tasks.js';
+import 'bas-meteor-facebook-login';
 
 Migrations = [
   '1539727846000',
