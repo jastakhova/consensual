@@ -8,19 +8,21 @@ export default class LoginCtrl extends Controller {
 
         this.isNativeApp = Meteor.isCordova;
 
-        let fbLogoutSuccess = function (userData) {
-          console.log('UserInfo after logout: ', userData);
-          console.log(Meteor.user());
-        };
+        if (this.isNativeApp) {
+          let fbLogoutSuccess = function (userData) {
+            console.log('UserInfo after logout: ', userData);
+            console.log(Meteor.user());
+          };
 
-        let fbLogoutFail = function (error) {
-          console.log('Facebook plugin logout error: ', error);
-        };
-        facebookConnectPlugin.logout(fbLogoutSuccess, fbLogoutFail)
+          let fbLogoutFail = function (error) {
+            console.log('Facebook plugin logout error: ', error);
+          };
+          facebookConnectPlugin.logout(fbLogoutSuccess, fbLogoutFail)
+        }
 
         this.helpers({
             data() {
-              return Meteor.userId();
+              return Meteor.user();
             }
         });
     }

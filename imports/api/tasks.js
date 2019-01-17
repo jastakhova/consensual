@@ -462,7 +462,7 @@ Meteor.methods({
 });
 
 if (Meteor.isServer) {
-  process.env.MAIL_URL = "smtps://team.consensual%40gmail.com:team11223344556677@smtp.gmail.com:465/";
+  process.env.MAIL_URL = "smtps://team.consensual%40gmail.com:teamConsensual123@smtp.gmail.com:465/";
 
   Meteor.publish('tasks', function tasksPublication() {
     return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});

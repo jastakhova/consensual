@@ -25,14 +25,18 @@ Thanks for your support!
 #### Urgent tasks
 None
 
-#### Active ToDo (2 weeks)
-- [app] Native facebook login in the app (https://gist.github.com/jamielob/881e0fe059c0ef0eb36d)
+#### Active ToDo
+- Give materials to Jun Jun (images and text for landing page)
 - [talk] Approve logic is not well understood by ppl
+- [issue] Losing of data if facebook token exprires
+- [issue] Losing of data on deployment
+- [issue] Losing of data on simultaneous editing
+- [logic debt] Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
+
 - [ui] clear the search (estimate: 2h)
 - [logic] client side search (not regexp) (estimate: 2 days)
 - [logic] By who should sort by assignee and author
 - [ui bug] Browser suggest in different browsers (gathering statistical data so far from users)
-- [logic debt] Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)
 - [ui] Make the column width equal between different tasks lists on the main page
 - [ui] Calendar dialog shouldn't have Save button but save on the choice of the date
 - [logic] Not redirect to Open filter when nothing for today, act as in Inbox with empty list
@@ -182,6 +186,7 @@ meteor mongo
 
 ### Sources
 * Bootstrap Theme: https://github.com/creativetimofficial/light-bootstrap-dashboard
+* Markdown Library: bootstrap-markdown https://github.com/toopay/bootstrap-markdown/issues/265
 
 ### References
 * Meteor: https://docs.meteor.com/api
@@ -194,4 +199,10 @@ meteor mongo
 
 ### To use in future
 * Mail service: www.mailgun.com/‎
-* Markdown: https://simplemde.com/
+* When we hit production: https://medium.com/@davidyahalomi/when-a-meteor-finally-hits-production-6c37b81f795b
+
+### Facebook login in Cordova
+* old way - https://gist.github.com/jamielob/881e0fe059c0ef0eb36d
+* Done via Native Facebook SDK login for Meteor - bas-meteor-facebook-login https://www.npmjs.com/package/bas-meteor-facebook-login
+* With help of https://github.com/meteor/meteor/issues/9643
+* Erasing cache on simulator https://stackoverflow.com/questions/8323819/is-there-a-quicker-better-way-to-clear-the-iphone-simulator-cache-than-deletin
