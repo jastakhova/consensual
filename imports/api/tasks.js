@@ -361,7 +361,7 @@ Meteor.methods({
       options.text = text;
     }
     if (Meteor.isServer) {
-      Email.send(options);
+      return Email.send(options);
     }
   },
   'email.withError'(error) {
@@ -375,27 +375,33 @@ Meteor.methods({
     check(to.email, String);
 
     if (Meteor.user()) {
-      Meteor.call('email.send', to.name + ' <' + to.email + '>',
-        "Invitation to join Consensual from " + getName(Meteor.user()),
-        "<html><body>Hi!<br/>" + getName(Meteor.user()) + " invites you to join Consensual app. Proceed to " + process.env.ROOT_URL +
-            ".</body></html>");
+      var id = Invitees.insert({
+        invitorId: Meteor.userId(),
+        username: to.name,
+        creationTime: new Date(moment().format()).getTime(),
+        email: to.email.toLowerCase()
+      });
 
-      return Invitees.insert({
-         invitorId: Meteor.userId(),
-         username: to.name,
-         creationTime: new Date(moment().format()).getTime(),
-         email: to.email.toLowerCase()
-       });
+      try {
+        Meteor.call('email.send', to.name + ' <' + to.email + '>',
+            "Invitation to join Consensual from " + getName(Meteor.user()),
+            "<html><body>Hi!<br/>" + getName(Meteor.user()) + " invites you to join Consensual app." +
+            "Proceed to " + process.env.ROOT_URL + "?in=" + id + ".</body></html>");
+        return id;
+      } catch (noEmailError) {
+        console.log("No email " + to.email);
+        Invitees.remove({_id: id});
+      }
     }
   },
-  'invitees.register' () {
+  'invitees.register' (inviteeId) {
     var user = Meteor.user();
     if (user && user.services && user.services.facebook && user.services.facebook.email && Meteor.isServer) {
       var email = user.services.facebook.email;
       var newUserId = Meteor.userId();
-      console.log("Should register new invitee " + newUserId + " ?..");
+      console.log("Should register new invitee " + inviteeId + " as " + newUserId + " ?..");
 
-      Invitees.find({email}).fetch().forEach(invitee => {
+      Invitees.find({ $or: [{email}, {_id: inviteeId}]}).fetch().forEach(invitee => {
         console.log("Merging invitee " + invitee._id + " to " + newUserId);
 
         Tasks.update({authorId: invitee._id}, {
@@ -410,7 +416,7 @@ Meteor.methods({
           }, { multi: true });
       });
 
-      Invitees.remove({email});
+      Invitees.remove({ $or: [{email}, {_id: inviteeId}]});
 
       // TODO: let the invitors know
     }

@@ -423,9 +423,15 @@ export default class TodosListCtrl extends Controller {
 	    addNewPersonToSuggest(this.newInvitee.found._id, this.newInvitee.found.name);
 	  } else {
       Meteor.call('email.invite', to, function(error, result) {
-        Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: result, name:  to.name};
-
-        addNewPersonToSuggest(result, to.name);
+        if (result) {
+          Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: result, name:  to.name};
+          addNewPersonToSuggest(result, to.name);
+        } else {
+          var err = "We couldn't send an email to " + to.email;
+          console.log(err);
+          ProfileUtils.showError(err);
+          Meteor.call('email.withError', err);
+        }
       });
     }
 	}

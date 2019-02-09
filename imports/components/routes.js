@@ -52,7 +52,7 @@ export default class RoutesConfig extends Config {
         }
       })
       .state('login', {
-        url: '/login',
+        url: '/login?in',
         templateUrl: loginUrl,
         controller: 'LoginCtrl as login'
       })

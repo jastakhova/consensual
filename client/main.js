@@ -30,6 +30,10 @@ Meteor.isLoggedIn = function() {
     return Meteor.userId();
 }
 
+function getQuery(q) {
+   return (window.location.search.match(new RegExp('[?&]' + q + '=([^&]+)')) || [, null])[1];
+}
+
 // The useraccounts:ionic package uses Blaze even though the rest of the app uses Angular
 var angularMeteorTemplate = angular.module('angular-blaze-template', []);
 
@@ -116,7 +120,7 @@ consensual.run(['$ionicHistory', '$state', '$rootScope', function ($ionicHistory
         historyRoot: true
     });
 
-    $state.go("login");
+    $state.go("login", {'in': getQuery("in")});
   }
 
   $rootScope.$on('$stateChangeStart', function(event, toState, fromState) {
@@ -216,5 +220,5 @@ if (Meteor.isCordova) {
 }
 
 Accounts.onLogin(function(event) {
-  Meteor.call('invitees.register');
+  Meteor.call('invitees.register', getQuery("in"));
 });
