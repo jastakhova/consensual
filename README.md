@@ -200,6 +200,7 @@ meteor mongo
 ### To use in future
 * Mail service: www.mailgun.com/‎
 * When we hit production: https://medium.com/@davidyahalomi/when-a-meteor-finally-hits-production-6c37b81f795b
+* Upgrade of Meteor Galaxy setup https://forums.meteor.com/t/galaxy-really-concerned-about-launching-a-serious-app-maintenance-reboots/29507/6
 
 ### Facebook login in Cordova
 * old way - https://gist.github.com/jamielob/881e0fe059c0ef0eb36d

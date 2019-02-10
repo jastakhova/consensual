@@ -154,6 +154,9 @@ export default class TodosListCtrl extends Controller {
 							suggest[suggestSize++] = {id: key, name: ProfileUtils.getName(id2user[key])};
 					});
 					Meteor.settings.public.contacts = suggest;
+				  if (Meteor.settings.public.contacts.filter(x => x.id === Meteor.userId()).length === 0) {
+				    Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: Meteor.userId(), name:  ProfileUtils.getName(Meteor.user())};
+				  }
 					return suggest;
         }
 

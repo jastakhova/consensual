@@ -13,7 +13,7 @@ export const Invitees = new Mongo.Collection('invitees');
 // available where Tasks is imported
 datetimeDisplayFormat = "MMM DD, YYYY, h:mm A";
 
-foundersFilter = {'profile.name': {$in: ["Julia Astakhova", "Day Waterbury"]}};
+foundersFilter = {'profile.name': {$in: ["Julia Astakhova", "Day Waterbury", "All Consensual"]}};
 
 function getName(user) {
   return user.username ? user.username : user.profile.name;
@@ -456,7 +456,7 @@ Meteor.methods({
 
     if (receivers.length < size) {
       var founders = Meteor.users.find(
-        { $and: [foundersFilter, {_id: {$nin: receivers}}]},
+        { $and: [foundersFilter, {_id: {$nin: receivers}}, {_id: {$ne: Meteor.userId()}}]},
         { sort: { 'profile.name': 1 }, limit: size - receivers.length }).fetch().map(r => r._id);
       console.log("So the founders list was:");
       console.log(founders);
