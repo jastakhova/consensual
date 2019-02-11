@@ -387,6 +387,10 @@ Meteor.methods({
             "Invitation to join Consensual from " + getName(Meteor.user()),
             "<html><body>Hi!<br/>" + getName(Meteor.user()) + " invites you to join Consensual app." +
             "Proceed to " + process.env.ROOT_URL + "?in=" + id + ".</body></html>");
+
+
+
+
         return id;
       } catch (noEmailError) {
         console.log("No email " + to.email);
@@ -400,6 +404,10 @@ Meteor.methods({
       var email = user.services.facebook.email;
       var newUserId = Meteor.userId();
       console.log("Should register new invitee " + inviteeId + " as " + newUserId + " ?..");
+
+      if (!inviteeId) {
+        inviteeId = "undefined"; // if left undefined it will fetch all db records
+      }
 
       Invitees.find({ $or: [{email}, {_id: inviteeId}]}).fetch().forEach(invitee => {
         console.log("Merging invitee " + invitee._id + " to " + newUserId);
