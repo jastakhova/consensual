@@ -1,0 +1,39 @@
+#### Welcome to Consensual v0.0.1
+To get you started and familiarize you with the process, we humbly present to you the following Terms of Use for your review and approval:
+
+#### How to Use Consensual
+Use Consensual for real-life agreements and (optionally) give us valuable feedback on your experience.  An agreement may be with yourself or another person. If you you can propose it, discuss it, and agree on it, you can track it in Consensual. Use it for goals and commitments of any kind. Phone appointments or lunch dates. Rental agreements or bills of sale. Household chores or project management. Wedding vows or business partnerships.
+
+#### The Consensual Vision
+All of human society is built on the agreements we make. When we make these agreements consciously and take ownership of them, we are empowered to build a future based on mutual consent. Let's get started today!
+
+#### Our Agreement
+By using Consensual (hereinafter the Software), you accept and agree to be bound by these Terms of Use. If you do not agree to all of these Terms of Use, you may not use the Software.
+
+#### Your License
+You may use the Software for any lawful purpose consistent with these Terms of Use. Your license to use the Software is expressly conditioned upon your agreement to all of the Terms of Use. This software is licensed, not sold. You may not sell, resell, rent, lease or exchange the Software for anything of value. Consensual Ventures reserves all other rights not expressly granted by these Terms of Use.
+
+#### Consensual is in Alpha
+Thank you for registering to alpha test Consensual! Remember, the Software is under active development, and we want to hear about your experience. While we will make every reasonable effort to ensure the privacy, security, and continuity of your data, you may run into things that do not work they way you expect.
+
+#### 100% Human Technical Support
+Bug reports and feature requests can be sent to me directly as proposals using the app. If you have questions, concerns, wish to close your account, or require assistance of any kind, please send us email at team.consensual@gmail.com or call me directly at +1 707-205-7686.
+
+#### Disclaimers and Limiations on Liability
+THE SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, AND NO WARRANTY, EITHER EXPRESS OR IMPLIED, IS GIVEN. YOUR USE OF THE SOFTWARE IS AT YOUR SOLE RISK. Consensual Ventures does not warrant that (i) the Software will meet your specific requirements; (ii) the Software is fully compatible with any particular platform; (iii) your use of the Software will be uninterrupted, timely, secure, or error-free; (iv) the results that may be obtained from the use of the Software will be accurate or reliable; (v) the quality of any products, services, information, or other material purchased or obtained by you through the Software will meet your expectations; or (vi) any errors in the Software will be corrected.
+
+YOU EXPRESSLY UNDERSTAND AND AGREE THAT CONSENSUAL VENTURES SHALL NOT BE JOINTLY or SEPARATELY LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES, INCLUDING BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA OR OTHER INTANGIBLE LOSSES (EVEN IF CONSENSUAL VENTURES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES) RELATED TO THE SOFTWARE, including, for example: (i) the use or the inability to use the Software; (ii) the cost of procurement of substitute goods and services resulting from any goods, data, information or services purchased or obtained or messages received or transactions entered into through or from the Software; (iii) unauthorized access to or alteration of your transmissions or data; (iv) statements or conduct of any third-party on the Software; (v) or any other matter relating to the Software.
+
+Consensual Ventures reserves the right at any time and from time to time to modify or discontinue, temporarily or permanently, the Software (or any part thereof) with or without notice. Consensual Ventures shall not be liable to you or to any third-party for any modification, price change, suspension or discontinuance of the Software.
+
+#### Further Information
+You can read more about this project and view our development roadmap here: [https://github.com/jastakhova/consensual#roadmap](https://github.com/jastakhova/consensual#roadmap).
+
+#### Authorized Representative
+Because Consensual Ventures is currently an unincorporated partnership, all references to Consensual Ventures are to be understood as being references to myself, Day Waterbury, DBA Consensual Ventures. I am authorized to act and execute agreements on behalf Consensual Ventures.
+
+#### Approval in Lieu of Signature
+By clicking Approve you indicate your agreement to these terms. Please read this document thoroughly and be sure you understand and agree before clicking Approve.
+
+#### Consensual is Consensual
+If you do not agree to these Terms of Use, please Cancel this agreement and send email to team.consensual@gmail.com with the subject “UNREGISTER”. We will remove your account with all blessings and no questions asked.

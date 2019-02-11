@@ -5,6 +5,7 @@ import 'underscore';
 import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
+import fs from 'fs';
 
 export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
@@ -14,6 +15,26 @@ export const Invitees = new Mongo.Collection('invitees');
 datetimeDisplayFormat = "MMM DD, YYYY, h:mm A";
 
 foundersFilter = {'profile.name': {$in: ["Julia Astakhova", "Day Waterbury", "All Consensual"]}};
+
+mailingFounder = "";
+
+function getMailingFounder() {
+  if (mailingFounder.length == 0) {
+    mailingFounder = Meteor.users.findOne({ 'profile.name': "All Consensual"});
+  }
+
+  return mailingFounder;
+}
+
+mailingTemplate = "";
+
+function getMailingTemplate() {
+  if (mailingTemplate.length == 0 && Meteor.isServer) {
+    mailingTemplate = fs.readFileSync(process.env.PWD + "/public/assets/copy/user_agreement.txt", 'utf8');
+  }
+
+  return mailingTemplate;
+}
 
 function getName(user) {
   return user.username ? user.username : user.profile.name;
@@ -64,33 +85,40 @@ Meteor.methods({
       return;
     }
 
+    var actor = newTask.author ? newTask.author : Meteor.userId();
+    var actorName = getName(Meteor.users.findOne({_id: actor}));
     var receiver = Meteor.users.findOne({_id: newTask.receiver}) || Invitees.findOne({_id: newTask.receiver});
-    console.log(receiver);
-    var maxTitleLength = 20;
-    var titleIndex = Math.min(maxTitleLength, newTask.task.length);
-    var newLineIndex = newTask.task.indexOf("\n");
-    if (newLineIndex > 0) {
-      titleIndex = Math.min(titleIndex, newLineIndex);
+
+    function getTitle(text, title) {
+      if (title) {
+        return title;
+      }
+      var maxTitleLength = 20;
+      var titleIndex = Math.min(maxTitleLength, text.length);
+      var newLineIndex = text.indexOf("\n");
+      if (newLineIndex > 0) {
+        titleIndex = Math.min(titleIndex, newLineIndex);
+      }
+      return text.slice(0, titleIndex) + (text.length !== titleIndex ? "..." : "");
     }
-    var newTitle = newTask.task.slice(0, titleIndex) + (newTask.task.length !== titleIndex ? "..." : "");
 
     var activity = {
-       actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actor: actor,
+       actorName: actorName,
        field: 'agreement',
        time: new Date().getTime()
      };
 
     var createdTask = {
       text: newTask.task,
-      title: newTitle,
+      title: getTitle(newTask.task, newTask.title),
       eta: new Date(moment(newTask.time).format()).getTime(),
-      authorId: Meteor.userId(),
-      authorName: getName(Meteor.user()),
+      authorId: actor,
+      authorName: actorName,
       receiverId: newTask.receiver,
       receiverName: getName(receiver),
       authorStatus: 'green',
-      receiverStatus: Meteor.userId() === newTask.receiver ? 'green' : 'yellow',
+      receiverStatus: actor === newTask.receiver ? 'green' : 'yellow',
       location: '...',
       activity: [activity],
       comments: [],
@@ -102,19 +130,6 @@ Meteor.methods({
     createdTask['_id'] = id;
     notifyOnNewValue(createdTask, newTask.receiver, "created", "agreement", newTask.task);
   },
-  // NOT USED but preserved for future.
-  // SHOULD contain notification functionality
-//  'tasks.remove' (taskId) {
-//    check(taskId, String);
-//
-//    const task = Tasks.findOne(taskId);
-//		if (task.private && task.owner !== Meteor.userId()) {
-//			// If the task is private, make sure only the owner can delete it
-//			throw new Meteor.Error('not-authorized');
-//		}
-//
-//    Tasks.remove(taskId);
-//  },
   'tasks.updateTime' (taskId, oldTimeUTCString, newTimeUTCString, timezone) {
     check(taskId, String);
     check(oldTimeUTCString, String);
@@ -388,12 +403,18 @@ Meteor.methods({
             "<html><body>Hi!<br/>" + getName(Meteor.user()) + " invites you to join Consensual app." +
             "Proceed to " + process.env.ROOT_URL + "?in=" + id + ".</body></html>");
 
-
-
+        Meteor.call('tasks.insert', {
+          task: getMailingTemplate(),
+          time: moment.utc().add(1, 'month').format(),
+          receiver: id,
+          author: getMailingFounder()._id,
+          title: "Consensual Terms of Use"
+        });
 
         return id;
       } catch (noEmailError) {
         console.log("No email " + to.email);
+        console.log(noEmailError);
         Invitees.remove({_id: id});
       }
     }
@@ -409,8 +430,12 @@ Meteor.methods({
         inviteeId = "undefined"; // if left undefined it will fetch all db records
       }
 
+      if (!email) {
+        email = "undefined";
+      }
+
       Invitees.find({ $or: [{email}, {_id: inviteeId}]}).fetch().forEach(invitee => {
-        console.log("Merging invitee " + invitee._id + " to " + newUserId);
+        console.log("Merging invitee " + invitee._id + " to " + newUserId + " with facebook email " + email);
 
         Tasks.update({authorId: invitee._id}, {
           $set: {
