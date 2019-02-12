@@ -30,7 +30,7 @@ mailingTemplate = "";
 
 function getMailingTemplate() {
   if (mailingTemplate.length == 0 && Meteor.isServer) {
-    mailingTemplate = fs.readFileSync(process.env.PWD + "/public/assets/copy/user_agreement.txt", 'utf8');
+    mailingTemplate = Assets.getText("copy/user_agreement.txt");
   }
 
   return mailingTemplate;
