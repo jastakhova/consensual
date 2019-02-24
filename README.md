@@ -175,6 +175,11 @@ $ sudo node main.js
 $ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
 ```
 
+### Testing
+```
+meteor test --driver-package=cultofcoders:mocha
+```
+
 ### Mongo
 
 ```

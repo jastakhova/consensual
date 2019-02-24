@@ -1,42 +1,73 @@
-/* eslint-env mocha */
-
 import { Meteor } from 'meteor/meteor';
 import { Random } from 'meteor/random';
 import { assert } from 'meteor/practicalmeteor:chai';
+import { sinon } from 'meteor/practicalmeteor:sinon';
 
-import { Tasks } from './tasks.js';
+import { Invitees } from './tasks.js';
 
 if (Meteor.isServer) {
   describe('Tasks', () => {
     describe('methods', () => {
-    	const userId = Random.id();
-			let taskId;
+    	const userId = "dpy3hmJHy8ZQyuw5t";
+    	const inviteeId = "XbTqCFm4GMTZwRfyu";
+    	const email = "bla@bla.com";
 
 			beforeEach(() => {
-				Tasks.remove({});
-				taskId = Tasks.insert({
-					text: 'test task',
-					createdAt: new Date(),
-					owner: userId,
-					username: 'tmeasday',
-				});
+			  Meteor.user = sinon.stub();
+			  Meteor.user.returns( {
+          _id: userId,
+          services: {facebook: {email: email}}
+        });
+
+        Invitees.remove({_id: inviteeId});
 			});
     
-      it('can delete owned task', () => {
-        // Find the internal implementation of the task method so we can
-        // test it in isolation
-        const deleteTask = Meteor.server.method_handlers['tasks.remove'];
+      it('can register matching invitee by email', () => {
+        Invitees.insert({
+           _id: inviteeId,
+           invitorId: userId,
+           username: "Invitee",
+           creationTime: new Date(moment().format()).getTime(),
+           email: email
+        });
+        assert.equal(Invitees.find().count(), 1);
 
-        // Set up a fake method invocation that looks like what the method expects
-        const invocation = {
-          userId
-        };
+        const registerTask = Meteor.server.method_handlers['invitees.register'];
+        registerTask.apply({}, []);
 
-        // Run the method with `this` set to the fake invocation
-        deleteTask.apply(invocation, [taskId]);
+        assert.equal(Invitees.find().count(), 0);
+      });
 
-        // Verify that the method does what we expected
-        assert.equal(Tasks.find().count(), 0);
+      it('can register matching invitee by id', () => {
+        Invitees.insert({
+           _id: inviteeId,
+           invitorId: userId,
+           username: "Invitee",
+           creationTime: new Date(moment().format()).getTime(),
+           email: "notmatching@bla.com"
+        });
+        assert.equal(Invitees.find().count(), 1);
+
+        const registerTask = Meteor.server.method_handlers['invitees.register'];
+        registerTask.apply({}, [inviteeId]);
+
+        assert.equal(Invitees.find().count(), 0);
+      });
+
+      it('can persists invitees if no match', () => {
+        Invitees.insert({
+           _id: inviteeId,
+           invitorId: userId,
+           username: "Invitee",
+           creationTime: new Date(moment().format()).getTime(),
+           email: "notmatching@bla.com"
+        });
+        assert.equal(Invitees.find().count(), 1);
+
+        const registerTask = Meteor.server.method_handlers['invitees.register'];
+        registerTask.apply({}, []);
+
+        assert.equal(Invitees.find().count(), 1);
       });
 		});
   });

@@ -423,7 +423,7 @@ Meteor.methods({
     var user = Meteor.user();
     if (user && user.services && user.services.facebook && user.services.facebook.email && Meteor.isServer) {
       var email = user.services.facebook.email;
-      var newUserId = Meteor.userId();
+      var newUserId = user._id;
       console.log("Should register new invitee " + inviteeId + " as " + newUserId + " ?..");
 
       if (!inviteeId) {
