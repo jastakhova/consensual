@@ -43,11 +43,11 @@ export default class TodosListCtrl extends Controller {
 
     this.filters = [
         {name: "All", selector: {archived: false}},
-        {name: "Open", selector: {status: "open"}},
-        {name: "To me", selector: {receiverId: Meteor.userId(), archived: false}},
-        {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}},
+        {name: "Open", selector: {$or: [{status: "open"}, {status: "proposed"}]}},
+        {name: "To me", selector: {"receiver.id": Meteor.userId(), archived: false}},
+        {name: "Needs attention", selector: {$or: [{"author.id": Meteor.userId(), "author.status": "yellow"}, {"receiver.id": Meteor.userId(), "receiver.status": "yellow"}], archived: false}},
         {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}},
-        {name: "Blocked", selector: {archived: false, $or: [{authorId: Meteor.userId(), authorStatus: "green", receiverStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "green", authorStatus: "yellow"}]}},
+        {name: "Blocked", selector: {archived: false, $or: [{"author.id": Meteor.userId(), "author.status": "green", "receiver.status": "yellow"}, {"receiver.id": Meteor.userId(), "receiver.status": "green", "author.status": "yellow"}]}},
         {name: "Done", selector: {status: "done"}},
         {name: "Cancelled", selector: {status: "cancelled"}},
         {name: "Archived", selector: {archived: true}},
@@ -56,7 +56,7 @@ export default class TodosListCtrl extends Controller {
     this.sorts = [
       {name: "Default", groups: [
           {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[4]},
-          {name: "Needs attention", selector: {$or: [{authorId: Meteor.userId(), authorStatus: "yellow"}, {receiverId: Meteor.userId(), receiverStatus: "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5, appliedFilter: this.filters[3]},
+          {name: "Needs attention", selector: {$or: [{"author.id": Meteor.userId(), "author.status": "yellow"}, {"receiver.id": Meteor.userId(), "receiver.status": "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5, appliedFilter: this.filters[3]},
           {name: "Today", selector: {status: "open", eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
             return ProfileUtils.comparator(task1.eta, task2.eta);
           }},
@@ -67,7 +67,7 @@ export default class TodosListCtrl extends Controller {
         return moment(d).format("DD MMM");
       }}},
       // "By assignee" takes bigger space and overflows the allocated space
-      {name: "By Who", configuration: {sort: "receiverId", grouping: function(task) {return (task.receiverId === Meteor.userId()? "1" : "2") + task.receiverName;}, groupingName: function(group) {return group.slice(1);}}},
+      {name: "By Who", configuration: {sort: "receiver.id", grouping: function(task) {return (task.receiver.id === Meteor.userId()? "1" : "2") + task.receiver.name;}, groupingName: function(group) {return group.slice(1);}}},
     ];
 
     var requestedSort = this.sorts.filter(s => s.name === this.$state.params.group);
@@ -133,9 +133,9 @@ export default class TodosListCtrl extends Controller {
 
       	function getConnectedPeople(controller) {
       	  var connectedUsers = new Set();
-          Tasks.find({$or: [{authorId: Meteor.userId()}, {receiverId: Meteor.userId()}]}).fetch().forEach(task => {
-            connectedUsers.add(task.authorId);
-            connectedUsers.add(task.receiverId);
+          Tasks.find({$or: [{"author.id": Meteor.userId()}, {"receiver.id": Meteor.userId()}]}).fetch().forEach(task => {
+            connectedUsers.add(task.author.id);
+            connectedUsers.add(task.receiver.id);
           });
 
           controller.invitees = Invitees.find().fetch();
@@ -171,10 +171,10 @@ export default class TodosListCtrl extends Controller {
         function prepareTask(x) {
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
-          x.authorPicture = ProfileUtils.picture(id2user[x.authorId]);
-          x.receiverPicture = ProfileUtils.picture(id2user[x.receiverId]);
-          x.fromCurrentUser = x.authorId === Meteor.userId() && x.authorId != x.receiverId;
-          x.toCurrentUser = x.receiverId === Meteor.userId() && x.authorId != x.receiverId;
+          x.authorPicture = ProfileUtils.picture(id2user[x.author.id]);
+          x.receiverPicture = ProfileUtils.picture(id2user[x.receiver.id]);
+          x.fromCurrentUser = x.author.id === Meteor.userId() && x.author.id != x.receiver.id;
+          x.toCurrentUser = x.receiver.id === Meteor.userId() && x.author.id != x.receiver.id;
           return x;
         }
 
@@ -344,12 +344,12 @@ export default class TodosListCtrl extends Controller {
   }
 
   getTaskStatusImage(task) {
-    if (Meteor.userId() === task.authorId && task.authorStatus === 'yellow' ||
-            Meteor.userId() === task.receiverId && task.receiverStatus === 'yellow') {
+    if (Meteor.userId() === task.author.id && task.author.status === 'yellow' ||
+            Meteor.userId() === task.receiver.id && task.receiver.status === 'yellow') {
               return 'look'; // requires user's attention
             }
     if (task.status === 'open') {
-      if (task.authorStatus === 'yellow' || task.receiverStatus === 'yellow') {
+      if (task.author.status === 'yellow' || task.receiver.status === 'yellow') {
         return 'timer'; // is blocking current user
       }
       if (task.eta < new Date()) {

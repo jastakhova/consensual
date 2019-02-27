@@ -143,12 +143,12 @@
                 <td ng-show="task.toCurrentUser">
                   from
                   <img class="avatar border-gray" src="{{task.authorPicture}}" alt="..."/>
-                  {{task.authorName}}
+                  {{task.author.name}}
                 </td>
                 <td ng-show="task.fromCurrentUser">
                   to
                   <img class="avatar border-gray" src="{{task.receiverPicture}}" alt="..."/>
-                  {{task.receiverName}}
+                  {{task.receiver.name}}
                 </td>
                 <td><a href="#!/tab/proposal/{{task._id}}">{{task.title}}</a></td>
               </tr>

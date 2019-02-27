@@ -7,7 +7,8 @@ Migrations = [
   '1540240902000',
   '1540319678000',
   '1540929490000',
-  '1542315428741'
+  '1542315428741',
+  'new'
 ];
 
 Meteor.methods({
@@ -113,6 +114,30 @@ Meteor.methods({
         Tasks.update({_id: task._id}, {
           $set: {
             title: newTitle
+          }
+        });
+      }
+    }
+  },
+  'Migrations.new' () {
+    // 1. Added: author and receiver objects
+
+    tasks = Tasks.find();
+
+    for (let task of tasks) {
+      if (!task.author) {
+        Tasks.update({_id: task._id}, {
+          $set: {
+            author: {
+              id: task.authorId,
+              name: task.authorName,
+              status: task.authorStatus
+            },
+            receiver: {
+              id: task.receiverId,
+              name: task.receiverName,
+              status: task.receiverStatus
+            }
           }
         });
       }

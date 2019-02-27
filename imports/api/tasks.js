@@ -6,6 +6,7 @@ import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
+import {Actions, Notices, getAction} from './dictionary.js';
 
 export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
@@ -45,7 +46,7 @@ function getEmail(user) {
 }
 
 function notifyOnNewValue(task, receiver, verb, entity, newValue, oldValue, timezone) {
-  if (task.authorId !== task.receiverId) {
+  if (task.author.id !== task.receiver.id) {
     Emails.insert({
       receiver,
       actor: Meteor.userId(),
@@ -62,7 +63,7 @@ function notifyOnNewValue(task, receiver, verb, entity, newValue, oldValue, time
 }
 
 function notifyOnActivity(task, activity, timezone) {
-  notifyOnNewValue(task, task.authorId === Meteor.userId() ? task.receiverId : task.authorId, "changed to", activity.field,
+  notifyOnNewValue(task, task.author.id === Meteor.userId() ? task.receiver.id : task.author.id, "changed to", activity.field,
     activity.newValue, activity.oldValue, timezone);
 }
 
@@ -109,21 +110,41 @@ Meteor.methods({
        time: new Date().getTime()
      };
 
+     var author = {
+      id: actor,
+      name: actorName,
+      status: 'green',
+      notices: [],
+      ticklers: []
+     };
+
+     var receiver = {
+       id: newTask.receiver,
+       name: getName(receiver),
+       status: 'grey',
+       notices: [{
+          code: 0,
+          created: new Date().getTime()
+       }],
+       ticklers: []
+      };
+
     var createdTask = {
       text: newTask.task,
       title: getTitle(newTask.task, newTask.title),
       eta: new Date(moment(newTask.time).format()).getTime(),
-      authorId: actor,
-      authorName: actorName,
-      receiverId: newTask.receiver,
-      receiverName: getName(receiver),
-      authorStatus: 'green',
-      receiverStatus: actor === newTask.receiver ? 'green' : 'yellow',
       location: '...',
+
+      author: author,
+      receiver: receiver,
+
       activity: [activity],
       comments: [],
-      status: 'open',
-      archived: false
+
+      status: 'proposed',
+      archived: false,
+      locked: false,
+      wasAgreed: false,
     };
 
     var id = Tasks.insert(createdTask);
@@ -141,8 +162,8 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
-    var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
+    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
+    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -158,8 +179,8 @@ Meteor.methods({
       $set: {
         eta: new Date(moment(newTimeUTCString).format()).getTime(),
         activity: task.activity,
-        authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus
       }
     });
 
@@ -174,8 +195,8 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
-    var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
+    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
+    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -190,8 +211,8 @@ Meteor.methods({
       $set: {
         location: newLocation,
         activity: task.activity,
-        authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus
       }
     });
 
@@ -206,8 +227,8 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
-    var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
+    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
+    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -222,8 +243,8 @@ Meteor.methods({
       $set: {
         text: newDescription,
         activity: task.activity,
-        authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus
       }
     });
 
@@ -238,8 +259,8 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.authorId != Meteor.userId() ? 'yellow' : task.authorStatus;
-    var newReceiverStatus = task.receiverId != Meteor.userId() ? 'yellow' : task.receiverStatus;
+    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
+    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -254,8 +275,8 @@ Meteor.methods({
       $set: {
         title: newTitle,
         activity: task.activity,
-        authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus
       }
     });
 
@@ -267,14 +288,14 @@ Meteor.methods({
 
     const task = Tasks.findOne(taskId);
 
-    var newAuthorStatus = task.authorId === Meteor.userId() ? status : task.authorStatus;
-    var newReceiverStatus = task.receiverId === Meteor.userId() ? status : task.receiverStatus;
+    var newAuthorStatus = task.author.id === Meteor.userId() ? status : task.author.status;
+    var newReceiverStatus = task.receiver.id === Meteor.userId() ? status : task.receiver.status;
 
-    if (newAuthorStatus === task.authorStatus && newReceiverStatus === task.receiverStatus) {
+    if (newAuthorStatus === task.author.status && newReceiverStatus === task.receiver.status) {
       return;
     }
 
-    var oldValue = task.authorId === Meteor.userId() ? task.authorStatus : task.receiverStatus;
+    var oldValue = task.author.id === Meteor.userId() ? task.author.status : task.receiver.status;
 
     function verbalize(status) {
       if (!archive) {
@@ -294,8 +315,8 @@ Meteor.methods({
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
-        authorStatus: newAuthorStatus,
-        receiverStatus: newReceiverStatus,
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus,
         archived: archive || task.archived
       }
     });
@@ -309,19 +330,19 @@ Meteor.methods({
 
     task.comments.push({
           author: Meteor.userId(),
-          authorName: getName(Meteor.user()),
+          "author.name": getName(Meteor.user()),
           text: text,
           time: new Date().getTime()
         });
     Tasks.update(taskId, {
       $set: {
         comments: task.comments,
-        authorStatus: Meteor.userId() === task.authorId ? task.authorStatus : 'yellow',
-        receiverStatus: Meteor.userId() === task.receiverId ? task.receiverStatus : 'yellow',
+        "author.status": Meteor.userId() === task.author.id ? task.author.status : 'yellow',
+        "receiver.status": Meteor.userId() === task.receiver.id ? task.receiver.status : 'yellow',
       }
     });
 
-    notifyOnNewValue(task, Meteor.userId() === task.authorId ? task.receiverId : task.authorId, "added", "comment", text);
+    notifyOnNewValue(task, Meteor.userId() === task.author.id ? task.receiver.id : task.author.id, "added", "comment", text);
   },
   'tasks.changeTaskStatus' (taskId, status) {
     check(taskId, String);
@@ -342,10 +363,10 @@ Meteor.methods({
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
-        authorStatus: Meteor.userId() === task.authorId ? 'green' : 'yellow',
-        receiverStatus: Meteor.userId() === task.receiverId ? 'green' : 'yellow',
+        "author.status": Meteor.userId() === task.author.id ? 'green' : 'yellow',
+        "receiver.status": Meteor.userId() === task.receiver.id ? 'green' : 'yellow',
         status: status,
-        archived: task.authorId === task.receiverId && status !== 'open'
+        archived: task.author.id === task.receiver.id && status !== 'open'
       }
     });
 
@@ -437,14 +458,14 @@ Meteor.methods({
       Invitees.find({ $or: [{email}, {_id: inviteeId}]}).fetch().forEach(invitee => {
         console.log("Merging invitee " + invitee._id + " to " + newUserId + " with facebook email " + email);
 
-        Tasks.update({authorId: invitee._id}, {
+        Tasks.update({"author.id": invitee._id}, {
           $set: {
-              authorId: newUserId
+              "author.id": newUserId
             }
           }, { multi: true });
-        Tasks.update({receiverId: invitee._id}, {
+        Tasks.update({"receiver.id": invitee._id}, {
           $set: {
-              receiverId: newUserId
+              "receiver.id": newUserId
             }
           }, { multi: true });
       });
@@ -459,10 +480,10 @@ Meteor.methods({
       return [];
     }
     var receivers = Promise.await(Tasks.rawCollection().aggregate([
-          { $match: { $and: [{authorId: Meteor.userId()}, {receiverId: {$ne: Meteor.userId()}}]}},
+          { $match: { $and: [{"author.id": Meteor.userId()}, {"receiver.id": {$ne: Meteor.userId()}}]}},
           {
           $group: {
-            _id: "$receiverId",
+            _id: "$receiver.id",
             count: { $sum: 1 },
             emails: { $push: "$$ROOT" }
           }},
@@ -472,13 +493,13 @@ Meteor.methods({
      if (receivers.length < size) {
       receivers = receivers.concat(Promise.await(Tasks.rawCollection().aggregate([
                 { $match: { $and: [
-                    {receiverId: Meteor.userId()},
-                    { authorId: {$nin: receivers } },
-                    { authorId: {$ne: Meteor.userId() } }
+                    {"receiver.id": Meteor.userId()},
+                    { "author.id": {$nin: receivers } },
+                    { "author.id": {$ne: Meteor.userId() } }
                     ]}},
                 {
                 $group: {
-                  _id: "$authorId",
+                  _id: "$author.id",
                   count: { $sum: 1 },
                   emails: { $push: "$$ROOT" }
                 }},
@@ -504,7 +525,7 @@ if (Meteor.isServer) {
   process.env.MAIL_URL = "smtps://team.consensual%40gmail.com:teamConsensual123@smtp.gmail.com:465/";
 
   Meteor.publish('tasks', function tasksPublication() {
-    return Tasks.find({$or: [{authorId: this.userId}, {receiverId: this.userId}]});
+    return Tasks.find({$or: [{"author.id": this.userId}, {"receiver.id": this.userId}]});
   });
 
   Meteor.publish('invitees', function inviteesPublication() {

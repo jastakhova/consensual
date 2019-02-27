@@ -26,6 +26,10 @@
 	box-shadow: 0px 0px 45px #cc3232;
 }
 
+.grey-glow {
+	box-shadow: 0px 0px 45px #a9a9a9;
+}
+
 .header-title {
     height: 20px;
     line-height: 25px;
