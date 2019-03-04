@@ -3,24 +3,53 @@ import { Random } from 'meteor/random';
 import { assert } from 'meteor/practicalmeteor:chai';
 import { sinon } from 'meteor/practicalmeteor:sinon';
 
-import { Invitees } from './tasks.js';
+import { Invitees, Tasks } from './tasks.js';
+import { getCurrentState, getState, getCondition } from './dictionary.js';
 
 if (Meteor.isServer) {
   describe('Tasks', () => {
     describe('methods', () => {
     	const userId = "dpy3hmJHy8ZQyuw5t";
+    	const otherUserId = "3iSfMT3X4TYyvvRQ4";
     	const inviteeId = "XbTqCFm4GMTZwRfyu";
     	const email = "bla@bla.com";
+    	const otherEmail = "bla2@bla.com";
 
-			beforeEach(() => {
-			  Meteor.user = sinon.stub();
-			  Meteor.user.returns( {
-          _id: userId,
+    	function changeUser(id) {
+    	  Meteor.user = sinon.stub();
+        Meteor.user.returns( {
+          _id: id,
+          username: "name",
           services: {facebook: {email: email}}
         });
 
-        Invitees.remove({_id: inviteeId});
+        Meteor.userId = sinon.stub();
+        Meteor.userId.returns(id);
+    	}
+
+			beforeEach(() => {
+			  changeUser(userId);
+
+        Meteor.users.insert({
+          _id: userId,
+          username: "author name",
+          services: {facebook: { email: email}}
+        });
+
+        Meteor.users.insert({
+          _id: otherUserId,
+          username: "receiver name",
+          services: {facebook: { email: otherEmail}}
+        });
 			});
+
+			afterEach(( ) => {
+			  Invitees.remove({_id: inviteeId});
+			  Tasks.remove({"author.id": userId});
+
+        Meteor.users.remove({_id: userId});
+        Meteor.users.remove({_id: otherUserId});
+      });
     
       it('can register matching invitee by email', () => {
         Invitees.insert({
@@ -68,6 +97,181 @@ if (Meteor.isServer) {
         registerTask.apply({}, []);
 
         assert.equal(Invitees.find().count(), 1);
+      });
+
+      it('can create task', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(tasks[0].author.id, userId);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+      });
+
+      it('can create self task', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: userId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(tasks[0].author.id, userId);
+        assert.equal(tasks[0].receiver.id, userId);
+        assert.equal(getCurrentState(tasks[0]).id, getState("AGREED").id);
+      });
+
+      it('can edit task by author after proposal', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.updateTime'];
+        registerTask2.apply({}, [tasks[0]._id, initialTime, moment().add(1, 'days').utc().format()]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.ok(initialTime !== tasks2[0].eta);
+        assert.equal(getCurrentState(tasks2[0]).id, getState("PROPOSED").id);
+
+        assert.equal(tasks[0].author.status, tasks2[0].author.status);
+        assert.equal(tasks[0].receiver.status, tasks2[0].receiver.status);
+      });
+
+      it('can edit task by receiver after proposal', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        var newLocation = "new location";
+        const registerTask2 = Meteor.server.method_handlers['tasks.updateLocation'];
+        registerTask2.apply({}, [tasks[0]._id, newLocation]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(tasks2[0].location, newLocation);
+        assert.equal(getCurrentState(tasks2[0]).id, getState("DEEPLY_CONSIDERED").id);
+      });
+      it('can edit task in case of self agreement', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: userId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("AGREED").id);
+
+        var newDescription = task.task + "2";
+        const registerTask2 = Meteor.server.method_handlers['tasks.updateDescription'];
+        registerTask2.apply({}, [tasks[0]._id, newDescription]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(tasks2[0].text, newDescription);
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+      });
+
+      it('can edit task when it is considered by both parties', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        var newTitle = "stupid title";
+        const registerTask2 = Meteor.server.method_handlers['tasks.updateTitle'];
+        registerTask2.apply({}, [tasks[0]._id, newTitle]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(tasks2[0].title, newTitle);
+        assert.equal(getCurrentState(tasks2[0]).id, getState("DEEPLY_CONSIDERED").id);
+
+        changeUser(userId);
+
+        var newTitle3 = "smart title";
+        registerTask2.apply({}, [tasks[0]._id, newTitle3]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+
+        assert.equal(tasks3[0].title, newTitle3);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("DEEPLY_CONSIDERED").id);
       });
 		});
   });

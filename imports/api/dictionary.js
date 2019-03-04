@@ -195,6 +195,14 @@ export const States = [
   }
 ];
 
+export const getState = function(id) {
+  var found = States.filter(x => x.id === id);
+  if (found.length > 0) {
+    return found[0];
+  }
+  throw new Error("No state named " + id);
+}
+
 export const getCurrentState = function(task) {
   var found = States.filter(x => x.validation(task));
   if (found.length > 0) {

@@ -26,7 +26,24 @@ Thanks for your support!
 None
 
 #### Active ToDo
-- Give materials to Jun Jun (images and text for landing page)
+
+- implement Agree action
+- test Agree action
+- test Edit agreed agreement
+==============================================
+- implement Disagree action
+- implement Cancel
+- implement Reconsider
+- add notices
+- add ticklers
+- add Done action
+- add requesting
+- add locking
+- add cancel request
+- add blocking comments
+- add Copy action
+
+
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token exprires
 - [issue] Losing of data on deployment

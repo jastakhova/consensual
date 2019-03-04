@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
-import {Actions, Notices, getAction} from './dictionary.js';
+import {Actions, Notices, getAction, getCondition, getStatus} from './dictionary.js';
 
 export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
@@ -71,6 +71,19 @@ function capitalize(status) {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
+function changeStatusesOnEditing(task) {
+  var statuses = [];
+  // comparison is done via negation in order to avoid a change of statuses for self-agreement
+  statuses[0] = task.author.id != Meteor.userId() && task.author.status === getCondition("green").id
+    ? 'yellow' : task.author.status;
+  statuses[1] = (task.receiver.id != Meteor.userId() && task.receiver.status === getCondition("green").id)
+    || (task.author.id != Meteor.userId() && task.receiver.status === getCondition("grey").id)
+    ? 'yellow' : task.receiver.status;
+  statuses[2] = statuses[1] === getCondition("grey").id || task.author.id === task.receiver.id
+    ? task.status : getStatus("considered").id;
+  return statuses;
+}
+
 Meteor.methods({
   'tasks.insert' (newTask) {
     check(newTask.task, String);
@@ -87,8 +100,12 @@ Meteor.methods({
     }
 
     var actor = newTask.author ? newTask.author : Meteor.userId();
-    var actorName = getName(Meteor.users.findOne({_id: actor}));
-    var receiver = Meteor.users.findOne({_id: newTask.receiver}) || Invitees.findOne({_id: newTask.receiver});
+    var actorUser = Meteor.users.findOne({_id: actor});
+    var actorName = getName(actorUser);
+    var selfAgreement = newTask.receiver === actor;
+    var receiver = selfAgreement
+      ? actorUser
+      : Meteor.users.findOne({_id: newTask.receiver}) || Invitees.findOne({_id: newTask.receiver});
 
     function getTitle(text, title) {
       if (title) {
@@ -121,7 +138,7 @@ Meteor.methods({
      var receiver = {
        id: newTask.receiver,
        name: getName(receiver),
-       status: 'grey',
+       status: selfAgreement ? 'green' : 'grey',
        notices: [{
           code: 0,
           created: new Date().getTime()
@@ -141,10 +158,10 @@ Meteor.methods({
       activity: [activity],
       comments: [],
 
-      status: 'proposed',
+      status: selfAgreement ? getStatus('agreed').id : getStatus('proposed').id,
       archived: false,
       locked: false,
-      wasAgreed: false,
+      wasAgreed: selfAgreement,
     };
 
     var id = Tasks.insert(createdTask);
@@ -162,8 +179,7 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
-    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
+    var newStatuses = changeStatusesOnEditing(task);
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -179,8 +195,9 @@ Meteor.methods({
       $set: {
         eta: new Date(moment(newTimeUTCString).format()).getTime(),
         activity: task.activity,
-        "author.status": newAuthorStatus,
-        "receiver.status": newReceiverStatus
+        status: newStatuses[2],
+        "author.status": newStatuses[0],
+        "receiver.status": newStatuses[1]
       }
     });
 
@@ -195,8 +212,7 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
-    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
+    var newStatuses = changeStatusesOnEditing(task);
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -211,8 +227,9 @@ Meteor.methods({
       $set: {
         location: newLocation,
         activity: task.activity,
-        "author.status": newAuthorStatus,
-        "receiver.status": newReceiverStatus
+        status: newStatuses[2],
+        "author.status": newStatuses[0],
+        "receiver.status": newStatuses[1]
       }
     });
 
@@ -227,8 +244,7 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
-    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
+    var newStatuses = changeStatusesOnEditing(task);
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -243,8 +259,9 @@ Meteor.methods({
       $set: {
         text: newDescription,
         activity: task.activity,
-        "author.status": newAuthorStatus,
-        "receiver.status": newReceiverStatus
+        status: newStatuses[2],
+        "author.status": newStatuses[0],
+        "receiver.status": newStatuses[1]
       }
     });
 
@@ -259,8 +276,7 @@ Meteor.methods({
       return;
     }
 
-    var newAuthorStatus = task.author.id != Meteor.userId() ? 'yellow' : task.author.status;
-    var newReceiverStatus = task.receiver.id != Meteor.userId() ? 'yellow' : task.receiver.status;
+    var newStatuses = changeStatusesOnEditing(task);
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
@@ -275,8 +291,9 @@ Meteor.methods({
       $set: {
         title: newTitle,
         activity: task.activity,
-        "author.status": newAuthorStatus,
-        "receiver.status": newReceiverStatus
+        status: newStatuses[2],
+        "author.status": newStatuses[0],
+        "receiver.status": newStatuses[1]
       }
     });
 
