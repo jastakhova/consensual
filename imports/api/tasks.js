@@ -339,6 +339,40 @@ Meteor.methods({
     });
     notifyOnActivity(task, activity);
   },
+  'tasks.approve' (taskId) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+
+    var newAuthorStatus = task.author.id === Meteor.userId() ? getCondition("green").id : task.author.status;
+    var newReceiverStatus = task.receiver.id === Meteor.userId() ? getCondition("green").id : task.receiver.status;
+
+    if (newAuthorStatus === task.author.status && newReceiverStatus === task.receiver.status) {
+      return;
+    }
+
+    var oldValue = task.author.id === Meteor.userId() ? task.author.status : task.receiver.status;
+
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       newValue: getCondition("green", task),
+       time: new Date().getTime()
+     };
+
+    task.activity.push(activity);
+    Tasks.update(taskId, {
+      $set: {
+        activity: task.activity,
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus,
+        status: newAuthorStatus === newReceiverStatus ? getStatus("agreed").id : task.status,
+        wasAgreed: newAuthorStatus === newReceiverStatus
+      }
+    });
+    notifyOnActivity(task, activity);
+  },
   'tasks.addComment' (taskId, text) {
     check(taskId, String);
     check(text, String);

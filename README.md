@@ -27,10 +27,6 @@ None
 
 #### Active ToDo
 
-- implement Agree action
-- test Agree action
-- test Edit agreed agreement
-==============================================
 - implement Disagree action
 - implement Cancel
 - implement Reconsider

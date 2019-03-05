@@ -240,10 +240,8 @@ export default class ProposalCtrl extends Controller {
   }
 
   approveTask() {
-    Meteor.call('tasks.updateStatuses',
+    Meteor.call('tasks.approve',
       this.proposalId,
-      'green',
-      this.needsToApproveStatusChange,
       ProfileUtils.processMeteorResult);
   }
 
