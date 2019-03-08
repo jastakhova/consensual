@@ -27,9 +27,8 @@ None
 
 #### Active ToDo
 
-- implement Disagree action
-- implement Cancel
 - implement Reconsider
+==========================================
 - add notices
 - add ticklers
 - add Done action

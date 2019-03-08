@@ -357,7 +357,7 @@ Meteor.methods({
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
        field: 'status',
-       newValue: getCondition("green", task),
+       newValue: getStatus("agreed").id,
        time: new Date().getTime()
      };
 
@@ -373,6 +373,66 @@ Meteor.methods({
     });
     notifyOnActivity(task, activity);
   },
+  'tasks.maybe' (taskId) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+    if (task.receiver.id !== Meteor.userId() || task.receiver.status !== getCondition("grey").id) {
+      return;
+    }
+
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       newValue: getStatus("considered").id,
+       time: new Date().getTime()
+     };
+
+    task.activity.push(activity);
+    Tasks.update(taskId, {
+      $set: {
+        activity: task.activity,
+        "receiver.status": getCondition("yellow").id,
+        status: getStatus("considered").id
+      }
+    });
+    notifyOnActivity(task, activity);
+  },
+  'tasks.cancel' (taskId) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+
+    var newAuthorStatus = task.author.id === Meteor.userId() ? getCondition("red").id : task.author.status;
+    var newReceiverStatus = task.receiver.id === Meteor.userId() ? getCondition("red").id : task.receiver.status;
+
+    if (newAuthorStatus === task.author.status && newReceiverStatus === task.receiver.status) {
+      return;
+    }
+
+    var oldValue = task.author.id === Meteor.userId() ? task.author.status : task.receiver.status;
+
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       newValue: getStatus("cancelled").id,
+       time: new Date().getTime()
+     };
+
+    task.activity.push(activity);
+    Tasks.update(taskId, {
+      $set: {
+        activity: task.activity,
+        "author.status": newAuthorStatus,
+        "receiver.status": newReceiverStatus,
+        status: getStatus("cancelled").id,
+        archived: true
+      }
+    });
+    notifyOnActivity(task, activity);
+  },
   'tasks.addComment' (taskId, text) {
     check(taskId, String);
     check(text, String);
@@ -381,15 +441,18 @@ Meteor.methods({
 
     task.comments.push({
           author: Meteor.userId(),
-          "author.name": getName(Meteor.user()),
+          authorName: getName(Meteor.user()),
           text: text,
           time: new Date().getTime()
         });
+
+    var receiverShowedFirstResponse = Meteor.userId() === task.receiver.id
+      && task.receiver.status === getCondition("grey").id;
     Tasks.update(taskId, {
       $set: {
         comments: task.comments,
-        "author.status": Meteor.userId() === task.author.id ? task.author.status : 'yellow',
-        "receiver.status": Meteor.userId() === task.receiver.id ? task.receiver.status : 'yellow',
+        "receiver.status": receiverShowedFirstResponse ? 'yellow' : task.receiver.status,
+        status: receiverShowedFirstResponse ? getStatus('considered').id : task.status
       }
     });
 

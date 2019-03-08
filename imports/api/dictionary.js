@@ -147,7 +147,7 @@ export const States = [
   {
     id: "OPPOSED",
     validation: function(task) {
-      return task.status === getStatus("cancelled").id && !task.wasAgreed;
+      return task.status === getStatus("cancelled").id;
     },
     actions: function(task, actorId) {
       return [];

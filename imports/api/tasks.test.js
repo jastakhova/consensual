@@ -391,6 +391,103 @@ if (Meteor.isServer) {
         assert.equal(tasks3[0].author.status, getCondition("yellow").id);
         assert.equal(tasks3[0].wasAgreed, true);
       });
+
+      it('can oppose task', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.cancel'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("OPPOSED").id);
+        assert.equal(tasks2[0].author.status, getCondition("green").id);
+        assert.equal(tasks2[0].receiver.status, getCondition("red").id);
+        assert.ok(tasks2[0].archived);
+      });
+
+      it('can respond by adding a comment', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.addComment'];
+        registerTask2.apply({}, [tasks[0]._id, "I got pregnant in this bathroom."]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("CONSIDERED").id);
+        assert.equal(tasks2[0].author.status, getCondition("green").id);
+        assert.equal(tasks2[0].receiver.status, getCondition("yellow").id);
+      });
+
+      it('can consider', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.maybe'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("CONSIDERED").id);
+        assert.equal(tasks2[0].author.status, getCondition("green").id);
+        assert.equal(tasks2[0].receiver.status, getCondition("yellow").id);
+      });
 		});
   });
 }

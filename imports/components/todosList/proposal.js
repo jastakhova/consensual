@@ -252,10 +252,15 @@ export default class ProposalCtrl extends Controller {
       ProfileUtils.processMeteorResult);
   }
 
-  markTaskAsCancelled() {
-    Meteor.call('tasks.changeTaskStatus',
+  markTaskAsMaybe() {
+    Meteor.call('tasks.maybe',
       this.proposalId,
-      'cancelled',
+      ProfileUtils.processMeteorResult);
+  }
+
+  markTaskAsCancelled() {
+    Meteor.call('tasks.cancel',
+      this.proposalId,
       ProfileUtils.processMeteorResult);
   }
 
