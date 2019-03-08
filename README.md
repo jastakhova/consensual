@@ -27,8 +27,8 @@ None
 
 #### Active ToDo
 
-- implement Reconsider
-==========================================
+- new filter system
+=====================================
 - add notices
 - add ticklers
 - add Done action

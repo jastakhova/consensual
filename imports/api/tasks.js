@@ -377,7 +377,13 @@ Meteor.methods({
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
-    if (task.receiver.id !== Meteor.userId() || task.receiver.status !== getCondition("grey").id) {
+    var noResponseStatus = getCondition("grey").id;
+    var consideringStatus = getCondition("yellow").id;
+    var agreedStatus = getCondition("green").id;
+
+    if (!(task.receiver.id === Meteor.userId() && task.receiver.status === noResponseStatus)
+        && !(task.receiver.id === Meteor.userId() && task.receiver.status === agreedStatus
+              || task.author.id === Meteor.userId() && task.author.status === agreedStatus)) {
       return;
     }
 
@@ -393,7 +399,8 @@ Meteor.methods({
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
-        "receiver.status": getCondition("yellow").id,
+        "author.status": task.author.id === Meteor.userId() ? consideringStatus : task.author.status,
+        "receiver.status": task.receiver.id === Meteor.userId() ? consideringStatus : task.receiver.status,
         status: getStatus("considered").id
       }
     });

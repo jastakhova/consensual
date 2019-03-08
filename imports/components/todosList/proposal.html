@@ -90,6 +90,11 @@
               Done
             </button>
             <br/>
+            <button type="button" ng-show="proposal.showAction(proposal.data, 'RECONSIDER')" style="border-color: #e7b416; border-width: 1px; color: #e7b416; margin-bottom: 10px" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsMaybe()">
+              <i class="pe-7s-hourglass"></i>
+              Reconsider
+            </button>
+            <br/>
             <button type="button" ng-show="proposal.showAction(proposal.data, 'STATUS_CHANGE_CANCEL')" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsCancelled()">
               <i class="pe-7s-trash"></i>
               Cancel
