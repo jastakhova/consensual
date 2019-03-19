@@ -5,7 +5,8 @@ import DateTimePicker from 'date-time-picker';
 import graph from 'fbgraph';
 import ProfileUtils from  './profile.js';
 import '../../../public/assets/js/bootstrap-typeahead.min.js';
-import { Tracker } from 'meteor/tracker'
+import { Tracker } from 'meteor/tracker';
+import {getStatus} from '../../api/dictionary.js';
 
 export default class TodosListCtrl extends Controller {
   constructor() {
@@ -43,13 +44,11 @@ export default class TodosListCtrl extends Controller {
 
     this.filters = [
         {name: "All", selector: {archived: false}},
-        {name: "Open", selector: {$or: [{status: "open"}, {status: "proposed"}]}},
-        {name: "To me", selector: {"receiver.id": Meteor.userId(), archived: false}},
-        {name: "Needs attention", selector: {$or: [{"author.id": Meteor.userId(), "author.status": "yellow"}, {"receiver.id": Meteor.userId(), "receiver.status": "yellow"}], archived: false}},
-        {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}},
-        {name: "Blocked", selector: {archived: false, $or: [{"author.id": Meteor.userId(), "author.status": "green", "receiver.status": "yellow"}, {"receiver.id": Meteor.userId(), "receiver.status": "green", "author.status": "yellow"}]}},
-        {name: "Done", selector: {status: "done"}},
-        {name: "Cancelled", selector: {status: "cancelled"}},
+        {name: "Recently created", selector: {"author.id": Meteor.userId()}}, // pick the one that is on the top of activity array
+        {name: "No response yet", selector: {status: getStatus("proposed").id}},
+        {name: "Under consideration", selector: {status: getStatus("considered").id}},
+        {name: "Overdue", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
+        {name: "Agreed", selector: {status: getStatus("agreed").id}},
         {name: "Archived", selector: {archived: true}},
         ];
 
