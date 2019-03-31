@@ -27,8 +27,9 @@ None
 
 #### Active ToDo
 
-- new filter system
+- tests for frontend
 =====================================
+- new sortings
 - add notices
 - add ticklers
 - add Done action
@@ -40,7 +41,7 @@ None
 
 
 - [talk] Approve logic is not well understood by ppl
-- [issue] Losing of data if facebook token exprires
+- [issue] Losing of data if facebook token expires
 - [issue] Losing of data on deployment
 - [issue] Losing of data on simultaneous editing
 - [logic debt] Send inviteeId in the link to Consensual from email (in order to fight the situation when email of invitee doesn’t match with his facebook one or facebook doesn't provide email)

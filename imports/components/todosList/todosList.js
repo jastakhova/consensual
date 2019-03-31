@@ -44,19 +44,21 @@ export default class TodosListCtrl extends Controller {
 
     this.filters = [
         {name: "All", selector: {archived: false}},
-        {name: "Recently created", selector: {"author.id": Meteor.userId()}}, // pick the one that is on the top of activity array
-        {name: "No response yet", selector: {status: getStatus("proposed").id}},
-        {name: "Under consideration", selector: {status: getStatus("considered").id}},
+        {name: "Recently created", selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
+        {name: "No response yet", selector: {status: getStatus("proposed").id, archived: false}},
+        {name: "Under consideration", selector: {status: getStatus("considered").id, archived: false}},
         {name: "Overdue", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
-        {name: "Agreed", selector: {status: getStatus("agreed").id}},
+        {name: "Agreed", selector: {archived: false, status: getStatus("agreed").id}},
         {name: "Archived", selector: {archived: true}},
         ];
 
     this.sorts = [
       {name: "Default", groups: [
-          {name: "Overdue", selector: {status: "open", eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[4]},
-          {name: "Needs attention", selector: {$or: [{"author.id": Meteor.userId(), "author.status": "yellow"}, {"receiver.id": Meteor.userId(), "receiver.status": "yellow"}], archived: false}, sort: function(task1, task2) {return ProfileUtils.comparator(ProfileUtils.getLatestActivityTime(task1), ProfileUtils.getLatestActivityTime(task2));}, limit: 5, appliedFilter: this.filters[3]},
-          {name: "Today", selector: {status: "open", eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
+          {name: "Overdue", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[4]},
+          {name: "Today", selector: {archived: false, eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
+            return ProfileUtils.comparator(task1.eta, task2.eta);
+          }},
+          {name: "Other", selector: {archived: false, eta: {$gt: nextMidnight.getTime()}}, sort: function(task1, task2) {
             return ProfileUtils.comparator(task1.eta, task2.eta);
           }},
         ], configuration: {sort: "eta", grouping: function(task) {return "Agreements";}, groupingName: function(group) {return group;}}},
@@ -186,8 +188,9 @@ export default class TodosListCtrl extends Controller {
             return groups;
           }
 
-          this.currentFilter = this.filters[1];
-          selector = this.filters[1];
+        // it worked only when first filter was "Open"
+//          this.currentFilter = this.filters[1];
+//          selector = this.filters[1];
         }
 
         var sortingField = sortMethod.configuration.sort;
