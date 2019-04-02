@@ -27,9 +27,13 @@ None
 
 #### Active ToDo
 
-- tests for frontend
-=====================================
-- new sortings
+- Today / Tomorrow / More block
+- Option to choose date for Day-group
+- Option to search including Archive
+- Sorting by ppl made in groups of 3 most recent interaction, no yourself
+- Search by from and to
+- Profile page
+- Contacts page
 - add notices
 - add ticklers
 - add Done action
@@ -38,6 +42,7 @@ None
 - add cancel request
 - add blocking comments
 - add Copy action
+- Terms of use email should we sent on new sign-ups not only invites
 
 
 - [talk] Approve logic is not well understood by ppl

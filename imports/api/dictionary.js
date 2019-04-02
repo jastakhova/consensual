@@ -54,6 +54,10 @@ export const Statuses = [
   {
     id: "cancelled",
     label: "Cancelled"
+  },
+  {
+    id: "done",
+    label: "Done"
   }
 ];
 

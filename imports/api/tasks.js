@@ -135,14 +135,17 @@ Meteor.methods({
       ticklers: []
      };
 
+     var notices = selfAgreement ? [] :
+      [{
+        code: 0,
+        created: new Date().getTime()
+     }];
+
      var receiver = {
        id: newTask.receiver,
        name: getName(receiver),
        status: selfAgreement ? 'green' : 'grey',
-       notices: [{
-          code: 0,
-          created: new Date().getTime()
-       }],
+       notices: notices,
        ticklers: []
       };
 

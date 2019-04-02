@@ -41,6 +41,6 @@
     "testModule": "tests/main.js"
   },
   "devDependencies": {
-    "angular-mocks": "^1.7.4"
+    "angular-mocks": "^1.7.8"
   }
 }

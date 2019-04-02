@@ -116,6 +116,8 @@ if (Meteor.isServer) {
         assert.equal(tasks.length, 1);
         assert.equal(tasks[0].author.id, userId);
         assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+        // a notice should have been created for the receiver
+        assert.equal(tasks[0].receiver.notices.length, 1);
       });
 
       it('can create self task', () => {
@@ -136,6 +138,8 @@ if (Meteor.isServer) {
         assert.equal(tasks[0].author.id, userId);
         assert.equal(tasks[0].receiver.id, userId);
         assert.equal(getCurrentState(tasks[0]).id, getState("AGREED").id);
+        // no notices as self agreement
+        assert.equal(tasks[0].receiver.notices.length, 0);
       });
 
       it('can edit task by author after proposal', () => {

@@ -43,32 +43,33 @@ export default class TodosListCtrl extends Controller {
     const dayAgo = new Date(moment().subtract({ hours: 24}).format());
 
     this.filters = [
-        {name: "All", selector: {archived: false}},
-        {name: "Recently created", selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
-        {name: "No response yet", selector: {status: getStatus("proposed").id, archived: false}},
-        {name: "Under consideration", selector: {status: getStatus("considered").id, archived: false}},
-        {name: "Overdue", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
-        {name: "Agreed", selector: {archived: false, status: getStatus("agreed").id}},
-        {name: "Archived", selector: {archived: true}},
+/*0*/   {name: "All", groupName: "All Active Proposals and Agreements", hide: true, selector: {archived: false}},
+/*1*/   {name: "Needs Attention", groupName: "Agreements that Need Attention", hide: true, selector: {$and: [{archived: false}, {$or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}},
+/*2*/   {name: "Your Recent Activity", groupName: "Your Recent Activity", hide: true, selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
+/*3*/   {name: "Recently created", groupName: "Recently Created Proposals", selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
+/*4*/   {name: "No response yet", groupName: "Non-Responsive Proposals", selector: {status: getStatus("proposed").id, archived: false}},
+/*5*/   {name: "Under consideration", groupName: "Proposals Under Consideration", selector: {status: getStatus("considered").id, archived: false}},
+/*6*/   {name: "Agreed", groupName: "Accomplished Agreements", selector: {archived: false, status: getStatus("agreed").id}},
+/*7*/   {name: "Overdue", groupName: "Overdue Agreements", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
+/*8*/   {name: "Upcoming", groupName: "Upcoming Agreements", selector: {archived: false, eta: {$gt: new Date(moment().format()).getTime()}}},
+/*9*/   {name: "Archived", groupName: "Archived Agreements", selector: {archived: true}}
         ];
 
     this.sorts = [
       {name: "Default", groups: [
-          {name: "Overdue", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[4]},
-          {name: "Today", selector: {archived: false, eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
+          {name: "Needs Attention", selector: {$and: [{archived: false}, { $or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 5, appliedFilter: this.filters[1]},
+          {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]},
+          {name: "Today / Tomorrow / More", selector: {archived: false, eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
             return ProfileUtils.comparator(task1.eta, task2.eta);
-          }},
-          {name: "Other", selector: {archived: false, eta: {$gt: nextMidnight.getTime()}}, sort: function(task1, task2) {
-            return ProfileUtils.comparator(task1.eta, task2.eta);
-          }},
-        ], configuration: {sort: "eta", grouping: function(task) {return "Agreements";}, groupingName: function(group) {return group;}}},
-      {name: "By Time", configuration: {sort: "eta", grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();}, groupingName: function(groupField) {
+          }}
+        ], configuration: {sort: "eta", grouping: function(task) {return "Agreements";}, groupingName: function(group, filter) {return filter.groupName;}}},
+      {name: "By Time", configuration: {sort: "eta", grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();}, groupingName: function(groupField, filter) {
         var d = new Date();
         d.setTime(groupField);
         return moment(d).format("DD MMM");
       }}},
       // "By assignee" takes bigger space and overflows the allocated space
-      {name: "By Who", configuration: {sort: "receiver.id", grouping: function(task) {return (task.receiver.id === Meteor.userId()? "1" : "2") + task.receiver.name;}, groupingName: function(group) {return group.slice(1);}}},
+      {name: "By Who", configuration: {sort: "receiver.id", grouping: function(task) {return (task.receiver.id === Meteor.userId()? "1" : "2") + task.receiver.name;}, groupingName: function(group, filter) {return group.slice(1);}}},
     ];
 
     var requestedSort = this.sorts.filter(s => s.name === this.$state.params.group);
@@ -78,11 +79,12 @@ export default class TodosListCtrl extends Controller {
     this.currentFilter = requestedFilter.length > 0 ? requestedFilter[0] : this.filters[0];
 
     this.adjustFilters = function() {
-      // the first filter (index == 0) is not shown and has top == 0
-      var filters = $("#filters").find($("button.filterToggle")).slice(1);
-      if (filters.length == 0) {
+      if ($("#filters").find($("button.filterToggle")).length == 0) {
         return;
       }
+      var filters = $("#filters").find($("button.filterToggle")).filter((index, element) => {
+        return !$($(element)[0]).hasClass("no-show");
+      });
       var firstRowTop = $(filters[0]).offset().top;
       var hasHidden = false;
       var filterToggleControl = $($("#filters").find($("a.btn-more"))[0]);
@@ -161,7 +163,7 @@ export default class TodosListCtrl extends Controller {
 					return suggest;
         }
 
-        if (this.handleAllUsers.ready() && this.getReactively("proposingInProgress")) {
+        if (this.handleAllUsers.ready() && this.getReactively("proposingInProgress") && Meteor.userId()) {
           $(".typeahead").typeahead({ source: getSuggest(), autoSelect: false});
         }
 
@@ -200,7 +202,7 @@ export default class TodosListCtrl extends Controller {
         var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
         return Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
-          return {name: sortMethod.configuration.groupingName(groupKey), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
+          return {name: sortMethod.configuration.groupingName(groupKey, selector), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
         });
         } catch (err) {
           console.log(err);

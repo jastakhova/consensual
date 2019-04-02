@@ -121,6 +121,7 @@ Meteor.methods({
   },
   'Migrations.new' () {
     // 1. Added: author and receiver objects
+    // 2. Converted status from "open"
 
     tasks = Tasks.find();
 
@@ -138,6 +139,13 @@ Meteor.methods({
               name: task.receiverName,
               status: task.receiverStatus
             }
+          }
+        });
+      }
+      if (task.status === "open" || task.status.status === "green") {
+        Tasks.update({_id: task._id}, {
+          $set: {
+            status: ((task.author.status === "green" && task.receiver.status === "green") ? "agreed" : "proposed")
           }
         });
       }

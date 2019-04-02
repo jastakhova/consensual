@@ -134,23 +134,6 @@ consensual.run(['$ionicHistory', '$state', '$rootScope', function ($ionicHistory
 //  });
 }]);
 
-// Defines an angular directive, 'required-field', which runs validation when an input is changed
-//consensual.directive('requiredField', function() {
-//  return {
-//    require: 'ngModel',
-//    link: function(scope, element, attr, mCtrl) {
-//      if (mCtrl.$$parentForm.$name.substring(0,3) === "add") {
-//        mCtrl.$setValidity('required-field', false);
-//      }
-//      function requiredField(value) {
-//        mCtrl.$setValidity('required-field', (value !== ""));
-//        return value;
-//      }
-//      mCtrl.$parsers.push(requiredField);
-//    }
-//  };
-//});
-//
 consensual.directive('contactsOnly', function() {
   return {
     require: 'ngModel',
