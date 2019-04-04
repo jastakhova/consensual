@@ -104,7 +104,7 @@
             <span style="margin-left: 10px;" class="caret"></span>
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li><a ng-repeat="sortToggle in todoList.sorts" class="link" ng-click="todoList.selectSort(sortToggle)">{{sortToggle.name}}</a></li>
+            <li><a ng-repeat="sortToggle in todoList.sorts" class="link" ng-click="todoList.selectSort(sortToggle)" ng-show="sortToggle.visible">{{sortToggle.name}}</a></li>
           </ul>
         </span>
       </div>

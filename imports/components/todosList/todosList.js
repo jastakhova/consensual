@@ -31,7 +31,10 @@ export default class TodosListCtrl extends Controller {
     this.searchEdit = false;
     this.search = "";
     this.popularUsers = [];
-    this.timeOptions = [{name: 'tomorrow', addedCount: 1, unit: 'days'}, {name: 'next week', addedCount: 7, unit: 'days'}, {name: 'whenever', addedCount: 3, unit: 'months'}];
+    this.timeOptions = [
+      {name: 'tomorrow', addedCount: 1, unit: 'days'},
+      {name: 'next week', addedCount: 7, unit: 'days'},
+      {name: 'whenever', addedCount: 3, unit: 'months'}];
 
     this.allUsers = [];
     this.invitees = [];
@@ -44,38 +47,67 @@ export default class TodosListCtrl extends Controller {
 
     this.filters = [
 /*0*/   {name: "All", groupName: "All Active Proposals and Agreements", hide: true, selector: {archived: false}},
-/*1*/   {name: "Needs Attention", groupName: "Agreements that Need Attention", hide: true, selector: {$and: [{archived: false}, {$or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}},
-/*2*/   {name: "Your Recent Activity", groupName: "Your Recent Activity", hide: true, selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
-/*3*/   {name: "Recently created", groupName: "Recently Created Proposals", selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
-/*4*/   {name: "No response yet", groupName: "Non-Responsive Proposals", selector: {status: getStatus("proposed").id, archived: false}},
-/*5*/   {name: "Under consideration", groupName: "Proposals Under Consideration", selector: {status: getStatus("considered").id, archived: false}},
+/*1*/   {name: "Needs Attention", groupName: "Agreements that Need Attention", hide: true,
+          selector: {$and: [
+            {archived: false},
+            {$or: [
+              {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
+              {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}},
+/*2*/   {name: "Your Recent Activity", groupName: "Your Recent Activity", hide: true,
+          selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
+/*3*/   {name: "Recently created", groupName: "Recently Created Proposals",
+           selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
+/*4*/   {name: "No response yet", groupName: "Non-Responsive Proposals",
+           selector: {status: getStatus("proposed").id, archived: false}},
+/*5*/   {name: "Under consideration", groupName: "Proposals Under Consideration",
+           selector: {status: getStatus("considered").id, archived: false}},
 /*6*/   {name: "Agreed", groupName: "Accomplished Agreements", selector: {archived: false, status: getStatus("agreed").id}},
-/*7*/   {name: "Overdue", groupName: "Overdue Agreements", selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
-/*8*/   {name: "Upcoming", groupName: "Upcoming Agreements", selector: {archived: false, eta: {$gt: new Date(moment().format()).getTime()}}},
+/*7*/   {name: "Overdue", groupName: "Overdue Agreements",
+           selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
+/*8*/   {name: "Upcoming", groupName: "Upcoming Agreements",
+           selector: {archived: false, eta: {$gt: new Date(moment().format()).getTime()}}},
 /*9*/   {name: "Archived", groupName: "Archived Agreements", selector: {archived: true}}
         ];
 
+    var formatDate = function(time, unusedParameter) {
+      var d = new Date();
+      d.setTime(time);
+      if (prevMidnight.getTime() == d.getTime()) {
+        return "Today";
+      }
+      if (nextMidnight.getTime() == d.getTime()) {
+        return "Tomorrow";
+      }
+      return moment(d).format("DD MMM");
+    };
+
     this.sorts = [
-      {name: "Default", groups: [
-          {name: "Needs Attention", selector: {$and: [{archived: false}, { $or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 5, appliedFilter: this.filters[1]},
-          {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]},
-          {name: "Today / Tomorrow / More", selector: {archived: false, eta: {$lt: nextMidnight.getTime(), $gt: prevMidnight.getTime()}}, sort: function(task1, task2) {
-            return ProfileUtils.comparator(task1.eta, task2.eta);
-          }}
-        ], configuration: {sort: "eta", grouping: function(task) {return "Agreements";}, groupingName: function(group, filter) {return filter.groupName;}}},
-      {name: "By Time", configuration: {sort: "eta", grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();}, groupingName: function(groupField, filter) {
-        var d = new Date();
-        d.setTime(groupField);
-        return moment(d).format("DD MMM");
-      }}},
+      {name: "Initial", visible: false, selector: {eta: {$gt: new Date(moment().format()).getTime()}},
+        configuration: {
+          sort: "eta",
+          grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
+          groupingName: formatDate}, additionalGroups: [
+        {name: "Needs Attention", selector: {$and: [{archived: false}, { $or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 5, appliedFilter: this.filters[1]},
+        {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]}
+      ]},
+      {name: "Default", visible: true,
+        configuration:
+          {sort: "eta",
+          grouping: function(task) {return "Agreements";},
+          groupingName: function(group, filter) {return filter.groupName;}}},
+      {name: "By Time", visible: true,
+        configuration: {
+          sort: "eta",
+          grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
+          groupingName: formatDate}},
       // "By assignee" takes bigger space and overflows the allocated space
-      {name: "By Who", configuration: {sort: "receiver.id", grouping: function(task) {return (task.receiver.id === Meteor.userId()? "1" : "2") + task.receiver.name;}, groupingName: function(group, filter) {return group.slice(1);}}},
+      {name: "By Who", visible: true, configuration: {sort: "receiver.id", grouping: function(task) {return (task.receiver.id === Meteor.userId()? "1" : "2") + task.receiver.name;}, groupingName: function(group, filter) {return group.slice(1);}}},
     ];
 
     var requestedSort = this.sorts.filter(s => s.name === this.$state.params.group);
     var requestedFilter = this.filters.filter(f => f.name === this.$state.params.filter);
 
-    this.currentSort = requestedSort.length > 0 ? requestedSort[0] : this.sorts[0];
+    this.currentSort = requestedSort.length > 0 ? requestedSort[0] : this.sorts[1]; // Default, not initial
     this.currentFilter = requestedFilter.length > 0 ? requestedFilter[0] : this.filters[0];
 
     this.adjustFilters = function() {
@@ -181,29 +213,33 @@ export default class TodosListCtrl extends Controller {
           return x;
         }
 
-        if (sortMethod.groups && selector.name === this.filters[0].name && searchValue === "") {
-          var groups = sortMethod.groups.map(sortGroup => {
-            var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
-            return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length, sliced: tasks.length > sortGroup.limit, appliedFilter: sortGroup.appliedFilter};
-            }).filter(group => group.tasks.length > 0);
-          if (groups.length > 0) {
-            return groups;
-          }
+        var additionalGroups = [];
+        if (sortMethod.name == "Default") {
+          if (selector.name === this.filters[0].name && searchValue === "") {
+            sortMethod = this.sorts[0]; // doing "Initial" style of sorting
+            additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
+              var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
+              return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length, sliced: tasks.length > sortGroup.limit, appliedFilter: sortGroup.appliedFilter};
+              }).filter(group => group.tasks.length > 0);
 
-        // it worked only when first filter was "Open"
-//          this.currentFilter = this.filters[1];
-//          selector = this.filters[1];
+          // it worked only when first filter was "Open"
+  //          this.currentFilter = this.filters[1];
+  //          selector = this.filters[1];
+          }
         }
 
         var sortingField = sortMethod.configuration.sort;
         searchValue = searchValue.replace(/\W/g, "");
         var searchRegex = new RegExp(searchValue, "i");
-        var selectorWithSearch = searchValue === "" ? selector.selector : {$and: [selector.selector, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
+
+        var selectorWithSortFiltering = sortMethod.selector ? {$and: [selector.selector, sortMethod.selector]} : selector.selector;
+        var selectorWithSearch = searchValue === "" ? selectorWithSortFiltering : {$and: [selectorWithSortFiltering, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
+
         var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
-        return Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
+        return additionalGroups.concat(Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
           return {name: sortMethod.configuration.groupingName(groupKey, selector), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
-        });
+        }));
         } catch (err) {
           console.log(err);
           ProfileUtils.showError();
