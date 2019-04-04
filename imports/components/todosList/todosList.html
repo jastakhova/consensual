@@ -121,6 +121,7 @@
       <div class="card ">
         <div class="header">
           <h4 class="title">{{taskList.name}}
+            <span class="alternative-action" style="text-decoration-line: none; font-size: 14px" ng-show="taskList.datepickerStub">or start with another date (<a class="link alternative-action" ng-click="todoList.applyDate('today')">today</a> / <a class="link alternative-action" ng-click="todoList.applyDate('tomorrow')">tomorrow</a> / <a class="link alternative-action" ng-click="todoList.applyDate('more')">more</a>)</span>
             <a class="link" style="float: right !important; font-size: 14px;" ng-show="taskList.sliced" ng-click="todoList.applyFilter(taskList.appliedFilter)">
               Show all {{taskList.size}} tasks
             </a>
@@ -130,6 +131,7 @@
           <div class="table-full-width">
             <table class="table" style="margin-bottom: 0px">
               <tbody>
+              <tr ng-show="taskList.tasks.length == 0"><td>no tasks</td></tr>
               <tr ng-repeat="task in taskList.tasks" style="background-color: {{task.toCurrentUser ? 'white' : (task.fromCurrentUser ? 'rgba(0,0,0,.1)' : 'rgba(0,0,0,.05)')}}" ng-click="todoList.gotoProposal(task._id)" class="link">
                 <td>
                   <a href="#!/tab/proposal/{{task._id}}"><i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i></a>

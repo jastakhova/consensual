@@ -27,7 +27,6 @@ None
 
 #### Active ToDo
 
-- Option to choose date for Day-group
 - Option to search including Archive
 - Sorting by ppl made in groups of 3 most recent interaction, no yourself
 - Search by from and to

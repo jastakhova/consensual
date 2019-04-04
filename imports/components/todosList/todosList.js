@@ -8,7 +8,14 @@ import '../../../public/assets/js/bootstrap-typeahead.min.js';
 import { Tracker } from 'meteor/tracker';
 import {getStatus} from '../../api/dictionary.js';
 
+const nextMidnight = new Date(moment().format());
+nextMidnight.setHours(24, 0, 0, 0);
+const prevMidnight = new Date(moment().format());
+prevMidnight.setHours(0, 0, 0, 0);
+const dayAgo = new Date(moment().subtract({ hours: 24}).format());
+
 export default class TodosListCtrl extends Controller {
+
   constructor() {
   	super(...arguments);
 
@@ -38,12 +45,6 @@ export default class TodosListCtrl extends Controller {
 
     this.allUsers = [];
     this.invitees = [];
-
-    const nextMidnight = new Date(moment().format());
-    nextMidnight.setHours(24, 0, 0, 0);
-    const prevMidnight = new Date(moment().format());
-    prevMidnight.setHours(0, 0, 0, 0);
-    const dayAgo = new Date(moment().subtract({ hours: 24}).format());
 
     this.filters = [
 /*0*/   {name: "All", groupName: "All Active Proposals and Agreements", hide: true, selector: {archived: false}},
@@ -82,7 +83,7 @@ export default class TodosListCtrl extends Controller {
     };
 
     this.sorts = [
-      {name: "Initial", visible: false, selector: {eta: {$gt: new Date(moment().format()).getTime()}},
+      {name: "Initial", visible: false,
         configuration: {
           sort: "eta",
           grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
@@ -109,6 +110,7 @@ export default class TodosListCtrl extends Controller {
 
     this.currentSort = requestedSort.length > 0 ? requestedSort[0] : this.sorts[1]; // Default, not initial
     this.currentFilter = requestedFilter.length > 0 ? requestedFilter[0] : this.filters[0];
+    this.currentDate = this.$state.params.date ? parseInt(this.$state.params.date) : new Date(moment().format()).getTime();
 
     this.adjustFilters = function() {
       if ($("#filters").find($("button.filterToggle")).length == 0) {
@@ -165,6 +167,7 @@ export default class TodosListCtrl extends Controller {
       	var selector = this.getReactively("currentFilter");
       	var sortMethod = this.getReactively("currentSort");
       	var searchValue = this.getReactively("search");
+      	var dateValue = this.getReactively("currentDate");
 
       	function getConnectedPeople(controller) {
       	  var connectedUsers = new Set();
@@ -231,15 +234,31 @@ export default class TodosListCtrl extends Controller {
         var sortingField = sortMethod.configuration.sort;
         searchValue = searchValue.replace(/\W/g, "");
         var searchRegex = new RegExp(searchValue, "i");
+        var initialSort = sortMethod.name === "Initial";
 
-        var selectorWithSortFiltering = sortMethod.selector ? {$and: [selector.selector, sortMethod.selector]} : selector.selector;
-        var selectorWithSearch = searchValue === "" ? selectorWithSortFiltering : {$and: [selectorWithSortFiltering, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
+        var selectorWithSortFiltering = initialSort ? {$and: [selector.selector, {eta: {$gt: dateValue}}]} : selector.selector;
+        var selectorWithSearch = searchValue === "" ?
+          selectorWithSortFiltering :
+          {$and: [selectorWithSortFiltering, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
 
         var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
-        return additionalGroups.concat(Object.keys(groups).sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);}).map(groupKey => {
-          return {name: sortMethod.configuration.groupingName(groupKey, selector), tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})};
-        }));
+        var resultGroups = Object.keys(groups)
+            .sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);})
+            .map(groupKey => {
+              return {
+                name: sortMethod.configuration.groupingName(groupKey, selector),
+                tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})
+              };
+            });
+        if (initialSort) {
+          var firstGroupName = sortMethod.configuration.groupingName(dateValue);
+          if (resultGroups.length == 0 || resultGroups[0].name != firstGroupName) {
+            resultGroups = [{name: firstGroupName, tasks: []}].concat(resultGroups);
+          }
+          resultGroups[0].datepickerStub = true;
+        }
+        return additionalGroups.concat(resultGroups);
         } catch (err) {
           console.log(err);
           ProfileUtils.showError();
@@ -271,6 +290,16 @@ export default class TodosListCtrl extends Controller {
     }
     this.currentFilter = filterToggle;
     this.$state.go('tab.todo', {'filter': filterToggle.name, 'group' : this.currentSort.name}, {notify: false});
+  }
+
+  applyDate(d) {
+    var time = (d === "today") ? prevMidnight : (d === "tomorrow" ? nextMidnight : "more");
+    if (time === "more") {
+      this.showDatePickerForFilters();
+    } else {
+      this.currentDate = time.getTime();
+      this.$state.go('tab.todo', {'date': time.getTime()}, {notify: false});
+    }
   }
 
   logout() {
@@ -406,8 +435,32 @@ export default class TodosListCtrl extends Controller {
     return 'science'; // unrecognized state
   }
 
-	showDatePicker() {
+  showDatePickerForFilters() {
+    var current = new Date();
+    var controller = this;
+    var doBeforeShow = function() {};
+    var doOnSelect = function(formatTime) {
+       controller.currentDate = moment(formatTime + ' 00:00', "MM-DD-YYYY HH:mm").utc().valueOf();
+       controller.$state.go('tab.todo', {'date': controller.currentDate}, {notify: false});
+    };
+    this.showDateBasePicker(current, doBeforeShow, doOnSelect);
+  }
+
+  showDatePicker() {
     var current = (this.newDate === '' || this.newDate === undefined) ? new Date() : this.newDate;
+    var controller = this;
+    var doBeforeShow = function() {
+      controller.setViewValue(controller, 'newDate', '', 'click');
+    };
+    var doOnSelect = function(formatTime) {
+      controller.newDate = formatTime;
+      controller.runParsers(controller, 'newDate', controller.newDate);
+      controller.scope.$apply();
+    };
+    this.showDateBasePicker(current, doBeforeShow, doOnSelect);
+  }
+
+	showDateBasePicker(current, doBeforeShow, doOnSelect) {
     var options = {
       format: 'MM-dd-yyyy',
       default: current
@@ -416,13 +469,10 @@ export default class TodosListCtrl extends Controller {
       shortDay: ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa']
     };
 
-    var controller = this;
-    var timePicker = new DateTimePicker.Date(options, config)
-    controller.setViewValue(controller, 'newDate', '', 'click');
+    var timePicker = new DateTimePicker.Date(options, config);
+    doBeforeShow();
     timePicker.on('selected', function (formatTime, now) {
-      controller.newDate = formatTime;
-      controller.runParsers(controller, 'newDate', controller.newDate);
-      controller.scope.$apply();
+      doOnSelect(formatTime);
       timePicker.destroy();
     });
   }

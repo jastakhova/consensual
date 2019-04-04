@@ -16,7 +16,7 @@ export default class RoutesConfig extends Config {
         abstract: true
       })
       .state('tab.todo', {
-        url: '/todo?group&filter',
+        url: '/todo?group&filter&date',
         views: {
           'tab-todo': {
             templateUrl: todoListUrl,
