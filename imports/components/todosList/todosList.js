@@ -37,6 +37,7 @@ export default class TodosListCtrl extends Controller {
 
     this.searchEdit = false;
     this.search = "";
+    this.searchWithArchive = false;
     this.popularUsers = [];
     this.timeOptions = [
       {name: 'tomorrow', addedCount: 1, unit: 'days'},
@@ -47,26 +48,24 @@ export default class TodosListCtrl extends Controller {
     this.invitees = [];
 
     this.filters = [
-/*0*/   {name: "All", groupName: "All Active Proposals and Agreements", hide: true, selector: {archived: false}},
-/*1*/   {name: "Needs Attention", groupName: "Agreements that Need Attention", hide: true,
-          selector: {$and: [
-            {archived: false},
-            {$or: [
+/*0*/   {name: "All", groupName: "All Active Proposals and Agreements", hide: true, selector: {}, nonarchive: true},
+/*1*/   {name: "Needs Attention", groupName: "Agreements that Need Attention", hide: true, nonarchive: true,
+          selector: {$or: [
               {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
-              {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}},
+              {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}},
 /*2*/   {name: "Your Recent Activity", groupName: "Your Recent Activity", hide: true,
-          selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
+          selector: {"activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
 /*3*/   {name: "Recently created", groupName: "Recently Created Proposals",
            selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
 /*4*/   {name: "No response yet", groupName: "Non-Responsive Proposals",
-           selector: {status: getStatus("proposed").id, archived: false}},
+           selector: {status: getStatus("proposed").id}, nonarchive: true},
 /*5*/   {name: "Under consideration", groupName: "Proposals Under Consideration",
-           selector: {status: getStatus("considered").id, archived: false}},
-/*6*/   {name: "Agreed", groupName: "Accomplished Agreements", selector: {archived: false, status: getStatus("agreed").id}},
-/*7*/   {name: "Overdue", groupName: "Overdue Agreements",
-           selector: {archived: false, eta: {$lt: new Date(moment().format()).getTime()}}},
-/*8*/   {name: "Upcoming", groupName: "Upcoming Agreements",
-           selector: {archived: false, eta: {$gt: new Date(moment().format()).getTime()}}},
+           selector: {status: getStatus("considered").id}, nonarchive: true},
+/*6*/   {name: "Agreed", groupName: "Accomplished Agreements", nonarchive: true, selector: {status: getStatus("agreed").id}},
+/*7*/   {name: "Overdue", groupName: "Overdue Agreements", nonarchive: true,
+           selector: {eta: {$lt: new Date(moment().format()).getTime()}}},
+/*8*/   {name: "Upcoming", groupName: "Upcoming Agreements", nonarchive: true,
+           selector: {eta: {$gt: new Date(moment().format()).getTime()}}},
 /*9*/   {name: "Archived", groupName: "Archived Agreements", selector: {archived: true}}
         ];
 
@@ -168,6 +167,7 @@ export default class TodosListCtrl extends Controller {
       	var sortMethod = this.getReactively("currentSort");
       	var searchValue = this.getReactively("search");
       	var dateValue = this.getReactively("currentDate");
+      	var withArchiveFlag = this.getReactively("searchWithArchive");
 
       	function getConnectedPeople(controller) {
       	  var connectedUsers = new Set();
@@ -224,10 +224,6 @@ export default class TodosListCtrl extends Controller {
               var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
               return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length, sliced: tasks.length > sortGroup.limit, appliedFilter: sortGroup.appliedFilter};
               }).filter(group => group.tasks.length > 0);
-
-          // it worked only when first filter was "Open"
-  //          this.currentFilter = this.filters[1];
-  //          selector = this.filters[1];
           }
         }
 
@@ -237,9 +233,10 @@ export default class TodosListCtrl extends Controller {
         var initialSort = sortMethod.name === "Initial";
 
         var selectorWithSortFiltering = initialSort ? {$and: [selector.selector, {eta: {$gt: dateValue}}]} : selector.selector;
+        var selectorWithArchive = selector.nonarchive && !withArchiveFlag ? {$and: [selectorWithSortFiltering, {archived: false}]} : selectorWithSortFiltering;
         var selectorWithSearch = searchValue === "" ?
-          selectorWithSortFiltering :
-          {$and: [selectorWithSortFiltering, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
+          selectorWithArchive :
+          {$and: [selectorWithArchive, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
 
         var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
