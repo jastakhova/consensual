@@ -81,27 +81,52 @@ export default class TodosListCtrl extends Controller {
       return moment(d).format("DD MMM");
     };
 
+    var sortingByETA = function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)};
+
     this.sorts = [
       {name: "Initial", visible: false,
         configuration: {
           sort: "eta",
           grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
           groupingName: formatDate}, additionalGroups: [
-        {name: "Needs Attention", selector: {$and: [{archived: false}, { $or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 5, appliedFilter: this.filters[1]},
-        {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]}
-      ]},
+            {name: "Needs Attention", selector: {$and: [{archived: false}, { $or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 5, appliedFilter: this.filters[1]},
+            {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]}
+          ],
+          ingroupSort: sortingByETA
+      },
       {name: "Default", visible: true,
         configuration:
           {sort: "eta",
           grouping: function(task) {return "Agreements";},
-          groupingName: function(group, filter) {return filter.groupName;}}},
+          groupingName: function(group, filter) {return filter.groupName;},
+          ingroupSort: sortingByETA,
+          limit: 3}},
       {name: "By Time", visible: true,
         configuration: {
           sort: "eta",
           grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
-          groupingName: formatDate}},
+          groupingName: formatDate,
+          ingroupSort: sortingByETA,
+          limit: 3}},
       // "By assignee" takes bigger space and overflows the allocated space
-      {name: "By Who", visible: true, configuration: {sort: "receiver.id", grouping: function(task) {return (task.receiver.id === Meteor.userId()? "1" : "2") + task.receiver.name;}, groupingName: function(group, filter) {return group.slice(1);}}},
+      {name: "By Who", visible: true,
+        configuration: {
+          sort: "receiver.id",
+          grouping: function(task) {
+            return task.receiver.id === Meteor.userId()
+              ? (
+                task.receiver.id === task.author.id
+                ? "Self-agreements"
+                : ("Agreements with " + task.author.name))
+              : task.receiver.name;
+           },
+           groupingName: function(group, filter) {return group;},
+           ingroupSort: function(task1, task2) {
+              return ProfileUtils.comparator(
+                ProfileUtils.getLatestActivityTime(task2, Meteor.userId()),
+                ProfileUtils.getLatestActivityTime(task1, Meteor.userId()))
+           },
+           limit: 3}},
     ];
 
     var requestedSort = this.sorts.filter(s => s.name === this.$state.params.group);
@@ -222,8 +247,15 @@ export default class TodosListCtrl extends Controller {
             sortMethod = this.sorts[0]; // doing "Initial" style of sorting
             additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
               var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
-              return {name: sortGroup.name, tasks: sortGroup.limit ? tasks.slice(0, sortGroup.limit): tasks, size: tasks.length, sliced: tasks.length > sortGroup.limit, appliedFilter: sortGroup.appliedFilter};
-              }).filter(group => group.tasks.length > 0);
+              return {
+                name: sortGroup.name,
+                tasks: tasks,
+                size: tasks.length,
+                sliced: tasks.length > sortGroup.limit,
+                appliedFilter: sortGroup.appliedFilter,
+                limit: sortGroup.limit
+              };
+            }).filter(group => group.tasks.length > 0);
           }
         }
 
@@ -245,7 +277,9 @@ export default class TodosListCtrl extends Controller {
             .map(groupKey => {
               return {
                 name: sortMethod.configuration.groupingName(groupKey, selector),
-                tasks: groups[groupKey].sort(function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)})
+                tasks: groups[groupKey].sort(sortMethod.configuration.ingroupSort),
+                sliced: Object.keys(groups).length > 1 && groups[groupKey].length > sortMethod.configuration.limit,
+                limit: sortMethod.configuration.limit
               };
             });
         if (initialSort) {

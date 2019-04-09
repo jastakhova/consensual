@@ -27,11 +27,14 @@ var ProfileUtils = {
     return comparison;
   },
 
-  getLatestActivityTime: function(task) {
+  getLatestActivityTime: function(task, by) {
     if (task.activity.length === 0) {
       return null;
     }
-    return task.activity.sort(function(x, y) {return ProfileUtils.comparator(y.time, x.time);})[0].time;
+    var result = task.activity
+       .filter(record => !by || record.actor === by)
+       .sort(function(x, y) {return ProfileUtils.comparator(y.time, x.time);});
+    return result.length > 0 ? result[0].time : -1;
   },
 
   showError(message) {
