@@ -38,6 +38,7 @@ export default class TodosListCtrl extends Controller {
     this.searchEdit = false;
     this.search = "";
     this.searchWithArchive = false;
+    this.searchTypeahead = false;
     this.popularUsers = [];
     this.timeOptions = [
       {name: 'tomorrow', addedCount: 1, unit: 'days'},
@@ -224,7 +225,7 @@ export default class TodosListCtrl extends Controller {
         }
 
         if (this.handleAllUsers.ready() && this.getReactively("proposingInProgress") && Meteor.userId()) {
-          $(".typeahead").typeahead({ source: getSuggest(), autoSelect: false});
+          $(".nametypeahead").typeahead({ source: getSuggest(), autoSelect: false});
         }
 
         function isNumeric(value) {
@@ -239,6 +240,58 @@ export default class TodosListCtrl extends Controller {
           x.fromCurrentUser = x.author.id === Meteor.userId() && x.author.id != x.receiver.id;
           x.toCurrentUser = x.receiver.id === Meteor.userId() && x.author.id != x.receiver.id;
           return x;
+        }
+
+        if (this.getReactively("searchEdit") && !this.getReactively("searchTypeahead")) {
+          $(".searchtypeahead").typeahead({
+            source: getSuggest(),
+            matcher: function(item) {
+              return item.name.startsWith(this.query.replace(/^from:/g, "").replace(/^to:/g, ""));
+            },
+            autoSelect: false,
+            updater: function(item) {
+              var newSearch = (this.query.startsWith("from:") ? "from:" : "to:") + item.name;
+              return {name: newSearch, id: item.id};
+            },
+            afterSelect: function(item) {
+              $(".searchtypeahead")[0].dispatchEvent(new Event("input", { bubbles: true }));
+    //                  $('.searchtypeahead').typeahead('destroy');
+    //                  $('.typeahead').typeahead('destroy');
+    //                  $(".search > ul").remove();
+            }});
+          this.searchTypeahead = true;
+        }
+
+        function retrieveSearchSelector(query, controller) {
+          var stripped = query.replace(/^from:/g, "").replace(/^to:/g, "");
+          var hasPrefix = (query).startsWith("from:") || (query).startsWith("to:");
+          if (hasPrefix && stripped.length > 0) {
+            if (Meteor.settings.public.contacts) {
+              var valid = false;
+              for (let contact of Meteor.settings.public.contacts) {
+                if (stripped === contact.name) {
+                  // hide suggest as the match was found
+                  if (!$('.typeahead').hasClass('hidden')) {
+                    $('.typeahead').addClass('hidden');
+                  }
+                  if (query.startsWith("from:")) {
+                    return {"author.id": contact.id};
+                  }
+                  return {"receiver.id": contact.id};
+                }
+              }
+            }
+            // suggest in progress
+            $('.typeahead').removeClass('hidden');
+          }
+          if (!hasPrefix) {
+            // no prefix, so no need in showing suggest
+            if (!$('.typeahead').hasClass('hidden')) {
+              $('.typeahead').addClass('hidden');
+            }
+          }
+          var searchRegex = new RegExp(query.replace(/\W/g, ""), "i");
+          return {$or: [{text: searchRegex}, {title: searchRegex} ]};
         }
 
         var additionalGroups = [];
@@ -260,15 +313,13 @@ export default class TodosListCtrl extends Controller {
         }
 
         var sortingField = sortMethod.configuration.sort;
-        searchValue = searchValue.replace(/\W/g, "");
-        var searchRegex = new RegExp(searchValue, "i");
         var initialSort = sortMethod.name === "Initial";
 
         var selectorWithSortFiltering = initialSort ? {$and: [selector.selector, {eta: {$gt: dateValue}}]} : selector.selector;
         var selectorWithArchive = selector.nonarchive && !withArchiveFlag ? {$and: [selectorWithSortFiltering, {archived: false}]} : selectorWithSortFiltering;
         var selectorWithSearch = searchValue === "" ?
           selectorWithArchive :
-          {$and: [selectorWithArchive, {$or: [{text: searchRegex}, {title: searchRegex} ]}]};
+          {$and: [selectorWithArchive, retrieveSearchSelector(searchValue, this)]};
 
         var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
@@ -349,7 +400,7 @@ export default class TodosListCtrl extends Controller {
     Meteor.call('tasks.insert', {
       task: newTask,
       time: moment(this.newDate + ' ' + this.newTime, "MM-DD-YYYY HH:mm").utc().format(),
-      receiver: $('.typeahead').typeahead('getActive') ? $('.typeahead').typeahead('getActive').id : this.newReceiverId
+      receiver: $('.nametypeahead').typeahead('getActive') ? $('.nametypeahead').typeahead('getActive').id : this.newReceiverId
       }, ProfileUtils.processMeteorResult);
 
     // Clear form
@@ -357,7 +408,7 @@ export default class TodosListCtrl extends Controller {
     this.$scope.addTaskForm.$setPristine();
     this.$scope.addTaskForm.$setUntouched();
     this.newReceiver = '';
-    $('.typeahead').val(''); //TODO: clears form but not model
+    $('.nametypeahead').val(''); //TODO: clears form but not model
     this.newDate = '';
     this.newTime = '';
     this.newInvitee = {};
@@ -390,10 +441,10 @@ export default class TodosListCtrl extends Controller {
 	  }
 	  this.newReceiver = user.name ? user.name : ProfileUtils.getName(user);
     this.newReceiverId = user._id;
-    $('.typeahead').val(this.newReceiver);
-    if ($('.typeahead').typeahead('getActive')) {
-      $('.typeahead').typeahead('getActive').id = this.newReceiverId;
-      $('.typeahead').typeahead('getActive').name = this.newReceiver;
+    $('.nametypeahead').val(this.newReceiver);
+    if ($('.nametypeahead').typeahead('getActive')) {
+      $('.nametypeahead').typeahead('getActive').id = this.newReceiverId;
+      $('.nametypeahead').typeahead('getActive').name = this.newReceiver;
     }
 
     this.setViewValue(this, 'newReceiver', this.newReceiver, 'click');
@@ -530,13 +581,13 @@ export default class TodosListCtrl extends Controller {
 	  var controller = this;
 
 	  function addNewPersonToSuggest(id, name) {
-      $(".typeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
+      $(".nametypeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
       controller.newReceiver = name;
       controller.newReceiverId = id;
-      $('.typeahead').val(name);
-      if ($('.typeahead').typeahead('getActive')) {
-        $('.typeahead').typeahead('getActive').id = id;
-        $('.typeahead').typeahead('getActive').name = name;
+      $('.nametypeahead').val(name);
+      if ($('.nametypeahead').typeahead('getActive')) {
+        $('.nametypeahead').typeahead('getActive').id = id;
+        $('.nametypeahead').typeahead('getActive').name = name;
       }
 
       controller.setViewValue(controller, 'newReceiver', name, 'click');
@@ -561,7 +612,7 @@ export default class TodosListCtrl extends Controller {
 	}
 
 	suggestKeyEntered() {
-	  var suggest = $('.typeahead').val().toLowerCase();
+	  var suggest = $('.nametypeahead').val().toLowerCase();
 	  if (suggest.length < 5) {
 	    return;
 	  }
@@ -577,7 +628,7 @@ export default class TodosListCtrl extends Controller {
       );
 
 	  if (initialLength !== Meteor.settings.public.contacts.length) {
-	    $(".typeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
+	    $(".nametypeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
 	  }
 	}
 

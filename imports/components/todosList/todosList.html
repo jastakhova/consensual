@@ -53,7 +53,7 @@
                 <span style="margin: 0px 10px">or</span>
               </div>
               <div class="col-md-9">
-                <input type="text" name="newReceiver" ng-model="todoList.newReceiver" ng-keyup="todoList.suggestKeyEntered()" class="form-control typeahead" data-provide="typeahead" placeholder="Start entering the name" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
+                <input type="text" name="newReceiver" ng-model="todoList.newReceiver" ng-keyup="todoList.suggestKeyEntered()" class="form-control nametypeahead" data-provide="typeahead" placeholder="Start entering the name" required minlength='1' contacts-only autocomplete="off" autofill="off"/>
                 <div ng-hide="todoList.invitationLimitReached" class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>
               </div>
             </div>
@@ -95,7 +95,7 @@
           <i class="fa fa-search"></i>
           <span ng-show="!todoList.searchEdit">Search</span>
           <span ng-show="todoList.searchEdit" class="search">
-            <input type="text" autofocus style="width: 60%; border: none; margin-right: 20px" ng-model="todoList.search"/>
+            <input type="text" autofocus style="width: 60%; border: none; margin-right: 20px" ng-model="todoList.search" class="searchtypeahead" data-provide="typeahead" autocomplete="off"/>
             <span class="hidden-xs hidden-sm">
               <span class="alternative-action" style="text-decoration-line: none">include archive</span>
               <span class="material-switch" style="margin-left: 10px">

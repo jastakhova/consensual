@@ -27,7 +27,6 @@ None
 
 #### Active ToDo
 
-- Search by from and to
 - Profile page
 - Contacts page
 - add notices
