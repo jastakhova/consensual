@@ -8,7 +8,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">User profile</a>
+        <a class="navbar-brand" href="#">{{profile.data.fullName}}</a>
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-left">
@@ -16,7 +16,7 @@
 
         <ul class="nav navbar-nav navbar-right">
           <li class="card" style="box-shadow: none; margin-top:15px;">
-            <img class="avatar border-gray" src="{{profile.data.picture}}" alt="..."/>
+            <img class="avatar border-gray" src="{{profile.data.accountPicture}}" alt="..."/>
           </li>
           <li>
             <a href="#!/login" ng-click="profile.logout()">Log out</a>
@@ -29,51 +29,14 @@
 
   <div class="content">
     <div class="container-fluid">
-      <form name="editProfile" autocomplete="off">
-        <button class="hidden">Receives Enter key for the form and does nothing</button>
-        <div class="row">
-          <div class="col-md-2 col-xs-6 col-sm-3 center">
-            <div>
-              <img class="avatar-big border-gray " style="width: 100px" src="{{profile.data.picture}}" alt="..."/>
-            </div>
-          </div>
-          <div class="col-md-10 col-xs-6 col-sm-9 lower">
-            <div class="header-title">Name:
-              <button type="button" rel="tooltip" title="{{profile.editingName ? 'Save' : 'Edit'}}" ng-click="profile.editingName ? profile.saveName(profile.data.name) : profile.flipNameEditingStatus()" class="btn {{profile.editingName ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
-                <i class="fa fa-edit"></i>
-              </button>
-            </div>
-            <div ng-show="!profile.editingName" ng-click="profile.flipNameEditingStatus()" style="word-wrap:break-word">{{profile.data.name}}</div>
-            <div ng-show="profile.editingName">
-              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && profile.saveName(profile.data.name)" ng-model="profile.data.name" name="editName" required-field autocomplete="off">
-            </div>
-          </div>
-          <div class="col-md-10 col-xs-6 col-sm-9 lower">
-            <div class="header-title">Email:
-              <button type="button" rel="tooltip" title="{{profile.editingEmail ? 'Save' : 'Edit'}}" ng-click="profile.editingEmail ? profile.saveEmail(profile.data.email) : profile.flipEmailEditingStatus()" class="btn {{profile.editingEmail ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
-                <i class="fa fa-edit"></i>
-              </button>
-            </div>
-            <div ng-show="!profile.editingEmail" ng-click="profile.flipEmailEditingStatus()" style="word-wrap:break-word">{{profile.data.email}}</div>
-            <div ng-show="profile.editingEmail">
-              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && profile.saveEmail(profile.data.email)" ng-model="profile.data.email" name="editEmail" required-field autocomplete="off">
-            </div>
+      <div class="row">
+        <div class="col-md-2 col-xs-6 col-sm-3 center">
+          <div>
+            <img class="avatar-big border-gray " style="width: 100px" src="{{profile.data.profilePicture}}" alt="..."/>
+            <a style="top:-130px; right: -50px;" href="{{profile.data.facebookLink}}" class="fa fa-facebook" ng-show="profile.data.showFacebookLink"></a>
           </div>
         </div>
-        <div class="row">
-          Currently {{profile.data.subscribed ? '' : 'not '}}subscribed to receive email notifications for:
-          <ul style="margin-top: 10px">
-            <li>new agreements</li>
-            <li>agreement details changes</li>
-            <li>agreement status change</li>
-            <li>agreement approval</li>
-            <li>new comments on agreements</li>
-          </ul>
-          <a href="" ng-click="profile.saveSubscription(!profile.data.subscribed)" style="border-color: #9A9A9A; border-width: 1px; color: #9A9A9A; margin-bottom: 10px; margin-right: 10px;" class="btn btn-round btn-social btn-outline">
-            {{profile.data.subscribed ? 'Unsubscribe' : 'Subscribe'}}
-          </a>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </ion-view>

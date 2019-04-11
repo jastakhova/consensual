@@ -64,23 +64,11 @@ export default class ProposalCtrl extends Controller {
         this.selectedDate = moment(foundTask.eta).format("MM-DD-YYYY");
         this.selectedTime = moment(foundTask.eta).format("HH:mm");
         this.previousDateTime = moment(foundTask.eta).format();
-//        this.currentUserIsInDoubt = Meteor.userId() === foundTask.author.id && foundTask.author.status === 'yellow' ||
-//          Meteor.userId() === foundTask.receiver.id && foundTask.receiver.status === 'yellow';
-//        this.activityShowed = !this.activityShowed && this.currentUserIsInDoubt || this.activityShowed;
         foundTask.comments.forEach(function(obj) {
           obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
         });
 
         foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
-
-//        var recentStatusChangeActivity = foundTask.activity
-//          .sort(function(record1, record2) {return ProfileUtils.comparator(record2.time, record1.time);})
-//          .filter(function(record) {return record.field === 'status' && (record.newValue === 'Done' || record.newValue === 'Cancelled');});
-//        if (recentStatusChangeActivity.length > 0 && foundTask.status != 'open' && !foundTask.archived
-//          && this.currentUserIsInDoubt && recentStatusChangeActivity[0].actor !== Meteor.userId()) {
-//          this.acknowledgeLabel = 'Acknowledge task status change to ' + foundTask.status;
-//          this.needsToApproveStatusChange = true;
-//        }
 
         foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.author.id]);
         foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiver.id]);

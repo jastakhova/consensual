@@ -22,6 +22,7 @@ import TodosListCtrl from '../imports/components/todosList/todosList';
 import ProposalCtrl from '../imports/components/todosList/proposal';
 import LoginCtrl from '../imports/components/account/login';
 import ProfileCtrl from '../imports/components/account/profile';
+import SettingsCtrl from '../imports/components/account/settings';
 import NotFoundCtrl from '../imports/components/account/notfound';
 import RoutesConfig from '../imports/components/routes';
 
@@ -189,6 +190,7 @@ new Loader(App)
 	.load(ProposalCtrl)
   .load(LoginCtrl)
   .load(ProfileCtrl)
+  .load(SettingsCtrl)
   .load(NotFoundCtrl)
 	.load(RoutesConfig);
 

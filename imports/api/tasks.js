@@ -666,7 +666,7 @@ if (Meteor.isServer) {
   Meteor.publish("allusers",
     function () {
           return Meteor.users.find({},
-            {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1, "email": 1, "services.facebook.email": 1}});
+            {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1, "email": 1, "services.facebook.email": 1, "services.facebook.name": 1}});
         }
   );
 

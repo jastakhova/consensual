@@ -3,6 +3,7 @@ import { Config } from 'angular-ecmascript/module-helpers';
 import todoListUrl from './todosList/todosList.html';
 import proposalUrl from './todosList/proposal.html';
 import loginUrl from './account/login.html';
+import settingsUrl from './account/settings.html';
 import profileUrl from './account/profile.html';
 import tabsTemplateUrl from './tabs.html';
 import notFoundTemplateUrl from './account/notfound.html';
@@ -42,8 +43,17 @@ export default class RoutesConfig extends Config {
               }
             }
         })
+      .state('tab.settings', {
+        url: '/settings',
+        views: {
+        'tab-settings': {
+          templateUrl: settingsUrl,
+          controller: 'SettingsCtrl as profile'
+          }
+        }
+      })
       .state('tab.profile', {
-        url: '/profile',
+        url: '/profile/:profileId',
         views: {
         'tab-profile': {
           templateUrl: profileUrl,

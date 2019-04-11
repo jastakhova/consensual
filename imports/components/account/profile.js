@@ -6,31 +6,34 @@ export default class ProfileCtrl extends Controller {
     constructor() {
         super(...arguments);
 
-        if (Meteor.userId()) {
-          this.userHandle = this.subscribe('currentuser');
-        }
+        this.profileId = this.$stateParams.profileId;
 
-        this.editingName = false;
-        this.editingEmail = false;
+        this.handleTasks = this.subscribe('tasks');
+        this.handleUsers = this.subscribe('allusers');
 
         this.helpers({
             data() {
-              if (!this.userHandle || !this.userHandle.ready()) {
+              if (!this.handleTasks || !this.handleTasks.ready() || !this.handleUsers || !this.handleUsers.ready()) {
                 return {};
               }
 
-              var subscribed = Meteor.user().subscribed;
-              if (typeof Meteor.user().subscribed === 'undefined') {
-                this.saveSubscription(true);
-                subscribed = true;
+              var user = Meteor.users.findOne({_id: this.profileId});
+              var facebookPresent = user.services && user.services.facebook && user.services.facebook.name;
+
+              if (!user) {
+                this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
+                return {};
               }
 
               return {
-                name: ProfileUtils.getName(Meteor.user()),
-                email: ProfileUtils.getEmail(Meteor.user()),
-                subscribed: subscribed,
-                user: Meteor.user(),
-                picture: ProfileUtils.picture(Meteor.user())
+                user: user,
+                showFacebookLink: facebookPresent,
+                facebookLink: facebookPresent
+                  ? "https://www.facebook.com/search/top/?q=" + encodeURI(user.services.facebook.name)
+                  : "",
+                fullName: ProfileUtils.getName(user),
+                profilePicture: ProfileUtils.picture(user),
+                accountPicture: ProfileUtils.picture(Meteor.user())
               };
             }
         });
@@ -39,29 +42,7 @@ export default class ProfileCtrl extends Controller {
     logout() {
       Meteor.logout();
     }
-
-    flipNameEditingStatus() {
-      this.editingName = !this.editingName;
-    }
-
-    flipEmailEditingStatus() {
-      this.editingEmail = !this.editingEmail;
-    }
-
-    saveSubscription(subscribed) {
-      Meteor.call('users.subscribe', subscribed);
-    }
-
-    saveName(name) {
-      Meteor.call('users.updateName', name);
-      this.flipNameEditingStatus();
-    }
-
-    saveEmail(email) {
-      Meteor.call('users.updateEmail', email);
-      this.flipEmailEditingStatus();
-    }
 }
 
 ProfileCtrl.$name = 'ProfileCtrl';
-ProfileCtrl.$inject = ['$stateParams'];
+ProfileCtrl.$inject = ['$stateParams', '$state'];
