@@ -7,6 +7,7 @@ import settingsUrl from './account/settings.html';
 import profileUrl from './account/profile.html';
 import tabsTemplateUrl from './tabs.html';
 import notFoundTemplateUrl from './account/notfound.html';
+import partialTemplateUrl from './todosList/todosListPartial.html'; // important for ng-include
 
 export default class RoutesConfig extends Config {
   configure() {

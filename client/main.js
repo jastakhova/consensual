@@ -87,7 +87,7 @@ consensual = angular.module(App, [
   'ionic'
 ]);
 
-consensual.run(['$ionicHistory', '$state', '$rootScope', function ($ionicHistory, $state, $rootScope) {
+consensual.run(['$ionicHistory', '$state', '$rootScope', '$templateCache', function ($ionicHistory, $state, $rootScope, $templateCache) {
   AccountsTemplates.options.onSubmitHook = onSubmitHook;
   AccountsTemplates.options.onLogoutHook = onLogoutHook;
 

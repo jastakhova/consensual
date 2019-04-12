@@ -661,4 +661,5 @@ export default class TodosListCtrl extends Controller {
 }
 
 TodosListCtrl.$name = 'TodosListCtrl';
-TodosListCtrl.$inject = ['$state'];
+TodosListCtrl.$inject = ['$state', '$templateCache'];
+//templateCache can be used to check whether template is in the cache
