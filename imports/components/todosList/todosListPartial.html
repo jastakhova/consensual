@@ -51,25 +51,29 @@
         <table class="table" style="margin-bottom: 0px">
           <tbody>
           <tr ng-show="taskList.tasks.length == 0"><td>no tasks</td></tr>
-          <tr ng-repeat="task in taskList.tasks | limitTo: (!taskList.sliced || taskList.opened ? taskList.length : taskList.limit)" style="background-color: {{task.toCurrentUser ? 'white' : (task.fromCurrentUser ? 'rgba(0,0,0,.1)' : 'rgba(0,0,0,.05)')}}" ng-click="todoList.gotoProposal(task._id)" class="link">
-            <td>
+          <tr ng-repeat="task in taskList.tasks | limitTo: (!taskList.sliced || taskList.opened ? taskList.length : taskList.limit)" style="background-color: {{task.toCurrentUser ? 'white' : (task.fromCurrentUser ? 'rgba(0,0,0,.1)' : 'rgba(0,0,0,.05)')}}">
+            <td ng-click="todoList.gotoProposal(task._id)" class="link">
               <a href="#!/tab/proposal/{{task._id}}"><i style="font-size: 30px;" class="pe-7s-{{todoList.getTaskStatusImage(task)}}"></i></a>
             </td>
-            <td>
+            <td ng-click="todoList.gotoProposal(task._id)" class="link">
               {{task.time}}
             </td>
-            <td ng-show="task.toCurrentUser == task.fromCurrentUser">
+            <td ng-show="task.toCurrentUser == task.fromCurrentUser" ng-click="todoList.gotoProposal(task._id)" class="link">
               self agreement
             </td>
             <td ng-show="task.toCurrentUser">
+              <a href="#!/tab/profile/{{task.author.id}}" class="base-color">
               from
               <img class="avatar border-gray" src="{{task.authorPicture}}" alt="..."/>
               {{task.author.name}}
+              </a>
             </td>
             <td ng-show="task.fromCurrentUser">
+              <a href="#!/tab/profile/{{task.receiver.id}}" class="base-color">
               to
               <img class="avatar border-gray" src="{{task.receiverPicture}}" alt="..."/>
               {{task.receiver.name}}
+              </a>
             </td>
             <td><a href="#!/tab/proposal/{{task._id}}">{{task.title}}</a></td>
           </tr>

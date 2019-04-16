@@ -36,7 +36,9 @@
             <div class="header-title">Author</div>
             <span class="grey">{{proposal.getStatusLabel(proposal.data, proposal.data.author)}}</span>
             <div>
-              <img class="avatar-big border-gray {{proposal.data.author.status}}-glow" src="{{proposal.data.authorPicture}}" alt="..."/>
+              <a href="#!/tab/{{proposal.currentUser === proposal.data.author.id ? 'settings' : ('profile/' + proposal.data.author.id)}}">
+                <img class="avatar-big border-gray {{proposal.data.author.status}}-glow" src="{{proposal.data.authorPicture}}" alt="..."/>
+              </a>
             </div>
             <a href=""><h5 class="title same-line">{{proposal.currentUser === proposal.data.author.id ? "You" : proposal.data.author.name}}</h5></a>
           </div>
@@ -44,7 +46,9 @@
             <div class="header-title">Receiver</div>
             <span class="grey">{{proposal.getStatusLabel(proposal.data, proposal.data.receiver)}}</span>
             <div>
-              <img class="avatar-big border-gray {{proposal.data.receiver.status}}-glow" src="{{proposal.data.receiverPicture}}" alt="..."/>
+              <a href="#!/tab/{{proposal.currentUser === proposal.data.receiver.id ? 'settings' : ('profile/' + proposal.data.receiver.id)}}">
+                <img class="avatar-big border-gray {{proposal.data.receiver.status}}-glow" src="{{proposal.data.receiverPicture}}" alt="..."/>
+              </a>
             </div>
             <a href=""><h5 class="title same-line">{{proposal.currentUser === proposal.data.receiver.id ? "You" : proposal.data.receiver.name}}</h5></a>
           </div>

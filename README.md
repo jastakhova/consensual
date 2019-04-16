@@ -27,7 +27,6 @@ None
 
 #### Active ToDo
 
-- Profile page
 - Contacts page
 - add notices
 - add ticklers
