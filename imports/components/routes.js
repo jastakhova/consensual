@@ -54,11 +54,11 @@ export default class RoutesConfig extends Config {
         }
       })
       .state('tab.profile', {
-        url: '/profile/:profileId',
+        url: '/profile/:profileId?group&filter&date',
         views: {
         'tab-profile': {
           templateUrl: profileUrl,
-          controller: 'ProfileCtrl as profile'
+          controller: 'ProfileCtrl as todoList'
           }
         }
       })

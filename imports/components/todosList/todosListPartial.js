@@ -154,7 +154,7 @@ export class TodosListPartialCtrl extends Controller {
     $("#filters").resize(this.adjustFilters);
     var filterAdjustingWasMade = false;
 
-    this.todoListMain = function(useSuggest, oneTime) {
+    this.todoListMain = function(useSuggest, oneTime, additionalFilter) {
         if (!this.handleTasks.ready()) {
           return [];
         }
@@ -261,27 +261,27 @@ export class TodosListPartialCtrl extends Controller {
         }
 
         var additionalGroups = [];
-        if (sortMethod.name == "Default") {
-          if (selector.name === this.filters[0].name && searchValue === "") {
-            sortMethod = this.sorts[0]; // doing "Initial" style of sorting
-            additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
-              var tasks = Tasks.find(sortGroup.selector).fetch().sort(sortGroup.sort).map(prepareTask);
-              return {
-                name: sortGroup.name,
-                tasks: tasks,
-                size: tasks.length,
-                sliced: tasks.length > sortGroup.limit,
-                appliedFilter: sortGroup.appliedFilter,
-                limit: sortGroup.limit
-              };
-            }).filter(group => group.tasks.length > 0);
-          }
+        if (sortMethod.name == "Default" && selector.name === this.filters[0].name && searchValue === "") {
+          sortMethod = this.sorts[0]; // doing "Initial" style of sorting
+          additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
+            var selector = additionalFilter ? {$and: [additionalFilter, sortGroup.selector]} : sortGroup.selector;
+            var tasks = Tasks.find(selector).fetch().sort(sortGroup.sort).map(prepareTask);
+            return {
+              name: sortGroup.name,
+              tasks: tasks,
+              size: tasks.length,
+              sliced: tasks.length > sortGroup.limit,
+              appliedFilter: sortGroup.appliedFilter,
+              limit: sortGroup.limit
+            };
+          }).filter(group => group.tasks.length > 0);
         }
 
         var sortingField = sortMethod.configuration.sort;
         var initialSort = sortMethod.name === "Initial";
 
-        var selectorWithSortFiltering = initialSort ? {$and: [selector.selector, {eta: {$gt: dateValue}}]} : selector.selector;
+        var selectorWithSpecifics = additionalFilter ? {$and: [selector.selector, additionalFilter]} : selector.selector;
+        var selectorWithSortFiltering = initialSort ? {$and: [selectorWithSpecifics, {eta: {$gt: dateValue}}]} : selectorWithSpecifics;
         var selectorWithArchive = selector.nonarchive && !withArchiveFlag ? {$and: [selectorWithSortFiltering, {archived: false}]} : selectorWithSortFiltering;
         var selectorWithSearch = searchValue === "" ?
           selectorWithArchive :
@@ -311,7 +311,7 @@ export class TodosListPartialCtrl extends Controller {
 
   this.selectSort = function(sortToggle) {
     this.currentSort = sortToggle;
-    this.$state.go('tab.todo', {'filter': this.currentFilter.name, 'group' : sortToggle.name}, {notify: false});
+    this.$state.go(this.$state.current.name, {'filter': this.currentFilter.name, 'group' : sortToggle.name}, {notify: false});
   }
 
   this.applyFilter = function(filterToggle) {
@@ -319,7 +319,7 @@ export class TodosListPartialCtrl extends Controller {
       filterToggle = this.filters[0];
     }
     this.currentFilter = filterToggle;
-    this.$state.go('tab.todo', {'filter': filterToggle.name, 'group' : this.currentSort.name}, {notify: false});
+    this.$state.go(this.$state.current.name, {'filter': filterToggle.name, 'group' : this.currentSort.name}, {notify: false});
   }
 
   this.applyDate = function(d) {
@@ -328,7 +328,7 @@ export class TodosListPartialCtrl extends Controller {
       this.showDatePickerForFilters();
     } else {
       this.currentDate = time.getTime();
-      this.$state.go('tab.todo', {'date': time.getTime()}, {notify: false});
+      this.$state.go(this.$state.current.name, {'date': time.getTime()}, {notify: false});
     }
   }
 
@@ -383,7 +383,7 @@ export class TodosListPartialCtrl extends Controller {
     var doBeforeShow = function() {};
     var doOnSelect = function(formatTime) {
        controller.currentDate = moment(formatTime + ' 00:00', "MM-DD-YYYY HH:mm").utc().valueOf();
-       controller.$state.go('tab.todo', {'date': controller.currentDate}, {notify: false});
+       controller.$state.go(controller.$state.current.name, {'date': controller.currentDate}, {notify: false});
     };
     this.showDateBasePicker(current, doBeforeShow, doOnSelect);
   }

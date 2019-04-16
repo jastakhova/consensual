@@ -1,8 +1,8 @@
-import { Controller } from 'angular-ecmascript/module-helpers';
 import moment from 'moment';
 import ProfileUtils from '../todosList/profile.js';
+import { TodosListPartialCtrl } from '../todosList/todosListPartial.js';
 
-export default class ProfileCtrl extends Controller {
+export default class ProfileCtrl extends TodosListPartialCtrl {
     constructor() {
         super(...arguments);
 
@@ -11,36 +11,56 @@ export default class ProfileCtrl extends Controller {
         this.handleTasks = this.subscribe('tasks');
         this.handleUsers = this.subscribe('allusers');
 
+        this.essencial = {};
+
         this.helpers({
-            data() {
+            tasks() {
               if (!this.handleTasks || !this.handleTasks.ready() || !this.handleUsers || !this.handleUsers.ready()) {
                 return {};
               }
 
-              var user = Meteor.users.findOne({_id: this.profileId});
-              var facebookPresent = user.services && user.services.facebook && user.services.facebook.name;
+              try {
+                var user = Meteor.users.findOne({_id: this.profileId});
 
-              if (!user) {
-                this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
-                return {};
-              }
+                if (!user) {
+                  this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
+                  return {};
+                }
 
-              return {
-                user: user,
-                showFacebookLink: facebookPresent,
-                facebookLink: facebookPresent
-                  ? "https://www.facebook.com/search/top/?q=" + encodeURI(user.services.facebook.name)
-                  : "",
-                fullName: ProfileUtils.getName(user),
-                profilePicture: ProfileUtils.picture(user),
-                accountPicture: ProfileUtils.picture(Meteor.user())
+                var facebookPresent = user.services && user.services.facebook && user.services.facebook.name;
+
+                this.essencial = {
+                   user: user,
+                   showFacebookLink: facebookPresent,
+                   facebookLink: facebookPresent
+                     ? "https://www.facebook.com/search/top/?q=" + encodeURI(user.services.facebook.name)
+                     : "",
+                   fullName: ProfileUtils.getName(user),
+                   profilePicture: ProfileUtils.picture(user),
+                   accountPicture: ProfileUtils.picture(Meteor.user())
+                };
+
+                var handleAllUsers = this.handleAllUsers;
+                var proposingInProgress = this.getReactively("proposingInProgress");
+                var popularUsers = this.popularUsers;
+
+                return this.todoListMain(
+                  function(getSuggest) {},
+                  function() {},
+                  {$or: [{"author.id": user._id}, {"receiver.id": user._id}]}
+                );
+              } catch (err) {
+                console.log(err);
+                ProfileUtils.showError();
+                Meteor.call('email.withError', err);
+                return [];
               };
             }
         });
-    }
 
-    logout() {
-      Meteor.logout();
+        this.logout = function() {
+          Meteor.logout();
+        }
     }
 }
 
