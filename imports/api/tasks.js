@@ -7,6 +7,7 @@ import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
 import {Actions, Notices, getAction, getCondition, getStatus} from './dictionary.js';
+import ProfileUtils from '../components/todosList/profile.js';
 
 export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
@@ -14,8 +15,6 @@ export const Invitees = new Mongo.Collection('invitees');
 
 // available where Tasks is imported
 datetimeDisplayFormat = "MMM DD, YYYY, h:mm A";
-
-foundersFilter = {'profile.name': {$in: ["Julia Astakhova", "Day Waterbury", "All Consensual"]}};
 
 mailingFounder = "";
 
@@ -634,7 +633,7 @@ Meteor.methods({
 
     if (receivers.length < size) {
       var founders = Meteor.users.find(
-        { $and: [foundersFilter, {_id: {$nin: receivers}}, {_id: {$ne: Meteor.userId()}}]},
+        { $and: [ProfileUtils.foundersFilter(), {_id: {$nin: receivers}}, {_id: {$ne: Meteor.userId()}}]},
         { sort: { 'profile.name': 1 }, limit: size - receivers.length }).fetch().map(r => r._id);
       console.log("So the founders list was:");
       console.log(founders);

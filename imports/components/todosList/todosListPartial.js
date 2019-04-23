@@ -171,35 +171,10 @@ export class TodosListPartialCtrl extends Controller {
       	var dateValue = this.getReactively("currentDate");
       	var withArchiveFlag = this.getReactively("searchWithArchive");
 
-      	function getConnectedPeople(controller) {
-      	  var connectedUsers = new Set();
-          Tasks.find({$or: [{"author.id": Meteor.userId()}, {"receiver.id": Meteor.userId()}]}).fetch().forEach(task => {
-            connectedUsers.add(task.author.id);
-            connectedUsers.add(task.receiver.id);
-          });
-
-          controller.invitees = Invitees.find().fetch();
-          return controller.invitees.concat(Meteor.users.find({$or: [{_id: {$in: Array.from(connectedUsers)}}, foundersFilter]},
-            {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1}}).fetch());
-      	}
-
-      	var id2user = ProfileUtils.createMapFromList(getConnectedPeople(this), "_id");
+      	var id2user = ProfileUtils.getId2User(this, Tasks, Invitees);
       	this.allUsers = Meteor.users.find({}, {"username": 1, "profile.name" : 1}).fetch();
 
-				function getSuggest() {
-					var suggest = [];
-					var suggestSize = 0;
-					Object.keys(id2user).forEach(function(key) {
-							suggest[suggestSize++] = {id: key, name: ProfileUtils.getName(id2user[key])};
-					});
-					Meteor.settings.public.contacts = suggest;
-				  if (Meteor.settings.public.contacts.filter(x => x.id === Meteor.userId()).length === 0) {
-				    Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: Meteor.userId(), name:  ProfileUtils.getName(Meteor.user())};
-				  }
-					return suggest;
-        }
-
-        useSuggest(getSuggest);
+        useSuggest(ProfileUtils.getSuggest(id2user));
 
         function prepareTask(x) {
           x.time = moment(x.eta).format("DD MMM h:mm a");
@@ -213,7 +188,7 @@ export class TodosListPartialCtrl extends Controller {
 
         if (this.getReactively("searchEdit") && !this.getReactively("searchTypeahead")) {
           $(".searchtypeahead").typeahead({
-            source: getSuggest(),
+            source: ProfileUtils.getSuggest(id2user)(),
             matcher: function(item) {
               return item.name.startsWith(this.query.replace(/^from:/g, "").replace(/^to:/g, ""));
             },

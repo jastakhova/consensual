@@ -1,0 +1,65 @@
+<ion-view view-title="Contacts" cache-view="false">
+  <nav class="navbar navbar-default navbar-fixed">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#sidebar" onclick='$(":root").toggleClass("nav-open"); $(".sidebar").removeClass("in")'>
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Contacts</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-left">
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="card" style="box-shadow: none; margin-top:15px;">
+            <img class="avatar border-gray" src="{{contacts.accountPicture()}}" alt="..."/>
+          </li>
+          <li>
+            <a href="#!/login" ng-click="contacts.logout()">Log out</a>
+          </li>
+          <li class="separator hidden-lg"></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-10 col-sm-10 col-xs-7" style="padding-left: 0px">
+          <span ng-click="contacts.flipSearchEditing()" style="border-color: #9A9A9A; border-width: 1px; color: #9A9A9A; margin-bottom: 10px; margin-right: 10px; {{contacts.searchEdit? 'width: 90%;' : ''}} " class="btn btn-round btn-social btn-outline">
+            <i class="fa fa-search"></i>
+            <span ng-show="!contacts.searchEdit">Search</span>
+            <span ng-show="contacts.searchEdit" class="search">
+              <input type="text" autofocus style="width: 90%; border: none; margin-right: 20px" ng-model="contacts.search" ng-keyup="contacts.suggestKeyEntered()"/>
+              <!--<div ng-hide="contacts.invitationLimitReached" class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>-->
+            </span>
+          </span>
+        </div>
+      </div>
+        <div class="row" ng-repeat="letterGroup in contacts.data">
+          <div class="card" style="margin-bottom:0px">
+            <div class="header">
+              <h4 class="title">{{letterGroup.letter}}</h4>
+            </div>
+                <table class="table" style="margin-bottom: 0px" >
+                  <tbody>
+                  <tr ng-repeat="user in letterGroup.users" style="background-color: {{task.toCurrentUser ? 'white' : (task.fromCurrentUser ? 'rgba(0,0,0,.1)' : 'rgba(0,0,0,.05)')}}">
+                    <td>
+                      <a href="#!/tab/profile/{{user._id}}" class="base-color avatar">
+                        <img class="avatar border-gray" src="{{user.picture}}" alt="..."/>
+                        {{user.name}}
+                      </a>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+          </div>
+        </div>
+    </div>
+  </div>
+</ion-view>

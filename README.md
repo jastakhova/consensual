@@ -27,16 +27,15 @@ None
 
 #### Active ToDo
 
-- Contacts page
-- add notices
-- add ticklers
-- add Done action
-- add requesting
-- add locking
-- add cancel request
-- add blocking comments
-- add Copy action
-- Terms of use email should we sent on new sign-ups not only invites
+- add notices -- Tuesday, Wednesday - 04.24
+- add ticklers -- Thursday, Friday - 04.26
+- add Done action -- Monday - 04.29
+- add requesting -- Tuesday, Wednesday
+- add locking -- Thursday, Friday +1 week
+- add cancel request -- Monday, Tuesday
+- add blocking comments -- Wednesday, Thursday, Friday +1 week
+- add Copy action -- Monday
+- Terms of use email should we sent on new sign-ups not only invites -- Tuesday
 
 
 - [talk] Approve logic is not well understood by ppl

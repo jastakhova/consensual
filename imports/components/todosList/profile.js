@@ -37,26 +37,65 @@ var ProfileUtils = {
     return result.length > 0 ? result[0].time : -1;
   },
 
-  showError(message) {
+  showError: function(message) {
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0;
     $('.notification').removeClass("hidden");
     $('#notificationMessage').text(message ? message : "An inner error occurred. We are already working on a fix. Please try to use the service later.");
   },
 
-  processMeteorResult(err, res) {
+  processMeteorResult: function(err, res) {
     if (err) {
       ProfileUtils.showError();
       Meteor.call('email.withError', err);
     }
   },
 
-  getName(user) {
+  getName: function(user) {
     return user.username ? user.username : user.profile.name;
   },
 
-  getEmail(user) {
+  getEmail: function(user) {
     return user.email ? user.email : user.services.facebook.email;
+  },
+
+  getConnectedPeople: function(controller, tasksDB, inviteesDB) {
+    var connectedUsers = new Set();
+    tasksDB.find({$or: [{"author.id": Meteor.userId()}, {"receiver.id": Meteor.userId()}]}).fetch().forEach(task => {
+      connectedUsers.add(task.author.id);
+      connectedUsers.add(task.receiver.id);
+    });
+
+    controller.invitees = inviteesDB.find().fetch();
+    var existingUsers = Meteor.users.find({$or: [
+        {_id: {$in: Array.from(connectedUsers)}},
+        ProfileUtils.foundersFilter()]},
+      {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1}}).fetch();
+    return controller.invitees.concat(existingUsers);
+  },
+
+  getId2User: function(controller, tasksDB, inviteesDB) {
+    return ProfileUtils.createMapFromList(ProfileUtils.getConnectedPeople(controller, tasksDB, inviteesDB), "_id");
+  },
+
+  getSuggest: function(id2user) {
+    var suggest = [];
+    var suggestSize = 0;
+    Object.keys(id2user).forEach(function(key) {
+        suggest[suggestSize++] = {id: key, name: ProfileUtils.getName(id2user[key])};
+    });
+
+    return function() {
+      Meteor.settings.public.contacts = suggest;
+      if (Meteor.settings.public.contacts.filter(x => x.id === Meteor.userId()).length === 0) {
+        Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: Meteor.userId(), name:  ProfileUtils.getName(Meteor.user())};
+      }
+      return suggest;
+    }
+  },
+
+  foundersFilter: function() {
+    return {'profile.name': {$in: ["Julia Astakhova", "Day Waterbury", "All Consensual"]}};
   }
 };
 

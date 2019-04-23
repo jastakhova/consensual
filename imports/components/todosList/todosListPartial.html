@@ -37,7 +37,7 @@
   </a>
 </div>
 <div ng-repeat="taskList in todoList.tasks" class="row">
-  <div class="card ">
+  <div class="card">
     <div class="header">
       <h4 class="title">{{taskList.name}}
         <span class="alternative-action" style="text-decoration-line: none; font-size: 14px" ng-show="taskList.datepickerStub">or start with another date (<a class="link alternative-action" ng-click="todoList.applyDate('today')">today</a> / <a class="link alternative-action" ng-click="todoList.applyDate('tomorrow')">tomorrow</a> / <a class="link alternative-action" ng-click="todoList.applyDate('more')">more</a>)</span>

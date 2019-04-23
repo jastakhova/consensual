@@ -4,6 +4,7 @@ import todoListUrl from './todosList/todosList.html';
 import proposalUrl from './todosList/proposal.html';
 import loginUrl from './account/login.html';
 import settingsUrl from './account/settings.html';
+import contactsUrl from './account/contacts.html';
 import profileUrl from './account/profile.html';
 import tabsTemplateUrl from './tabs.html';
 import notFoundTemplateUrl from './account/notfound.html';
@@ -32,6 +33,15 @@ export default class RoutesConfig extends Config {
           'tab-proposal': {
             templateUrl: proposalUrl,
             controller: 'ProposalCtrl as proposal'
+            }
+          }
+      })
+      .state('tab.contacts', {
+        url: '/contacts',
+        views: {
+          'tab-contacts': {
+            templateUrl: contactsUrl,
+            controller: 'ContactsCtrl as contacts'
             }
           }
       })
