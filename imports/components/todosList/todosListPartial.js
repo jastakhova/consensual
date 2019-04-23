@@ -103,10 +103,10 @@ export class TodosListPartialCtrl extends Controller {
               ? (
                 task.receiver.id === task.author.id
                 ? "Self-agreements"
-                : ("Agreements with " + task.author.name))
+                : task.author.name)
               : task.receiver.name;
            },
-           groupingName: function(group, filter) {return group;},
+           groupingName: function(group, filter) {return group == "Self-agreements" ? group : "Agreements with " + group;},
            ingroupSort: function(task1, task2) {
               return ProfileUtils.comparator(
                 ProfileUtils.getLatestActivityTime(task2, Meteor.userId()),
