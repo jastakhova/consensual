@@ -28,11 +28,47 @@ export const getAction = function(name) {
 export const Notices = [
   { // 0
     text: "New proposal",
-    actions: [
-      getAction("DECISION_YES"),
-      getAction("DECISION_NO"),
-      getAction("DECISION_MAYBE")
-    ]
+    type: "visit"
+  },
+  { // 1
+    text: "Proposal approved",
+    type: "view"
+  },
+  { // 2
+    text: "Proposal rejected",
+    type: "view"
+  },
+  { // 3
+    text: "Under consideration",
+    type: "view"
+  },
+  { // 4
+    text: "Has comments",
+    type: "visit"
+  },
+  { // 5
+    text: "Has updates",
+    type: "visit"
+  },
+  { // 6
+    text: "Locked",
+    type: "view"
+  },
+  { // 7
+    text: "Cancellation request",
+    type: "visit"
+  },
+  { // 8
+    text: "Cancellation approval",
+    type: "view"
+  },
+  { // 9
+    text: "Cancellation request denied",
+    type: "visit"
+  },
+  { // 10
+    text: "Cancellation",
+    type: "visit"
   }
 ];
 
@@ -107,6 +143,7 @@ export const getCondition = function(id, task) {
 }
 
 //////////////////////////// STATES /////////////////////////////////////////////////////////
+// One can always comment. Other actions are allowed depending on the state.
 
 export const States = [
   {

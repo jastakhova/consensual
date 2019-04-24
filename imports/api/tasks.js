@@ -70,6 +70,12 @@ function capitalize(status) {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
+function removeNotice(notices, noticeReceiverId, code, time) {
+  return noticeReceiverId === Meteor.userId()
+    ? notices.filter(notice => (notice.code != code || notice.created != time))
+    : notices;
+}
+
 function changeStatusesOnEditing(task) {
   var statuses = [];
   // comparison is done via negation in order to avoid a change of statuses for self-agreement
@@ -204,6 +210,20 @@ Meteor.methods({
     });
 
     notifyOnActivity(task, activity, timezone);
+  },
+  'tasks.removeNotice' (taskId, code, time) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+    var authorNotices = removeNotice(task.author.notices, task.author.id, code, time);
+    var receiverNotices = removeNotice(task.receiver.notices, task.receiver.id, code, time);
+
+    Tasks.update(taskId, {
+      $set: {
+        "author.notices": authorNotices,
+        "receiver.notices": receiverNotices
+      }
+    });
   },
   'tasks.updateLocation' (taskId, newLocation) {
     check(taskId, String);

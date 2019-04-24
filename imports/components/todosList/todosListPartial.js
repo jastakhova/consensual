@@ -1,5 +1,5 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
-import {getStatus} from '../../api/dictionary.js';
+import {getStatus, Notices} from '../../api/dictionary.js';
 import ProfileUtils from  './profile.js';
 import { Tasks, Invitees } from '../../api/tasks.js';
 import DateTimePicker from 'date-time-picker';
@@ -35,12 +35,12 @@ export class TodosListPartialCtrl extends Controller {
 
     this.filters = [
 /*0*/   {name: "All", groupName: "All Active Proposals and Agreements", hide: true, selector: {}, nonarchive: true},
-/*1*/   {name: "Needs Attention", groupName: "Agreements that Need Attention", hide: true, nonarchive: true,
-          selector: {$or: [
-              {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
-              {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}},
-/*2*/   {name: "Your Recent Activity", groupName: "Your Recent Activity", hide: true,
-          selector: {"activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
+///*1*/   {name: "Needs Attention", groupName: "Notifications", hide: true, nonarchive: true,
+//          selector: {$or: [
+//              {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
+//              {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}},
+///*2*/   {name: "Your Recent Activity", groupName: "Your Recent Activity", hide: true,
+//          selector: {"activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}},
 /*3*/   {name: "Recently created", groupName: "Recently Created Proposals",
            selector: {"author.id": Meteor.userId(), "activity": {$elemMatch: {"field": "agreement", "time": {$gt: prevMidnight.getTime()}}}}},
 /*4*/   {name: "No response yet", groupName: "Non-Responsive Proposals",
@@ -67,7 +67,8 @@ export class TodosListPartialCtrl extends Controller {
       return moment(d).format("DD MMM");
     };
 
-    var sortingByETA = function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)};
+    var sortingByETA = function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta);};
+    var sortingNotices = function(notice1, notice2) {return ProfileUtils.comparator(notice2.created, notice1.created);};
 
     this.sorts = [
       {name: "Initial", visible: false,
@@ -75,7 +76,31 @@ export class TodosListPartialCtrl extends Controller {
           sort: "eta",
           grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
           groupingName: formatDate}, additionalGroups: [
-            {name: "Needs Attention", selector: {$and: [{archived: false}, { $or: [{"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}}, {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}]}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 5, appliedFilter: this.filters[1]},
+            {name: "Notifications", selector: {$and: [
+              {archived: false},
+              { $or: [
+                {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
+                {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}
+              ]},
+             sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)},
+             limit: 5,
+             prepare: function(task) {
+                var actor = 0;
+                var notice = 0;
+                if (task.author.id == Meteor.userId()) {
+                  actor = task.receiver;
+                  notice = task.author.notices.sort(sortingNotices)[0];
+                }
+                if (task.receiver.id == Meteor.userId()) {
+                  actor = task.author;
+                  notice = task.receiver.notices.sort(sortingNotices)[0];
+                }
+                task.notice = notice;
+                task.notice.actor = actor;
+                task.notice.type = Notices[notice.code];
+                task.notice.time = moment(notice.created).format("DD MMM h:mm a");
+                return task;
+             }},
             {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]}
           ],
           ingroupSort: sortingByETA
@@ -240,14 +265,20 @@ export class TodosListPartialCtrl extends Controller {
           sortMethod = this.sorts[0]; // doing "Initial" style of sorting
           additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
             var selector = additionalFilter ? {$and: [additionalFilter, sortGroup.selector]} : sortGroup.selector;
-            var tasks = Tasks.find(selector).fetch().sort(sortGroup.sort).map(prepareTask);
+            var tasks = Tasks.find(selector).fetch()
+              .sort(sortGroup.sort)
+              .map(sortGroup.prepare ? function(task) {
+                var prepared = sortGroup.prepare(task);
+                prepared.notice.actor.picture = ProfileUtils.picture(id2user[prepared.notice.actor.id]);
+                return prepared;
+                } : prepareTask);
             return {
               name: sortGroup.name,
               tasks: tasks,
               size: tasks.length,
               sliced: tasks.length > sortGroup.limit,
-              appliedFilter: sortGroup.appliedFilter,
-              limit: sortGroup.limit
+              limit: sortGroup.limit,
+              notifications: !!sortGroup.prepare
             };
           }).filter(group => group.tasks.length > 0);
         }
@@ -378,6 +409,14 @@ export class TodosListPartialCtrl extends Controller {
       doOnSelect(formatTime);
       timePicker.destroy();
     });
+  }
+
+  this.removeNotice = function(task) {
+   Meteor.call('tasks.removeNotice',
+           task._id,
+           task.notice.code,
+           task.notice.created,
+           ProfileUtils.processMeteorResult);
   }
 
   } // constructor

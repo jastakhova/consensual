@@ -120,6 +120,34 @@ if (Meteor.isServer) {
         assert.equal(tasks[0].receiver.notices.length, 1);
       });
 
+      it('can remove notice', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(tasks[0].author.id, userId);
+        assert.equal(tasks[0].receiver.notices.length, 1);
+
+        changeUser(otherUserId);
+
+        const removeNotice = Meteor.server.method_handlers['tasks.removeNotice'];
+        removeNotice.apply({}, [tasks[0]._id, 0, tasks[0].receiver.notices[0].created]);
+
+        tasks = Tasks.find().fetch();
+        assert.equal(tasks.length, 1);
+        assert.equal(tasks[0].receiver.notices.length, 0);
+      });
+
       it('can create self task', () => {
         assert.equal(Tasks.find().count(), 0);
 
