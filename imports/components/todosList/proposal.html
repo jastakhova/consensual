@@ -99,7 +99,7 @@
               Reconsider
             </button>
             <br/>
-            <button type="button" ng-show="proposal.showAction(proposal.data, 'STATUS_CHANGE_CANCEL')" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsCancelled()">
+            <button type="button" ng-show="proposal.showAction(proposal.data, 'STATUS_CHANGE_CANCEL')" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsCancelled('CANCELLATION')">
               <i class="pe-7s-trash"></i>
               Cancel
             </button>
@@ -138,7 +138,7 @@
         <div class="row" ng-show="proposal.showAction(proposal.data, 'DECISION_YES') || proposal.showAction(proposal.data, 'DECISION_NO') || proposal.showAction(proposal.data, 'DECISION_MAYBE')" style="margin-bottom: 20px; margin-left: 2px">
           <div class="col-md-8" style="padding-left: 0px">
             <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_YES')" style="padding-left: 0px;"><button type="button" style="background-color: #18ce0f; border: none;" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">OMG Yes!!!</button></div>
-            <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_NO')" style="padding-left: 0px;"><button type="button" style="background-color: red; border: none;" ng-click="proposal.markTaskAsCancelled()" class="btn btn-info btn-fill">Not for me</button></div>
+            <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_NO')" style="padding-left: 0px;"><button type="button" style="background-color: red; border: none;" ng-click="proposal.markTaskAsCancelled('PROPOSAL_REJECTED')" class="btn btn-info btn-fill">Not for me</button></div>
             <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_MAYBE')" style="padding-left: 0px;"><button type="button" style="background-color: #e7b416; border: none;" ng-click="proposal.markTaskAsMaybe()" class="btn btn-info btn-fill">Hmmm.. Maybe</button></div>
           </div>
         </div>

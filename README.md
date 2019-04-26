@@ -27,18 +27,17 @@ None
 
 #### Active ToDo
 
-- wiring more notices -- Thursday
 - automatic removal of notices based on views and visits -- Friday
-- add ticklers -- Thursday, Friday - 04.26
-- add Done action -- Monday - 04.29
+- grouping of notices -- Saturday, Monday
+- add ticklers -- ?
+- add Done action -- ?
 - add requesting -- Tuesday, Wednesday
-- add locking -- Thursday, Friday +1 week
-- add cancel request -- Monday, Tuesday
+- add locking + notice -- Thursday, Friday +1 week
+- add cancel request + notices -- Monday, Tuesday
 - add blocking comments -- Wednesday, Thursday, Friday +1 week
 - add Copy action -- Monday
 - Terms of use email should we sent on new sign-ups not only invites -- Tuesday
-Shifted by 2 days because of notices
-
+Shifted by 1 days because of notices
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

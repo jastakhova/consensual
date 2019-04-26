@@ -4,7 +4,7 @@ import { assert } from 'meteor/practicalmeteor:chai';
 import { sinon } from 'meteor/practicalmeteor:sinon';
 
 import { Invitees, Tasks } from './tasks.js';
-import { getCurrentState, getState, getCondition } from './dictionary.js';
+import { getCurrentState, getState, getCondition, getNotice } from './dictionary.js';
 
 if (Meteor.isServer) {
   describe('Tasks', () => {
@@ -141,7 +141,7 @@ if (Meteor.isServer) {
         changeUser(otherUserId);
 
         const removeNotice = Meteor.server.method_handlers['tasks.removeNotice'];
-        removeNotice.apply({}, [tasks[0]._id, 0, tasks[0].receiver.notices[0].created]);
+        removeNotice.apply({}, [tasks[0]._id, getNotice("NEW_PROPOSAL").id, tasks[0].receiver.notices[0].created]);
 
         tasks = Tasks.find().fetch();
         assert.equal(tasks.length, 1);
@@ -220,6 +220,7 @@ if (Meteor.isServer) {
 
         assert.equal(tasks.length, 1);
         assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+        assert.equal(tasks[0].author.notices.length, 0);
 
         changeUser(otherUserId);
 
@@ -232,6 +233,7 @@ if (Meteor.isServer) {
 
         assert.equal(tasks2[0].location, newLocation);
         assert.equal(getCurrentState(tasks2[0]).id, getState("DEEPLY_CONSIDERED").id);
+        assert.equal(tasks2[0].author.notices.length, 1);
       });
 
       it('can edit task in case of self agreement', () => {
@@ -262,6 +264,9 @@ if (Meteor.isServer) {
 
         assert.equal(tasks2[0].text, newDescription);
         assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+        //no notices for self agreements
+        assert.equal(tasks2[0].author.notices.length, 0);
+        assert.equal(tasks2[0].receiver.notices.length, 0);
       });
 
       it('can edit task when it is considered by both parties', () => {
@@ -294,6 +299,8 @@ if (Meteor.isServer) {
 
         assert.equal(tasks2[0].title, newTitle);
         assert.equal(getCurrentState(tasks2[0]).id, getState("DEEPLY_CONSIDERED").id);
+        assert.equal(tasks2[0].author.notices.length, 1);
+        assert.equal(tasks2[0].receiver.notices.length, 1);
 
         changeUser(userId);
 
@@ -305,6 +312,8 @@ if (Meteor.isServer) {
 
         assert.equal(tasks3[0].title, newTitle3);
         assert.equal(getCurrentState(tasks3[0]).id, getState("DEEPLY_CONSIDERED").id);
+        assert.equal(tasks3[0].author.notices.length, 1);
+        assert.equal(tasks3[0].receiver.notices.length, 2);
       });
 
       it('can approve task', () => {
@@ -335,6 +344,8 @@ if (Meteor.isServer) {
         assert.equal(tasks2.length, 1);
 
         assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+        assert.equal(tasks2[0].author.notices.length, 1);
+        assert.equal(tasks2[0].receiver.notices.length, 1);
       });
 
       it('can approve task when it is considered by both parties', () => {
@@ -446,7 +457,7 @@ if (Meteor.isServer) {
         changeUser(otherUserId);
 
         const registerTask2 = Meteor.server.method_handlers['tasks.cancel'];
-        registerTask2.apply({}, [tasks[0]._id]);
+        registerTask2.apply({}, [tasks[0]._id, getNotice("PROPOSAL_REJECTED")]);
 
         var tasks2 = Tasks.find().fetch();
         assert.equal(tasks2.length, 1);
@@ -454,6 +465,8 @@ if (Meteor.isServer) {
         assert.equal(getCurrentState(tasks2[0]).id, getState("OPPOSED").id);
         assert.equal(tasks2[0].author.status, getCondition("green").id);
         assert.equal(tasks2[0].receiver.status, getCondition("red").id);
+        assert.equal(tasks2[0].author.notices.length, 1);
+        assert.equal(tasks2[0].receiver.notices.length, 1);
         assert.ok(tasks2[0].archived);
       });
 
@@ -487,6 +500,8 @@ if (Meteor.isServer) {
         assert.equal(getCurrentState(tasks2[0]).id, getState("CONSIDERED").id);
         assert.equal(tasks2[0].author.status, getCondition("green").id);
         assert.equal(tasks2[0].receiver.status, getCondition("yellow").id);
+        assert.equal(tasks2[0].author.notices.length, 1);
+        assert.equal(tasks2[0].receiver.notices.length, 1);
       });
 
       it('can consider', () => {
@@ -519,6 +534,8 @@ if (Meteor.isServer) {
         assert.equal(getCurrentState(tasks2[0]).id, getState("CONSIDERED").id);
         assert.equal(tasks2[0].author.status, getCondition("green").id);
         assert.equal(tasks2[0].receiver.status, getCondition("yellow").id);
+        assert.equal(tasks2[0].author.notices.length, 1);
+        assert.equal(tasks2[0].receiver.notices.length, 1);
       });
 
       it('can reconsider', () => {
@@ -559,6 +576,8 @@ if (Meteor.isServer) {
         assert.equal(getCurrentState(tasks3[0]).id, getState("CONSIDERED").id);
         assert.equal(tasks3[0].author.status, getCondition("green").id);
         assert.equal(tasks3[0].receiver.status, getCondition("yellow").id);
+        assert.equal(tasks3[0].author.notices.length, 2); // for agreed and considered status changes separately
+        assert.equal(tasks3[0].receiver.notices.length, 1);
       });
 		});
   });

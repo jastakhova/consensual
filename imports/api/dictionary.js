@@ -27,50 +27,70 @@ export const getAction = function(name) {
 
 export const Notices = [
   { // 0
+    id: "NEW_PROPOSAL",
     text: "New proposal",
     type: "visit"
   },
   { // 1
+    id: "PROPOSAL_APPROVED",
     text: "Proposal approved",
     type: "view"
   },
   { // 2
+    id: "PROPOSAL_REJECTED",
     text: "Proposal rejected",
     type: "view"
   },
   { // 3
+    id: "UNDER_CONSIDERATION",
     text: "Under consideration",
     type: "view"
   },
   { // 4
+    id: "HAS_COMMENTS",
     text: "Has comments",
     type: "visit"
   },
   { // 5
+    id: "HAS_UPDATES",
     text: "Has updates",
     type: "visit"
   },
   { // 6
+    id: "LOCKED",
     text: "Locked",
     type: "view"
   },
   { // 7
+    id: "CANCELLATION_REQUEST",
     text: "Cancellation request",
     type: "visit"
   },
   { // 8
+    id: "CANCELLATION_APPROVAL",
     text: "Cancellation approval",
     type: "view"
   },
   { // 9
+    id: "CANCELLATION_REQUEST_DENIED",
     text: "Cancellation request denied",
     type: "visit"
   },
   { // 10
+    id: "CANCELLATION",
     text: "Cancellation",
     type: "visit"
   }
 ];
+
+export const getNotice = function(code) {
+  for (var i = 0; i < Notices.length; i++) {
+    if (Notices[i].id === code) {
+      return Notices[i];
+    }
+  }
+  throw new Error("No notice named " + name);
+}
 
 //////////////////////////// STATUSES /////////////////////////////////////////////////////////
 

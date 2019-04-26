@@ -1,5 +1,5 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
-import {getStatus, Notices} from '../../api/dictionary.js';
+import {getStatus, getNotice} from '../../api/dictionary.js';
 import ProfileUtils from  './profile.js';
 import { Tasks, Invitees } from '../../api/tasks.js';
 import DateTimePicker from 'date-time-picker';
@@ -97,7 +97,7 @@ export class TodosListPartialCtrl extends Controller {
                 }
                 task.notice = notice;
                 task.notice.actor = actor;
-                task.notice.type = Notices[notice.code];
+                task.notice.type = getNotice(notice.code);
                 task.notice.time = moment(notice.created).format("DD MMM h:mm a");
                 return task;
              }},

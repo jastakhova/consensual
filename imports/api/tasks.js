@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
-import {Actions, Notices, getAction, getCondition, getStatus} from './dictionary.js';
+import {Actions, getNotice, getAction, getCondition, getStatus} from './dictionary.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export const Tasks = new Mongo.Collection('tasks');
@@ -76,6 +76,17 @@ function removeNotice(notices, noticeReceiverId, code, time) {
     : notices;
 }
 
+function createNotice(notice) {
+  return {
+      code: notice.id,
+      created: new Date().getTime()
+   };
+}
+
+function updateNotices(person, notice) {
+  return person.id === Meteor.userId() ? person.notices : person.notices.concat(notice);
+}
+
 function changeStatusesOnEditing(task) {
   var statuses = [];
   // comparison is done via negation in order to avoid a change of statuses for self-agreement
@@ -140,11 +151,7 @@ Meteor.methods({
       ticklers: []
      };
 
-     var notices = selfAgreement ? [] :
-      [{
-        code: 0,
-        created: new Date().getTime()
-     }];
+     var notices = selfAgreement ? [] : [createNotice(getNotice("NEW_PROPOSAL"))];
 
      var receiver = {
        id: newTask.receiver,
@@ -199,13 +206,17 @@ Meteor.methods({
 
     task.activity.push(activity);
 
+    var notice = createNotice(getNotice("HAS_UPDATES"));
+
     Tasks.update(taskId, {
       $set: {
         eta: new Date(moment(newTimeUTCString).format()).getTime(),
         activity: task.activity,
         status: newStatuses[2],
         "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1]
+        "receiver.status": newStatuses[1],
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice)
       }
     });
 
@@ -245,13 +256,18 @@ Meteor.methods({
      };
 
     task.activity.push(activity);
+
+    var notice = createNotice(getNotice("HAS_UPDATES"));
+
     Tasks.update(taskId, {
       $set: {
         location: newLocation,
         activity: task.activity,
         status: newStatuses[2],
         "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1]
+        "receiver.status": newStatuses[1],
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice)
       }
     });
 
@@ -276,6 +292,8 @@ Meteor.methods({
        time: new Date().getTime()
      };
 
+    var notice = createNotice(getNotice("HAS_UPDATES"));
+
     task.activity.push(activity);
     Tasks.update(taskId, {
       $set: {
@@ -283,7 +301,9 @@ Meteor.methods({
         activity: task.activity,
         status: newStatuses[2],
         "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1]
+        "receiver.status": newStatuses[1],
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice)
       }
     });
 
@@ -309,56 +329,21 @@ Meteor.methods({
      };
 
     task.activity.push(activity);
+
+    var notice = createNotice(getNotice("HAS_UPDATES"));
+
     Tasks.update(taskId, {
       $set: {
         title: newTitle,
         activity: task.activity,
         status: newStatuses[2],
         "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1]
+        "receiver.status": newStatuses[1],
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice)
       }
     });
 
-    notifyOnActivity(task, activity);
-  },
-  'tasks.updateStatuses' (taskId, status, archive) {
-    check(taskId, String);
-    check(status, String);
-
-    const task = Tasks.findOne(taskId);
-
-    var newAuthorStatus = task.author.id === Meteor.userId() ? status : task.author.status;
-    var newReceiverStatus = task.receiver.id === Meteor.userId() ? status : task.receiver.status;
-
-    if (newAuthorStatus === task.author.status && newReceiverStatus === task.receiver.status) {
-      return;
-    }
-
-    var oldValue = task.author.id === Meteor.userId() ? task.author.status : task.receiver.status;
-
-    function verbalize(status) {
-      if (!archive) {
-        return 'green' === status ? 'approved the agreement' : 'Under Consideration';
-      }
-      return ('green' === status ? 'confirmed status change to ': '') + task.status;
-    }
-    var activity = {
-       actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
-       field: 'status',
-       newValue: verbalize(status),
-       time: new Date().getTime()
-     };
-
-    task.activity.push(activity);
-    Tasks.update(taskId, {
-      $set: {
-        activity: task.activity,
-        "author.status": newAuthorStatus,
-        "receiver.status": newReceiverStatus,
-        archived: archive || task.archived
-      }
-    });
     notifyOnActivity(task, activity);
   },
   'tasks.approve' (taskId) {
@@ -390,7 +375,8 @@ Meteor.methods({
         "author.status": newAuthorStatus,
         "receiver.status": newReceiverStatus,
         status: newAuthorStatus === newReceiverStatus ? getStatus("agreed").id : task.status,
-        wasAgreed: newAuthorStatus === newReceiverStatus
+        wasAgreed: newAuthorStatus === newReceiverStatus,
+        "author.notices": task.author.notices.concat(createNotice(getNotice("PROPOSAL_APPROVED")))
       }
     });
     notifyOnActivity(task, activity);
@@ -423,12 +409,13 @@ Meteor.methods({
         activity: task.activity,
         "author.status": task.author.id === Meteor.userId() ? consideringStatus : task.author.status,
         "receiver.status": task.receiver.id === Meteor.userId() ? consideringStatus : task.receiver.status,
+        "author.notices": task.author.notices.concat(createNotice(getNotice("UNDER_CONSIDERATION"))),
         status: getStatus("considered").id
       }
     });
     notifyOnActivity(task, activity);
   },
-  'tasks.cancel' (taskId) {
+  'tasks.cancel' (taskId, noticeType) {
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
@@ -441,6 +428,10 @@ Meteor.methods({
     }
 
     var oldValue = task.author.id === Meteor.userId() ? task.author.status : task.receiver.status;
+
+    var notice = createNotice(noticeType);
+    var authorNotices = updateNotices(task.author, notice);
+    var receiverNotices = updateNotices(task.receiver, notice);
 
     var activity = {
        actor: Meteor.userId(),
@@ -456,6 +447,8 @@ Meteor.methods({
         activity: task.activity,
         "author.status": newAuthorStatus,
         "receiver.status": newReceiverStatus,
+        "author.notices": authorNotices,
+        "receiver.notices": receiverNotices,
         status: getStatus("cancelled").id,
         archived: true
       }
@@ -475,13 +468,17 @@ Meteor.methods({
           time: new Date().getTime()
         });
 
+    var notice = createNotice(getNotice("HAS_COMMENTS"));
+
     var receiverShowedFirstResponse = Meteor.userId() === task.receiver.id
       && task.receiver.status === getCondition("grey").id;
     Tasks.update(taskId, {
       $set: {
         comments: task.comments,
         "receiver.status": receiverShowedFirstResponse ? 'yellow' : task.receiver.status,
-        status: receiverShowedFirstResponse ? getStatus('considered').id : task.status
+        status: receiverShowedFirstResponse ? getStatus('considered').id : task.status,
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice)
       }
     });
 

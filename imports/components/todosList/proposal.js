@@ -6,7 +6,7 @@ import { Tracker } from 'meteor/tracker'
 import {parse} from 'markdown/lib/index'
 import marked from 'marked'
 import 'bootstrap-markdown/js/bootstrap-markdown';
-import {getCurrentState, getAction, getCondition} from '../../api/dictionary.js';
+import {getCurrentState, getAction, getCondition, getNotice} from '../../api/dictionary.js';
 
 export default class ProposalCtrl extends Controller {
   constructor() {
@@ -246,9 +246,10 @@ export default class ProposalCtrl extends Controller {
       ProfileUtils.processMeteorResult);
   }
 
-  markTaskAsCancelled() {
+  markTaskAsCancelled(noticeCode) {
     Meteor.call('tasks.cancel',
       this.proposalId,
+      getNotice(noticeCode),
       ProfileUtils.processMeteorResult);
   }
 
