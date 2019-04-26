@@ -70,16 +70,10 @@ function capitalize(status) {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-function removeNotice(notices, noticeReceiverId, code, time) {
-  return noticeReceiverId === Meteor.userId()
-    ? notices.filter(notice => (notice.code != code || notice.created != time))
-    : notices;
-}
-
-function touchNotice(notices, noticeReceiverId, code, time) {
+function touchNotice(notices, noticeReceiverId) {
   return noticeReceiverId === Meteor.userId()
     ? notices.map(function(notice) {
-      if (notice.code === code && notice.created === time && getNotice(notice.code).type === "view") {
+      if (getNotice(notice.code).type === "view") {
         notice.touched = new Date().getTime();
       }
       return notice;
@@ -247,12 +241,12 @@ Meteor.methods({
         });
     }
   },
-  'tasks.touchNotice' (taskId, code, time) {
+  'tasks.touchNotice' (taskId) {
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
-    var authorNotices = touchNotice(task.author.notices, task.author.id, code, time);
-    var receiverNotices = touchNotice(task.receiver.notices, task.receiver.id, code, time);
+    var authorNotices = touchNotice(task.author.notices, task.author.id);
+    var receiverNotices = touchNotice(task.receiver.notices, task.receiver.id);
 
     Tasks.update(taskId, {
       $set: {
@@ -265,8 +259,8 @@ Meteor.methods({
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
-    var authorNotices = removeNotice(task.author.notices, task.author.id, code, time);
-    var receiverNotices = removeNotice(task.receiver.notices, task.receiver.id, code, time);
+    var authorNotices = task.author._id === Meteor.userId() ? [] : task.author.notices;
+    var receiverNotices = task.receiver._id === Meteor.userId() ? [] : task.receiver.notices;
 
     Tasks.update(taskId, {
       $set: {

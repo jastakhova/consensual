@@ -27,9 +27,8 @@ None
 
 #### Active ToDo
 
-- grouping of notices -- Saturday, Monday
-- add ticklers -- ?
-- add Done action -- ?
+- add ticklers -- Friday, Saturday
+- add Done action -- Monday
 - add requesting -- Tuesday, Wednesday
 - add locking + notice -- Thursday, Friday +1 week
 - add cancel request + notices -- Monday, Tuesday
@@ -37,7 +36,7 @@ None
 - add Copy action -- Monday
 - Terms of use email should we sent on new sign-ups not only invites -- Tuesday
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
-Shifted by 1 days because of notices
+Shifted by 2 days because of notices
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

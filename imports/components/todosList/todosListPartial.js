@@ -86,30 +86,30 @@ export class TodosListPartialCtrl extends Controller {
              limit: 5,
              prepare: function(task) {
                 var actor = 0;
-                var notice = 0;
+                var notices = [];
                 if (task.author.id == Meteor.userId()) {
                   actor = task.receiver;
-                  notice = task.author.notices.sort(sortingNotices)[0];
+                  notices = task.author.notices.sort(sortingNotices);
                 }
                 if (task.receiver.id == Meteor.userId()) {
                   actor = task.author;
-                  notice = task.receiver.notices.sort(sortingNotices)[0];
+                  notices = task.receiver.notices.sort(sortingNotices);
                 }
-                task.notice = notice;
-                task.notice.actor = actor;
-                task.notice.type = getNotice(notice.code);
-                task.notice.time = moment(notice.created).format("DD MMM h:mm a");
+                task.notice = {
+                  texts: Array.from(new Set(notices.map(notice => getNotice(notice.code).text))),
+                  actor : actor,
+                  time: moment(Math.min(...notices.map(notice => notice.created))).format("DD MMM h:mm a")
+                };
 
-                if (getNotice(notice.code).type === 'view' && !notice.touched)
-                Meteor.call('tasks.touchNotice',
-                     task._id,
-                     task.notice.code,
-                     task.notice.created,
-                     ProfileUtils.processMeteorResult);
+                if (notices.filter(notice => getNotice(notice.code).type === 'view' && !notice.touched).length > 0) {
+                  Meteor.call('tasks.touchNotice',
+                       task._id,
+                       ProfileUtils.processMeteorResult);
+                }
 
                 return task;
              }},
-            {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]}
+            {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task2.eta, task1.eta)}, limit: 3, appliedFilter: this.filters[2]}
           ],
           ingroupSort: sortingByETA
       },
@@ -422,8 +422,6 @@ export class TodosListPartialCtrl extends Controller {
   this.removeNotice = function(task) {
    Meteor.call('tasks.removeNotice',
            task._id,
-           task.notice.code,
-           task.notice.created,
            ProfileUtils.processMeteorResult);
   }
 
