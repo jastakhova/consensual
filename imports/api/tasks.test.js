@@ -141,7 +141,7 @@ if (Meteor.isServer) {
         changeUser(otherUserId);
 
         const removeNotice = Meteor.server.method_handlers['tasks.removeNotice'];
-        removeNotice.apply({}, [tasks[0]._id, getNotice("NEW_PROPOSAL").id, tasks[0].receiver.notices[0].created]);
+        removeNotice.apply({}, [tasks[0]._id]);
 
         tasks = Tasks.find().fetch();
         assert.equal(tasks.length, 1);

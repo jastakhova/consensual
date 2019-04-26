@@ -255,12 +255,12 @@ Meteor.methods({
       }
     });
   },
-  'tasks.removeNotice' (taskId, code, time) {
+  'tasks.removeNotice' (taskId) {
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
-    var authorNotices = task.author._id === Meteor.userId() ? [] : task.author.notices;
-    var receiverNotices = task.receiver._id === Meteor.userId() ? [] : task.receiver.notices;
+    var authorNotices = task.author.id === Meteor.userId() ? [] : task.author.notices;
+    var receiverNotices = task.receiver.id === Meteor.userId() ? [] : task.receiver.notices;
 
     Tasks.update(taskId, {
       $set: {
