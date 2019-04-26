@@ -44,6 +44,8 @@ export default class ProposalCtrl extends Controller {
           return {};
         }
 
+        Meteor.call('tasks.removeVisitNotices', this.proposalId, ProfileUtils.processMeteorResult);
+
         var currentTime = moment();
         var formatTime = function(ts) {
           var timeObj = moment(ts);

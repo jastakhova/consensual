@@ -99,6 +99,14 @@ export class TodosListPartialCtrl extends Controller {
                 task.notice.actor = actor;
                 task.notice.type = getNotice(notice.code);
                 task.notice.time = moment(notice.created).format("DD MMM h:mm a");
+
+                if (getNotice(notice.code).type === 'view' && !notice.touched)
+                Meteor.call('tasks.touchNotice',
+                     task._id,
+                     task.notice.code,
+                     task.notice.created,
+                     ProfileUtils.processMeteorResult);
+
                 return task;
              }},
             {name: "Your Recent Activity", selector: {archived: false, "activity": {$elemMatch: {"actor": Meteor.userId(), "time": {$gt: prevMidnight.getTime()}}}}, sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)}, limit: 3, appliedFilter: this.filters[2]}

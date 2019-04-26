@@ -76,6 +76,17 @@ function removeNotice(notices, noticeReceiverId, code, time) {
     : notices;
 }
 
+function touchNotice(notices, noticeReceiverId, code, time) {
+  return noticeReceiverId === Meteor.userId()
+    ? notices.map(function(notice) {
+      if (notice.code === code && notice.created === time && getNotice(notice.code).type === "view") {
+        notice.touched = new Date().getTime();
+      }
+      return notice;
+    })
+    : notices;
+}
+
 function createNotice(notice) {
   return {
       code: notice.id,
@@ -221,6 +232,34 @@ Meteor.methods({
     });
 
     notifyOnActivity(task, activity, timezone);
+  },
+  'tasks.removeVisitNotices' (taskId) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+    if (task.author.notices.length > 0 && task.author.id === Meteor.userId()
+      || task.receiver.notices.length > 0 && task.receiver.id === Meteor.userId()) {
+      Tasks.update(taskId, {
+          $set: {
+            "author.notices": task.author.id === Meteor.userId() ? [] : task.author.notices,
+            "receiver.notices":  task.receiver.id === Meteor.userId() ? [] : task.receiver.notices
+          }
+        });
+    }
+  },
+  'tasks.touchNotice' (taskId, code, time) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+    var authorNotices = touchNotice(task.author.notices, task.author.id, code, time);
+    var receiverNotices = touchNotice(task.receiver.notices, task.receiver.id, code, time);
+
+    Tasks.update(taskId, {
+      $set: {
+        "author.notices": authorNotices,
+        "receiver.notices": receiverNotices
+      }
+    });
   },
   'tasks.removeNotice' (taskId, code, time) {
     check(taskId, String);
@@ -686,101 +725,122 @@ if (Meteor.isServer) {
         }
   );
 
-    Meteor.setInterval(function() {
-      console.log("Starting sending cycle...");
+  Meteor.setInterval(function() {
+    console.log("Starting sending cycle...");
 
-      function getEmailsToProcess() {
-        var newReceivers = Promise.await(Emails.rawCollection().distinct("receiver", {"sentAt": { "$exists" : false }}));
-        var emails = Promise.await(Emails.rawCollection().aggregate([{ $match: { receiver: { $in: newReceivers } } },
-          {
-          $group: {
-            _id: "$receiver",
-            lastSent: { $max: "$sentAt" },
-            emails: { $push: "$$ROOT" }
-          }},
-          { $match: { $or: [{lastSent: null}, {lastSent: {$lt: moment.utc().subtract(30, 'minutes').valueOf()}}] }}]).toArray());
+    function getEmailsToProcess() {
+      var newReceivers = Promise.await(Emails.rawCollection().distinct("receiver", {"sentAt": { "$exists" : false }}));
+      var emails = Promise.await(Emails.rawCollection().aggregate([{ $match: { receiver: { $in: newReceivers } } },
+        {
+        $group: {
+          _id: "$receiver",
+          lastSent: { $max: "$sentAt" },
+          emails: { $push: "$$ROOT" }
+        }},
+        { $match: { $or: [{lastSent: null}, {lastSent: {$lt: moment.utc().subtract(30, 'minutes').valueOf()}}] }}]).toArray());
 
-        emails.forEach(email => email.emails = email.emails.filter(record => !record.sentAt));
-        return emails;
-      }
+      emails.forEach(email => email.emails = email.emails.filter(record => !record.sentAt));
+      return emails;
+    }
 
-      var emails = getEmailsToProcess();
+    var emails = getEmailsToProcess();
 
-      function getId2TaskMapping(emails) {
-        var taskIds = [];
-        emails.forEach(email => email.emails.forEach(e => taskIds.push(e.task)));
-        var tasks = Tasks.find({_id: {$in: _.uniq(taskIds)}}).fetch();
-        return new Map(tasks.map(i => [i._id, i]));
-      }
+    function getId2TaskMapping(emails) {
+      var taskIds = [];
+      emails.forEach(email => email.emails.forEach(e => taskIds.push(e.task)));
+      var tasks = Tasks.find({_id: {$in: _.uniq(taskIds)}}).fetch();
+      return new Map(tasks.map(i => [i._id, i]));
+    }
 
-      function getId2UserMapping(emails) {
-        var users = emails.map(email => email._id);
-        emails.forEach(record => record.emails.forEach(notification => users.push(notification.actor)));
-        var finalReceivers = Meteor.users.find({_id: {$in: _.uniq(users)}}).fetch();
-        return new Map(finalReceivers.map(i => [i._id, i]));
-      }
+    function getId2UserMapping(emails) {
+      var users = emails.map(email => email._id);
+      emails.forEach(record => record.emails.forEach(notification => users.push(notification.actor)));
+      var finalReceivers = Meteor.users.find({_id: {$in: _.uniq(users)}}).fetch();
+      return new Map(finalReceivers.map(i => [i._id, i]));
+    }
 
-      var id2task = getId2TaskMapping(emails);
-      var id2user = getId2UserMapping(emails);
+    var id2task = getId2TaskMapping(emails);
+    var id2user = getId2UserMapping(emails);
 
-      emails.forEach(function(record) {
-        var receiver = id2user.get(record._id);
-        if (receiver && receiver.services && receiver.services.facebook && getEmail(receiver)) {
-          var receiverEmail = getEmail(receiver);
-          var receiverName = getName(receiver);
+    emails.forEach(function(record) {
+      var receiver = id2user.get(record._id);
+      if (receiver && receiver.services && receiver.services.facebook && getEmail(receiver)) {
+        var receiverEmail = getEmail(receiver);
+        var receiverName = getName(receiver);
 
-          console.log("Sending mail to " + receiverName + " at " + receiverEmail);
-          var groupedByActor = Object.values(_.groupBy(record.emails, m => m.actor + m.task))
+        console.log("Sending mail to " + receiverName + " at " + receiverEmail);
+        var groupedByActor = Object.values(_.groupBy(record.emails, m => m.actor + m.task))
 
-          var allUpdates = groupedByActor.map(function(taskGroup) {
-            var taskId = taskGroup[0].task;
-            var task = id2task.get(taskId);
-            var actorName = getName(id2user.get(taskGroup[0].actor));
-            var link = process.env.ROOT_URL + "/#!/tab/proposal/" + taskId;
-            var href = "<a href=\"" + link + "\">'" + task.title + "'</a>";
+        var allUpdates = groupedByActor.map(function(taskGroup) {
+          var taskId = taskGroup[0].task;
+          var task = id2task.get(taskId);
+          var actorName = getName(id2user.get(taskGroup[0].actor));
+          var link = process.env.ROOT_URL + "/#!/tab/proposal/" + taskId;
+          var href = "<a href=\"" + link + "\">'" + task.title + "'</a>";
 
-            var updates = Object.values(_.groupBy(taskGroup, g => g.verb + g.entity)).map(function(fieldGroup) {
-              if (fieldGroup[0].verb === "created") {
-                return "created";
-              }
-              var possiblyStatusUpdates = [];
-              if (fieldGroup[0].entity === "status") {
-                var lastActivity = fieldGroup.filter(x => !x.oldValue).sort(function(a1, a2) {return a2.doneAt - a1.doneAt;})[0];
-                if (lastActivity) {
-                  possiblyStatusUpdates.push(actorName + " " + lastActivity.newValue + ".<br/>");
-                }
-              }
-              return possiblyStatusUpdates.concat(fieldGroup.filter(x => x.oldValue).map(function(activity) {
-                  var field = activity.entity;
-                  if (activity.entity === "time") field = "eta";
-                  if (activity.entity === "description") field = "text";
-                  var newValue = activity.timezone ? moment.tz(activity.newValue, activity.timezone).format("HH:mm MM-DD-YYYY") : activity.newValue;
-                  return (((typeof task[field] === 'string' || task[field] instanceof String) && task[field].toLowerCase() === activity.newValue.toLowerCase())
-                  || (task[field] === activity.newValue)) ?
-                    capitalize(activity.entity) + " was changed to '" + newValue + "'.<br/>" : "";
-                }).filter(u => u.length > 0)).join('');
-            }).filter(u => u.length > 0);
-            var multipleChanges = taskGroup.length > 1;
-            if (updates.includes('created')) {
-              return "<br/>" + actorName + " created a new agreement " + href + ".";
+          var updates = Object.values(_.groupBy(taskGroup, g => g.verb + g.entity)).map(function(fieldGroup) {
+            if (fieldGroup[0].verb === "created") {
+              return "created";
             }
-            return "<br/>New update" + (multipleChanges ? "s" : "") + " from " + actorName
-                     + " for agreement " + href + ".<br/>" + updates.join('');
-          });
-
-          var activityToSend = record.emails[0];
-
-          var task = id2task.get(activityToSend.task);
-          var subject = "Recent changes to Consensual agreements" + (groupedByActor.length > 1 ? "" : " by " + getName(id2user.get((groupedByActor[0])[0].actor)));
-          var text = "<html><body>Hi!<br/>" + allUpdates.join('') + "</body></html>";
-          Meteor.call('email.send', receiverName + "<" + receiverEmail + ">", subject, text);
-          var emailIds = record.emails.map(e => e._id);
-          Emails.update({_id: {$in: emailIds}}, {
-            $set: {
-              sentAt: moment.utc().valueOf()
+            var possiblyStatusUpdates = [];
+            if (fieldGroup[0].entity === "status") {
+              var lastActivity = fieldGroup.filter(x => !x.oldValue).sort(function(a1, a2) {return a2.doneAt - a1.doneAt;})[0];
+              if (lastActivity) {
+                possiblyStatusUpdates.push(actorName + " " + lastActivity.newValue + ".<br/>");
+              }
             }
-          }, { multi: true });
-        }
-      });
-    }, 60*1000 /* 1 minute interval */);
+            return possiblyStatusUpdates.concat(fieldGroup.filter(x => x.oldValue).map(function(activity) {
+                var field = activity.entity;
+                if (activity.entity === "time") field = "eta";
+                if (activity.entity === "description") field = "text";
+                var newValue = activity.timezone ? moment.tz(activity.newValue, activity.timezone).format("HH:mm MM-DD-YYYY") : activity.newValue;
+                return (((typeof task[field] === 'string' || task[field] instanceof String) && task[field].toLowerCase() === activity.newValue.toLowerCase())
+                || (task[field] === activity.newValue)) ?
+                  capitalize(activity.entity) + " was changed to '" + newValue + "'.<br/>" : "";
+              }).filter(u => u.length > 0)).join('');
+          }).filter(u => u.length > 0);
+          var multipleChanges = taskGroup.length > 1;
+          if (updates.includes('created')) {
+            return "<br/>" + actorName + " created a new agreement " + href + ".";
+          }
+          return "<br/>New update" + (multipleChanges ? "s" : "") + " from " + actorName
+                   + " for agreement " + href + ".<br/>" + updates.join('');
+        });
+
+        var activityToSend = record.emails[0];
+
+        var task = id2task.get(activityToSend.task);
+        var subject = "Recent changes to Consensual agreements" + (groupedByActor.length > 1 ? "" : " by " + getName(id2user.get((groupedByActor[0])[0].actor)));
+        var text = "<html><body>Hi!<br/>" + allUpdates.join('') + "</body></html>";
+        Meteor.call('email.send', receiverName + "<" + receiverEmail + ">", subject, text);
+        var emailIds = record.emails.map(e => e._id);
+        Emails.update({_id: {$in: emailIds}}, {
+          $set: {
+            sentAt: moment.utc().valueOf()
+          }
+        }, { multi: true });
+      }
+    });
+  }, 60*1000 /* 1 minute interval */);
+
+  Meteor.setInterval(function() {
+    console.log("Starting notice check cycle...");
+
+    function isOldNotice(notice) {
+      var dayPeriod = 24*60*60*1000;
+      var minPeriod = 5*60*1000;
+      return notice.touched < new Date().getTime() - minPeriod;
+    }
+
+    var tasks = Tasks.find({}).fetch().forEach(function(task) {
+      if (task.author.notices.filter(isOldNotice).length > 0 || task.receiver.notices.filter(isOldNotice).length > 0) {
+        Tasks.update(task._id, {
+          $set: {
+            "author.notices": task.author.notices.filter(notice => !isOldNotice(notice)),
+            "receiver.notices": task.receiver.notices.filter(notice => !isOldNotice(notice))
+          }
+        });
+      }
+    });
+    }, 1*60*1000  /* 10 minute interval */);
 }
