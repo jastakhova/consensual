@@ -80,6 +80,11 @@ export const Notices = [
     id: "CANCELLATION",
     text: "Cancellation",
     type: "visit"
+  },
+  {
+    id: "NEEDS_DECISION",
+    text: "Agreement is waiting for a decision",
+    type: "visit"
   }
 ];
 
@@ -270,4 +275,20 @@ export const getCurrentState = function(task) {
     return found[0];
   }
   throw new Error("No state for task " + task._id);
+}
+
+//////////////////////////// TICKLERS /////////////////////////////////////////////////////////
+export const Ticklers = [
+  {
+    id: "CONSIDERING",
+    notice: getNotice("NEEDS_DECISION")
+  }
+];
+
+export const getTickler = function(id) {
+  var found = Ticklers.filter(x => x.id === id);
+  if (found.length > 0) {
+    return found[0];
+  }
+  throw new Error("No tickler found for id " + id);
 }

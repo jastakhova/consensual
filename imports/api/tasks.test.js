@@ -334,6 +334,7 @@ if (Meteor.isServer) {
 
         assert.equal(tasks.length, 1);
         assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+        assert.equal(tasks[0].receiver.ticklers.length, 1);
 
         changeUser(otherUserId);
 
@@ -346,6 +347,7 @@ if (Meteor.isServer) {
         assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
         assert.equal(tasks2[0].author.notices.length, 1);
         assert.equal(tasks2[0].receiver.notices.length, 1);
+        assert.equal(tasks2[0].receiver.ticklers.length, 0);
       });
 
       it('can approve task when it is considered by both parties', () => {
@@ -390,6 +392,7 @@ if (Meteor.isServer) {
         assert.equal(getCurrentState(tasks3[0]).id, getState("CONSIDERED").id);
         assert.equal(tasks3[0].author.status, getCondition("green").id);
         assert.equal(tasks3[0].receiver.status, getCondition("yellow").id);
+        assert.equal(tasks3[0].receiver.notices.length, 2); // NEW_PROPOSAL and PROPOSAL_APPROVED
         assert.ok(!tasks3[0].wasAgreed);
       });
 
@@ -578,6 +581,55 @@ if (Meteor.isServer) {
         assert.equal(tasks3[0].receiver.status, getCondition("yellow").id);
         assert.equal(tasks3[0].author.notices.length, 2); // for agreed and considered status changes separately
         assert.equal(tasks3[0].receiver.notices.length, 1);
+      });
+
+      it('can correctly identify if the proposal was agreed before', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var initialTime = moment().utc().format();
+
+        var task = {
+          task: "Long description",
+          time: initialTime,
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.maybe'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("CONSIDERED").id);
+
+        changeUser(userId);
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks4 = Tasks.find().fetch();
+        assert.equal(tasks4.length, 1);
+        assert.equal(getCurrentState(tasks4[0]).id, getState("DEEPLY_CONSIDERED").id);
+
+        registerTask2.apply({}, [tasks[0]._id]);
+        var tasks5 = Tasks.find().fetch();
+        assert.equal(tasks5.length, 1);
+        assert.equal(tasks5[0].wasAgreed, true);
       });
 		});
   });

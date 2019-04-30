@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
-import {Actions, getNotice, getAction, getCondition, getStatus} from './dictionary.js';
+import {Actions, getNotice, getAction, getCondition, getStatus, getTickler} from './dictionary.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export const Tasks = new Mongo.Collection('tasks');
@@ -92,6 +92,19 @@ function updateNotices(person, notice) {
   return person.id === Meteor.userId() ? person.notices : person.notices.concat(notice);
 }
 
+function updateTicklers(person, ticklerId, task) {
+  return task.author.id === task.receiver.id
+    || person.id === Meteor.userId()
+    || person.ticklers.filter(t => t.id === ticklerId).length > 0
+      ? person.ticklers
+      : person.ticklers.concat({
+         id: ticklerId,
+         length: 1,
+         lastActivated: new Date().getTime() - (24*60*60*1000),
+         created: new Date().getTime()
+        });
+}
+
 function changeStatusesOnEditing(task) {
   var statuses = [];
   // comparison is done via negation in order to avoid a change of statuses for self-agreement
@@ -103,6 +116,39 @@ function changeStatusesOnEditing(task) {
   statuses[2] = statuses[1] === getCondition("grey").id || task.author.id === task.receiver.id
     ? task.status : getStatus("considered").id;
   return statuses;
+}
+
+function registerChange(taskId, isNotNeeded, fillActivity, fillUpdateEntity, notify) {
+  const task = Tasks.findOne(taskId);
+
+  if (isNotNeeded(task)) {
+    return;
+  }
+
+  var newStatuses = changeStatusesOnEditing(task);
+  var activity = {
+     actor: Meteor.userId(),
+     actorName: getName(Meteor.user()),
+     time: new Date().getTime()
+  };
+  fillActivity(task, activity);
+  task.activity.push(activity);
+
+  var notice = createNotice(getNotice("HAS_UPDATES"));
+  var updateEntity = {
+     activity: task.activity,
+     status: newStatuses[2],
+     "author.status": newStatuses[0],
+     "receiver.status": newStatuses[1],
+     "author.notices": updateNotices(task.author, notice),
+     "receiver.notices": updateNotices(task.receiver, notice),
+     "author.ticklers": updateTicklers(task.author, "CONSIDERING", task),
+     "receiver.ticklers": updateTicklers(task.receiver, "CONSIDERING", task)
+  };
+  fillUpdateEntity(updateEntity);
+
+  Tasks.update(taskId, { $set: updateEntity });
+  notify(task, activity);
 }
 
 Meteor.methods({
@@ -183,6 +229,7 @@ Meteor.methods({
       locked: false,
       wasAgreed: selfAgreement,
     };
+    createdTask.receiver.ticklers = updateTicklers(receiver, "CONSIDERING", createdTask);
 
     var id = Tasks.insert(createdTask);
     createdTask['_id'] = id;
@@ -193,39 +240,65 @@ Meteor.methods({
     check(oldTimeUTCString, String);
     check(newTimeUTCString, String);
 
-    const task = Tasks.findOne(taskId);
-
-    if (newTimeUTCString === oldTimeUTCString) {
-      return;
-    }
-
-    var newStatuses = changeStatusesOnEditing(task);
-    var activity = {
-       actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
-       field: 'time',
-       oldValue: new Date(moment(oldTimeUTCString).format()).getTime(),
-       newValue: new Date(moment(newTimeUTCString).format()).getTime(),
-       time: new Date().getTime()
-     };
-
-    task.activity.push(activity);
-
-    var notice = createNotice(getNotice("HAS_UPDATES"));
-
-    Tasks.update(taskId, {
-      $set: {
-        eta: new Date(moment(newTimeUTCString).format()).getTime(),
-        activity: task.activity,
-        status: newStatuses[2],
-        "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1],
-        "author.notices": updateNotices(task.author, notice),
-        "receiver.notices": updateNotices(task.receiver, notice)
-      }
+    registerChange(taskId, function(task) {
+      return newTimeUTCString === oldTimeUTCString;
+    }, function(activity) {
+      activity.field = 'time';
+      activity.oldValue = new Date(moment(oldTimeUTCString).format()).getTime();
+      activity.newValue = new Date(moment(newTimeUTCString).format()).getTime();
+    }, function(updateEntity) {
+      updateEntity.eta = new Date(moment(newTimeUTCString).format()).getTime();
+    }, function(task, activity) {
+      notifyOnActivity(task, activity, timezone);
     });
+  },
+  'tasks.updateLocation' (taskId, newLocation) {
+    check(taskId, String);
+    check(newLocation, String);
 
-    notifyOnActivity(task, activity, timezone);
+    registerChange(taskId, function(task) {
+      return newLocation === task.location;
+    }, function(task, activity) {
+      activity.field = 'location';
+      activity.oldValue = task.location;
+      activity.newValue = newLocation;
+    }, function(updateEntity) {
+      updateEntity.location = newLocation;
+    }, function(task, activity) {
+      notifyOnActivity(task, activity);
+    });
+  },
+  'tasks.updateDescription' (taskId, newDescription) {
+    check(taskId, String);
+    check(newDescription, String);
+
+    registerChange(taskId, function(task) {
+      return newDescription === task.text;
+    }, function(task, activity) {
+      activity.field = 'description';
+      activity.oldValue = task.text;
+      activity.newValue = newDescription;
+    }, function(updateEntity) {
+      updateEntity.text = newDescription;
+    }, function(task, activity) {
+      notifyOnActivity(task, activity);
+    });
+  },
+  'tasks.updateTitle' (taskId, newTitle) {
+    check(taskId, String);
+    check(newTitle, String);
+
+    registerChange(taskId, function(task) {
+      return newTitle === task.title;
+    }, function(task, activity) {
+      activity.field = 'title';
+      activity.oldValue = task.title;
+      activity.newValue = newTitle;
+    }, function(updateEntity) {
+      updateEntity.title = newTitle;
+    }, function(task, activity) {
+      notifyOnActivity(task, activity);
+    });
   },
   'tasks.removeVisitNotices' (taskId) {
     check(taskId, String);
@@ -269,116 +342,6 @@ Meteor.methods({
       }
     });
   },
-  'tasks.updateLocation' (taskId, newLocation) {
-    check(taskId, String);
-    check(newLocation, String);
-
-    const task = Tasks.findOne(taskId);
-    if (newLocation === task.location) {
-      return;
-    }
-
-    var newStatuses = changeStatusesOnEditing(task);
-    var activity = {
-       actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
-       field: 'location',
-       oldValue: task.location,
-       newValue: newLocation,
-       time: new Date().getTime()
-     };
-
-    task.activity.push(activity);
-
-    var notice = createNotice(getNotice("HAS_UPDATES"));
-
-    Tasks.update(taskId, {
-      $set: {
-        location: newLocation,
-        activity: task.activity,
-        status: newStatuses[2],
-        "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1],
-        "author.notices": updateNotices(task.author, notice),
-        "receiver.notices": updateNotices(task.receiver, notice)
-      }
-    });
-
-    notifyOnActivity(task, activity);
-  },
-  'tasks.updateDescription' (taskId, newDescription) {
-    check(taskId, String);
-    check(newDescription, String);
-
-    const task = Tasks.findOne(taskId);
-    if (newDescription === task.text) {
-      return;
-    }
-
-    var newStatuses = changeStatusesOnEditing(task);
-    var activity = {
-       actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
-       field: 'description',
-       oldValue: task.text,
-       newValue: newDescription,
-       time: new Date().getTime()
-     };
-
-    var notice = createNotice(getNotice("HAS_UPDATES"));
-
-    task.activity.push(activity);
-    Tasks.update(taskId, {
-      $set: {
-        text: newDescription,
-        activity: task.activity,
-        status: newStatuses[2],
-        "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1],
-        "author.notices": updateNotices(task.author, notice),
-        "receiver.notices": updateNotices(task.receiver, notice)
-      }
-    });
-
-    notifyOnActivity(task, activity);
-  },
-  'tasks.updateTitle' (taskId, newTitle) {
-    check(taskId, String);
-    check(newTitle, String);
-
-    const task = Tasks.findOne(taskId);
-    if (newTitle === task.title) {
-      return;
-    }
-
-    var newStatuses = changeStatusesOnEditing(task);
-    var activity = {
-       actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
-       field: 'title',
-       oldValue: task.title,
-       newValue: newTitle,
-       time: new Date().getTime()
-     };
-
-    task.activity.push(activity);
-
-    var notice = createNotice(getNotice("HAS_UPDATES"));
-
-    Tasks.update(taskId, {
-      $set: {
-        title: newTitle,
-        activity: task.activity,
-        status: newStatuses[2],
-        "author.status": newStatuses[0],
-        "receiver.status": newStatuses[1],
-        "author.notices": updateNotices(task.author, notice),
-        "receiver.notices": updateNotices(task.receiver, notice)
-      }
-    });
-
-    notifyOnActivity(task, activity);
-  },
   'tasks.approve' (taskId) {
     check(taskId, String);
 
@@ -402,14 +365,20 @@ Meteor.methods({
      };
 
     task.activity.push(activity);
+    var filterTickler = t => t.id != getTickler("CONSIDERING").id;
+
+    var notice = createNotice(getNotice("PROPOSAL_APPROVED"));
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
         "author.status": newAuthorStatus,
         "receiver.status": newReceiverStatus,
         status: newAuthorStatus === newReceiverStatus ? getStatus("agreed").id : task.status,
-        wasAgreed: newAuthorStatus === newReceiverStatus,
-        "author.notices": task.author.notices.concat(createNotice(getNotice("PROPOSAL_APPROVED")))
+        wasAgreed: task.wasAgreed || newAuthorStatus === newReceiverStatus,
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice),
+        "author.ticklers": task.author.id === Meteor.userId() ? task.author.ticklers.filter(filterTickler) : task.author.ticklers,
+        "receiver.ticklers": task.receiver.id === Meteor.userId() ? task.receiver.ticklers.filter(filterTickler) : task.receiver.ticklers
       }
     });
     notifyOnActivity(task, activity);
@@ -475,6 +444,7 @@ Meteor.methods({
      };
 
     task.activity.push(activity);
+    var filterTickler = t => t.id != getTickler("CONSIDERING").id;
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
@@ -482,6 +452,8 @@ Meteor.methods({
         "receiver.status": newReceiverStatus,
         "author.notices": authorNotices,
         "receiver.notices": receiverNotices,
+        "author.ticklers": task.author.id === Meteor.userId() ? task.author.ticklers.filter(filterTickler) : task.author.ticklers,
+        "receiver.ticklers": task.receiver.id === Meteor.userId() ? task.receiver.ticklers.filter(filterTickler) : task.receiver.ticklers,
         status: getStatus("cancelled").id,
         archived: true
       }
@@ -820,21 +792,65 @@ if (Meteor.isServer) {
   Meteor.setInterval(function() {
     console.log("Starting notice check cycle...");
 
-    function isOldNotice(notice) {
-      var dayPeriod = 24*60*60*1000;
-      var minPeriod = 5*60*1000;
-      return notice.touched < new Date().getTime() - minPeriod;
-    }
+    var dayPeriod = 24*60*60*1000;
+//      var minPeriod = 5*60*1000;
+    var timeToCheck = new Date().getTime() - dayPeriod;
+    var noticeFilter = notice => notice.touched > timeToCheck;
 
-    var tasks = Tasks.find({}).fetch().forEach(function(task) {
-      if (task.author.notices.filter(isOldNotice).length > 0 || task.receiver.notices.filter(isOldNotice).length > 0) {
+    var tasks = Tasks.find({$or: [
+      {"author.notices": {$elemMatch: {touched: {$lt: timeToCheck}}}},
+      {"receiver.notices": {$elemMatch: {touched: {$lt: timeToCheck}}}}]}).fetch().forEach(function(task) {
         Tasks.update(task._id, {
           $set: {
-            "author.notices": task.author.notices.filter(notice => !isOldNotice(notice)),
-            "receiver.notices": task.receiver.notices.filter(notice => !isOldNotice(notice))
+            "author.notices": task.author.notices.filter(noticeFilter),
+            "receiver.notices": task.receiver.notices.filter(noticeFilter)
           }
         });
-      }
     });
-    }, 1*60*1000  /* 10 minute interval */);
+    }, 10*60*1000  /* 10 minute interval */);
+
+  Meteor.setInterval(function() {
+    console.log("Starting ticklers check cycle...");
+
+    var dayPeriod = 24*60*60*1000;
+//    var dayPeriod = 5*60*1000;
+    var timeToCheck = new Date().getTime() - dayPeriod;
+
+    var findActionableTicklers = function(profile) {
+      return ProfileUtils.createMapFromList(profile.ticklers
+           .filter(t => t.lastActivated < new Date().getTime() - dayPeriod * t.length
+             && profile.notices.filter(n => n.code === getTickler(t.id).notice.id).length == 0)
+           .map(function(t) { return {
+              'id': t.id,
+              'notice': createNotice(getTickler(t.id).notice)
+              };}), "id");
+    };
+
+    var touchTickler = function(tickler, chosen) {
+      if (chosen[tickler.id]) {
+        tickler.length = tickler.length * 2;
+        tickler.lastActivated = new Date().getTime();
+      }
+      return tickler;
+    }
+
+    var tasks = Tasks.find({$or: [
+      {"author.ticklers": {$elemMatch: {lastActivated: {$lt: timeToCheck}}}},
+      {"receiver.ticklers": {$elemMatch: {lastActivated: {$lt: timeToCheck}}}}]}).fetch().forEach(function(task) {
+        var authorNoticesToAdd = findActionableTicklers(task.author);
+        var receiverNoticesToAdd = findActionableTicklers(task.receiver);
+        if (Object.keys(authorNoticesToAdd).length > 0  || Object.keys(receiverNoticesToAdd).length > 0) {
+          console.log("Tickler notice added for " + task._id);
+          Tasks.update(task._id, {
+            $set: {
+              "author.notices": Object.keys(authorNoticesToAdd).length > 0 ? task.author.notices.concat(Object.values(authorNoticesToAdd).map(n => n.notice)) : task.author.notices,
+              "receiver.notices": Object.keys(receiverNoticesToAdd).length ? task.receiver.notices.concat(Object.values(receiverNoticesToAdd).map(n => n.notice)) : task.receiver.notices,
+              "author.ticklers": Object.keys(authorNoticesToAdd).length > 0 ? task.author.ticklers.map(t => touchTickler(t, authorNoticesToAdd)) : task.author.ticklers,
+              "receiver.ticklers": Object.keys(receiverNoticesToAdd).length ? task.receiver.ticklers.map(t => touchTickler(t, receiverNoticesToAdd)) : task.receiver.ticklers
+            }
+          });
+        }
+    });
+
+  }, 10*60*1000  /* 10 minute interval */);
 }
