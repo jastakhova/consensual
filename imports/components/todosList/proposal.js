@@ -6,7 +6,7 @@ import { Tracker } from 'meteor/tracker'
 import {parse} from 'markdown/lib/index'
 import marked from 'marked'
 import 'bootstrap-markdown/js/bootstrap-markdown';
-import {getCurrentState, getAction, getCondition, getNotice} from '../../api/dictionary.js';
+import {getCurrentState, getAction, getCondition, getNotice, getRequest} from '../../api/dictionary.js';
 
 export default class ProposalCtrl extends Controller {
   constructor() {
@@ -44,7 +44,7 @@ export default class ProposalCtrl extends Controller {
           return {};
         }
 
-        Meteor.call('tasks.removeVisitNotices', this.proposalId, ProfileUtils.processMeteorResult);
+        Meteor.call('tasks.removeNotice', this.proposalId, ProfileUtils.processMeteorResult);
 
         var currentTime = moment();
         var formatTime = function(ts) {
@@ -74,6 +74,9 @@ export default class ProposalCtrl extends Controller {
 
         foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.author.id]);
         foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiver.id]);
+        if (foundTask.request) {
+          foundTask.request.type = getRequest(foundTask.request.id);
+        }
 
         var markdown = this.markdown;
 
@@ -262,6 +265,12 @@ export default class ProposalCtrl extends Controller {
 
   markRequestAsDenied() {
     Meteor.call('tasks.denyRequest',
+      this.proposalId,
+      ProfileUtils.processMeteorResult);
+  }
+
+  cancelRequest() {
+    Meteor.call('tasks.cancelRequest',
       this.proposalId,
       ProfileUtils.processMeteorResult);
   }

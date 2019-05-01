@@ -27,7 +27,6 @@ None
 
 #### Active ToDo
 
-- add cancel possibility for Done action and tests for Done -- Wednesday
 - add locking + notice -- Thursday, Friday +1 week
 - add cancel request + notices + tickler -- Monday, Tuesday
 - add blocking comments + notice + tickler -- Wednesday, Thursday, Friday +1 week

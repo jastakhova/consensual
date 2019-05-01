@@ -300,7 +300,7 @@ Meteor.methods({
       notifyOnActivity(task, activity);
     });
   },
-  'tasks.removeVisitNotices' (taskId) {
+  'tasks.removeNotice' (taskId) {
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
@@ -320,20 +320,6 @@ Meteor.methods({
     const task = Tasks.findOne(taskId);
     var authorNotices = touchNotice(task.author.notices, task.author.id);
     var receiverNotices = touchNotice(task.receiver.notices, task.receiver.id);
-
-    Tasks.update(taskId, {
-      $set: {
-        "author.notices": authorNotices,
-        "receiver.notices": receiverNotices
-      }
-    });
-  },
-  'tasks.removeNotice' (taskId) {
-    check(taskId, String);
-
-    const task = Tasks.findOne(taskId);
-    var authorNotices = task.author.id === Meteor.userId() ? [] : task.author.notices;
-    var receiverNotices = task.receiver.id === Meteor.userId() ? [] : task.receiver.notices;
 
     Tasks.update(taskId, {
       $set: {
@@ -605,6 +591,53 @@ Meteor.methods({
         activity: task.activity,
         "author.notices": updateNotices(task.author, notice),
         "receiver.notices": updateNotices(task.receiver, notice),
+        "author.ticklers": task.author.ticklers.filter(filterTickler),
+        "receiver.ticklers": task.receiver.ticklers.filter(filterTickler)
+      },
+    $unset : { "request": 1 }
+    });
+
+    notifyOnActivity(task, activity);
+  },
+  'tasks.cancelRequest' (taskId) {
+    check(taskId, String);
+    // remove request, new notice or remove old one, activity log, remove tickler
+
+    const task = Tasks.findOne(taskId);
+    var request = getRequest(task.request.id);
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       newValue: request.activityLogCancelRecord,
+       time: new Date().getTime()
+    };
+
+    task.activity.push(activity);
+    var filterTickler = t => t.id != request.tickler.id;
+
+    var filterUnseenNotice = n => n.code === request.requestNotice.id;
+    var requestNoticeWasUnseen = task.author.id != Meteor.userId() && task.author.notices.filter(filterUnseenNotice).length > 0
+    || task.receiver.id != Meteor.userId() && task.receiver.notices.filter(filterUnseenNotice).length > 0;
+    // unseen -> remove
+    // seen -> add new notice
+    var authorNotices = task.author.notices;
+    var receiverNotices = task.receiver.notices;
+    if (requestNoticeWasUnseen) {
+      var filterNotice = n => n.code != request.requestNotice.id && n.code != request.tickler.notice.id;
+      authorNotices = authorNotices.filter(filterNotice);
+      receiverNotices = receiverNotices.filter(filterNotice);
+    } else {
+      var notice = createNotice(request.cancelNotice);
+      authorNotices = updateNotices(task.author, notice);
+      receiverNotices = updateNotices(task.receiver, notice);
+    }
+
+    Tasks.update(taskId, {
+      $set: {
+        activity: task.activity,
+        "author.notices": authorNotices,
+        "receiver.notices": receiverNotices,
         "author.ticklers": task.author.ticklers.filter(filterTickler),
         "receiver.ticklers": task.receiver.ticklers.filter(filterTickler)
       },

@@ -4,7 +4,7 @@ import { assert } from 'meteor/practicalmeteor:chai';
 import { sinon } from 'meteor/practicalmeteor:sinon';
 
 import { Invitees, Tasks } from './tasks.js';
-import { getCurrentState, getState, getCondition, getNotice } from './dictionary.js';
+import { getCurrentState, getState, getCondition, getNotice, getRequest } from './dictionary.js';
 
 if (Meteor.isServer) {
   describe('Tasks', () => {
@@ -630,6 +630,240 @@ if (Meteor.isServer) {
         var tasks5 = Tasks.find().fetch();
         assert.equal(tasks5.length, 1);
         assert.equal(tasks5[0].wasAgreed, true);
+      });
+
+      it('can mark as done self-agreement', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: userId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("AGREED").id);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.markAsDone'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("COMPLETED").id);
+        assert.equal(tasks3[0].wasAgreed, true);
+        assert.equal(tasks3[0].archived, true);
+      });
+
+      it('can request marking as done and confirm that', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.markAsDone'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(tasks3[0].wasAgreed, true);
+        assert.equal(tasks3[0].archived, false);
+        assert.equal(tasks3[0].request.id, getRequest("DONE").id);
+        assert.equal(tasks3[0].request.actorId, otherUserId);
+
+        changeUser(userId);
+
+        const registerTask4 = Meteor.server.method_handlers['tasks.approveRequest'];
+        registerTask4.apply({}, [tasks[0]._id]);
+
+        var tasks4 = Tasks.find().fetch();
+        assert.equal(tasks4.length, 1);
+        assert.equal(getCurrentState(tasks4[0]).id, getState("COMPLETED").id);
+        assert.equal(tasks4[0].wasAgreed, true);
+        assert.equal(tasks4[0].archived, true);
+        assert.equal(!!tasks4[0].request, false);
+        assert.equal(tasks4[0].author.notices.length, 2);
+        assert.equal(tasks4[0].receiver.notices.length, 2);
+      });
+
+      it('can request marking as done and be denied', () => {
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        changeUser(userId);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.markAsDone'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(tasks3[0].wasAgreed, true);
+        assert.equal(tasks3[0].archived, false);
+        assert.equal(tasks3[0].request.id, getRequest("DONE").id);
+        assert.equal(tasks3[0].request.actorId, userId);
+
+        changeUser(otherUserId);
+
+        const registerTask4 = Meteor.server.method_handlers['tasks.denyRequest'];
+        registerTask4.apply({}, [tasks[0]._id]);
+
+        var tasks4 = Tasks.find().fetch();
+        assert.equal(tasks4.length, 1);
+        assert.equal(getCurrentState(tasks4[0]).id, getState("AGREED").id);
+        assert.equal(tasks4[0].wasAgreed, true);
+        assert.equal(tasks4[0].archived, false);
+        assert.equal(!!tasks4[0].request, false);
+        assert.equal(tasks4[0].author.notices.length, 2);
+        assert.equal(tasks4[0].receiver.notices.length, 2);
+      });
+
+      it('can request marking as done and then cancel the request without other person noticing', () => {
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        changeUser(userId);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.markAsDone'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+
+        const registerTask4 = Meteor.server.method_handlers['tasks.cancelRequest'];
+        registerTask4.apply({}, [tasks[0]._id]);
+
+        var tasks4 = Tasks.find().fetch();
+        assert.equal(tasks4.length, 1);
+        assert.equal(getCurrentState(tasks4[0]).id, getState("AGREED").id);
+        assert.equal(!!tasks4[0].request, false);
+        assert.equal(tasks4[0].author.notices.length, 1);
+        assert.equal(tasks4[0].receiver.notices.length, 1);
+      });
+
+      it('can request marking as done and then cancel the request with notices to the other party', () => {
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        changeUser(userId);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.markAsDone'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+
+        changeUser(otherUserId);
+        const registerTask3a = Meteor.server.method_handlers['tasks.removeNotice'];
+        registerTask3a.apply({}, [tasks[0]._id]);
+
+        var tasks3a = Tasks.find().fetch();
+        assert.equal(tasks3a.length, 1);
+        assert.equal(getCurrentState(tasks3a[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(tasks3a[0].receiver.notices.length, 0);
+
+        changeUser(userId);
+
+        const registerTask4 = Meteor.server.method_handlers['tasks.cancelRequest'];
+        registerTask4.apply({}, [tasks[0]._id]);
+
+        var tasks4 = Tasks.find().fetch();
+        assert.equal(tasks4.length, 1);
+        assert.equal(getCurrentState(tasks4[0]).id, getState("AGREED").id);
+        assert.equal(!!tasks4[0].request, false);
+        assert.equal(tasks4[0].author.notices.length, 1);
+        assert.equal(tasks4[0].receiver.notices.length, 1);
       });
 		});
   });

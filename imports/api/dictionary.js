@@ -105,6 +105,11 @@ export const Notices = [
     id: "DONE_REQUEST_DENIED",
     text: "Completion request was denied",
     type: "view"
+  },
+  {
+    id: "DONE_REQUEST_CANCELLED",
+    text: "Completion request was cancelled",
+    type: "view"
   }
 ];
 
@@ -350,9 +355,12 @@ export const Requests = [
     requestNotice: getNotice("DONE_REQUEST"),
     approvalNotice: getNotice("DONE_APPROVAL"),
     deniedNotice: getNotice("DONE_REQUEST_DENIED"),
+    cancelNotice: getNotice("DONE_REQUEST_CANCELLED"),
     tickler: getTickler("UNDER_DONE_REQUEST"),
+    descriptor: "Done",
     activityLogApprovalRecord: 'approved the completion request',
     activityLogDenialRecord: 'denied the completion request',
+    activityLogCancelRecord: 'cancelled the completion request',
     statusOnApproval: getStatus("done"),
     updateFields: [{ field: "archived", value: true}]
   }

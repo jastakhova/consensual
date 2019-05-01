@@ -103,6 +103,10 @@
               <i class="pe-7s-trash"></i>
               Cancel
             </button>
+            <button type="button" ng-show="proposal.showAction(proposal.data, 'CANCEL_REQUEST')" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.cancelRequest()">
+              <i class="pe-7s-trash"></i>
+              Cancel {{proposal.data.request.type.descriptor}} request
+            </button>
           </div>
         </div>
         <div class="row" style="margin-top: 30px">
