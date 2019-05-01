@@ -76,12 +76,10 @@ export class TodosListPartialCtrl extends Controller {
           sort: "eta",
           grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
           groupingName: formatDate}, additionalGroups: [
-            {name: "Notifications", selector: {$and: [
-              {archived: false},
+            {name: "Notifications", selector:
               { $or: [
                 {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
-                {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]}
-              ]},
+                {"receiver.id" : Meteor.userId(), "receiver.notices": {$exists: true, $not: {$size: 0}}}]},
              sort: function(task1, task2) {return ProfileUtils.comparator(task1.eta, task2.eta)},
              limit: 5,
              prepare: function(task) {

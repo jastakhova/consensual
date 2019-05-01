@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
-import {Actions, getNotice, getAction, getCondition, getStatus, getTickler} from './dictionary.js';
+import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest} from './dictionary.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export const Tasks = new Mongo.Collection('tasks');
@@ -489,30 +489,126 @@ Meteor.methods({
 
     notifyOnNewValue(task, Meteor.userId() === task.author.id ? task.receiver.id : task.author.id, "added", "comment", text);
   },
-  'tasks.changeTaskStatus' (taskId, status) {
+  'tasks.markAsDone' (taskId) {
     check(taskId, String);
-    check(status, String);
+
+    /*
+      if self-agreement -> A activity log, status, archived
+      regular           -> B activity log, request, notification, tickler
+    */
 
     const task = Tasks.findOne(taskId);
+    var selfAgreement = task.author.id === task.receiver.id;
 
+    var activity = selfAgreement
+    ? {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       oldValue: 'Open',
+       newValue: 'Completed',
+       time: new Date().getTime()
+     }
+     : {
+        actor: Meteor.userId(),
+        actorName: getName(Meteor.user()),
+        field: 'status',
+        newValue: 'requested marking as Done',
+        time: new Date().getTime()
+      };
+
+    var request = getRequest("DONE");
+    var notice = createNotice(request.requestNotice);
+    var tickler = getTickler("UNDER_DONE_REQUEST").id;
+
+    var updateEntity = {
+        activity: task.activity,
+        status: selfAgreement ? getStatus("done").id : task.status,
+        archived: selfAgreement,
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice),
+        "author.ticklers": updateTicklers(task.author, tickler, task),
+        "receiver.ticklers": updateTicklers(task.receiver, tickler, task)
+    }
+
+    if (!selfAgreement) {
+      updateEntity.request = {
+        id: request.id,
+        actorId: Meteor.userId(),
+        created: new Date().getTime()
+      }
+    }
+
+    task.activity.push(activity);
+    Tasks.update(taskId, { $set: updateEntity });
+
+    notifyOnActivity(task, activity);
+  },
+  'tasks.approveRequest' (taskId) {
+    check(taskId, String);
+    // remove request, move to a new state, remove tickler, archive, notice, activity log
+
+    const task = Tasks.findOne(taskId);
+    var request = getRequest(task.request.id);
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),
        field: 'status',
-       oldValue: capitalize(task.status),
-       newValue: capitalize(status),
+       newValue: request.activityLogApprovalRecord,
        time: new Date().getTime()
-     };
+    };
 
     task.activity.push(activity);
+    var filterTickler = t => t.id != request.tickler.id;
+    var notice = createNotice(request.approvalNotice);
+
+    var updateEntity = {
+     activity: task.activity,
+     status: request.statusOnApproval.id,
+     "author.notices": updateNotices(task.author, notice),
+     "receiver.notices": updateNotices(task.receiver, notice),
+     "author.ticklers": task.author.ticklers.filter(filterTickler),
+     "receiver.ticklers": task.receiver.ticklers.filter(filterTickler)
+    };
+
+    request.updateFields.forEach(function(updateField) {
+      updateEntity[updateField.field] = updateField.value;
+    });
+
+    Tasks.update(taskId, {
+      $set: updateEntity,
+      $unset : { "request": 1 }
+    });
+
+    notifyOnActivity(task, activity);
+  },
+  'tasks.denyRequest' (taskId) {
+    check(taskId, String);
+    // remove request, notice, activity log, remove tickler
+
+    const task = Tasks.findOne(taskId);
+    var request = getRequest(task.request.id);
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       newValue: request.activityLogDenialRecord,
+       time: new Date().getTime()
+    };
+
+    task.activity.push(activity);
+    var filterTickler = t => t.id != request.tickler.id;
+    var notice = createNotice(request.deniedNotice);
+
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
-        "author.status": Meteor.userId() === task.author.id ? 'green' : 'yellow',
-        "receiver.status": Meteor.userId() === task.receiver.id ? 'green' : 'yellow',
-        status: status,
-        archived: task.author.id === task.receiver.id && status !== 'open'
-      }
+        "author.notices": updateNotices(task.author, notice),
+        "receiver.notices": updateNotices(task.receiver, notice),
+        "author.ticklers": task.author.ticklers.filter(filterTickler),
+        "receiver.ticklers": task.receiver.ticklers.filter(filterTickler)
+      },
+    $unset : { "request": 1 }
     });
 
     notifyOnActivity(task, activity);

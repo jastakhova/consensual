@@ -85,6 +85,26 @@ export const Notices = [
     id: "NEEDS_DECISION",
     text: "Agreement is waiting for a decision",
     type: "visit"
+  },
+  {
+    id: "DONE_REQUEST",
+    text: "Agreement was marked as done",
+    type: "visit"
+  },
+  {
+    id: "DONE_NEEDS_APPROVAL",
+    text: "Completion of the agreement is waiting for an approval",
+    type: "visit"
+  },
+  {
+    id: "DONE_APPROVAL",
+    text: "Completion of the agreement was confirmed",
+    type: "view"
+  },
+  {
+    id: "DONE_REQUEST_DENIED",
+    text: "Completion request was denied",
+    type: "view"
   }
 ];
 
@@ -168,7 +188,7 @@ export const getCondition = function(id, task) {
 }
 
 //////////////////////////// STATES /////////////////////////////////////////////////////////
-// One can always comment. Other actions are allowed depending on the state.
+// One can always comment and copy. Other actions are allowed depending on the state.
 
 export const States = [
   {
@@ -258,6 +278,32 @@ export const States = [
         getAction("EDIT")
       ];
     }
+  },
+  {
+    id: "DONE_UNDER_REQUEST",
+    validation: function(task) {
+      return task.request && task.request.id === getRequest("DONE").id;
+    },
+    actions: function(task, actorId) {
+      if (task.request.actorId === actorId) {
+        return [
+          getAction("CANCEL_REQUEST")
+        ];
+      }
+      return [
+        getAction("REQUEST_APPROVE"),
+        getAction("REQUEST_DENY")
+      ];
+    }
+  },
+  {
+    id: "COMPLETED",
+    validation: function(task) {
+      return task.status === getStatus("done").id;
+    },
+    actions: function(task, actorId) {
+      return [];
+    }
   }
 ];
 
@@ -282,6 +328,10 @@ export const Ticklers = [
   {
     id: "CONSIDERING",
     notice: getNotice("NEEDS_DECISION")
+  },
+  {
+    id: "UNDER_DONE_REQUEST",
+    notice: getNotice("DONE_NEEDS_APPROVAL")
   }
 ];
 
@@ -291,4 +341,27 @@ export const getTickler = function(id) {
     return found[0];
   }
   throw new Error("No tickler found for id " + id);
+}
+
+//////////////////////////// REQUESTS /////////////////////////////////////////////////////////
+export const Requests = [
+  {
+    id: "DONE",
+    requestNotice: getNotice("DONE_REQUEST"),
+    approvalNotice: getNotice("DONE_APPROVAL"),
+    deniedNotice: getNotice("DONE_REQUEST_DENIED"),
+    tickler: getTickler("UNDER_DONE_REQUEST"),
+    activityLogApprovalRecord: 'approved the completion request',
+    activityLogDenialRecord: 'denied the completion request',
+    statusOnApproval: getStatus("done"),
+    updateFields: [{ field: "archived", value: true}]
+  }
+];
+
+export const getRequest = function(id) {
+  var found = Requests.filter(x => x.id === id);
+  if (found.length > 0) {
+    return found[0];
+  }
+  throw new Error("No request found for id " + id);
 }

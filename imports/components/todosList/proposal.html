@@ -135,11 +135,13 @@
           <!--<div ng-show="proposal.acknowledgeLabel === 'Approve'" class="col-xs-8 col-sm-10 col-md-10 col-lg-10" style="color: grey">[ check last changes at Activity log and comments down the page ]</div>-->
           <!--</div>-->
         <!--</div>-->
-        <div class="row" ng-show="proposal.showAction(proposal.data, 'DECISION_YES') || proposal.showAction(proposal.data, 'DECISION_NO') || proposal.showAction(proposal.data, 'DECISION_MAYBE')" style="margin-bottom: 20px; margin-left: 2px">
+        <div class="row" ng-show="proposal.showAction(proposal.data, 'DECISION_YES') || proposal.showAction(proposal.data, 'DECISION_NO') || proposal.showAction(proposal.data, 'DECISION_MAYBE') || proposal.showAction(proposal.data, 'REQUEST_APPROVE') || proposal.showAction(proposal.data, 'REQUEST_DENY')" style="margin-bottom: 20px; margin-left: 2px">
           <div class="col-md-8" style="padding-left: 0px">
             <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_YES')" style="padding-left: 0px;"><button type="button" style="background-color: #18ce0f; border: none;" ng-click="proposal.approveTask()" class="btn btn-info btn-fill">OMG Yes!!!</button></div>
             <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_NO')" style="padding-left: 0px;"><button type="button" style="background-color: red; border: none;" ng-click="proposal.markTaskAsCancelled('PROPOSAL_REJECTED')" class="btn btn-info btn-fill">Not for me</button></div>
             <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-show="proposal.showAction(proposal.data, 'DECISION_MAYBE')" style="padding-left: 0px;"><button type="button" style="background-color: #e7b416; border: none;" ng-click="proposal.markTaskAsMaybe()" class="btn btn-info btn-fill">Hmmm.. Maybe</button></div>
+            <div class="col-xs-8 col-sm-6 col-md-4 col-lg-4" ng-show="proposal.showAction(proposal.data, 'REQUEST_APPROVE')" style="padding-left: 0px;"><button type="button" style="background-color: #18ce0f; border: none;" ng-click="proposal.markRequestAsApproved()" class="btn btn-info btn-fill">Thank you! Done confirmed</button></div>
+            <div class="col-xs-8 col-sm-6 col-md-4 col-lg-4" ng-show="proposal.showAction(proposal.data, 'REQUEST_DENY')" style="padding-left: 0px;"><button type="button" style="background-color: red; border: none;" ng-click="proposal.markRequestAsDenied()" class="btn btn-info btn-fill">Nope... not done yet</button></div>
           </div>
         </div>
         <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.activity.length > 0">

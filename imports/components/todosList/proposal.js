@@ -236,9 +236,8 @@ export default class ProposalCtrl extends Controller {
   }
 
   markTaskAsDone() {
-    Meteor.call('tasks.changeTaskStatus',
+    Meteor.call('tasks.markAsDone',
       this.proposalId,
-      'done',
       ProfileUtils.processMeteorResult);
   }
 
@@ -255,10 +254,15 @@ export default class ProposalCtrl extends Controller {
       ProfileUtils.processMeteorResult);
   }
 
-  markTaskAsReopened() {
-    Meteor.call('tasks.changeTaskStatus',
+  markRequestAsApproved() {
+    Meteor.call('tasks.approveRequest',
       this.proposalId,
-      'open',
+      ProfileUtils.processMeteorResult);
+  }
+
+  markRequestAsDenied() {
+    Meteor.call('tasks.denyRequest',
+      this.proposalId,
       ProfileUtils.processMeteorResult);
   }
 

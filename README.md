@@ -27,14 +27,14 @@ None
 
 #### Active ToDo
 
-- add Done action -- Tuesday
-- add requesting + tickler -- Tuesday, Wednesday
+- add cancel possibility for Done action and tests for Done -- Wednesday
 - add locking + notice -- Thursday, Friday +1 week
 - add cancel request + notices + tickler -- Monday, Tuesday
 - add blocking comments + notice + tickler -- Wednesday, Thursday, Friday +1 week
 - add Copy action -- Monday
 - Terms of use email should we sent on new sign-ups not only invites -- Tuesday
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
+- show status of the proposal on the proposal page
 Shifted by 3 days because of:
   notices (extra 2 days)
   not working on the weekend
