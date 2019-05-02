@@ -110,7 +110,17 @@ export const Notices = [
     id: "DONE_REQUEST_CANCELLED",
     text: "Completion request was cancelled",
     type: "view"
-  }
+  },
+  {
+    id: "CANCELLATION_REQUEST_CANCELLED",
+    text: "Cancellation request was removed",
+    type: "view"
+  },
+  {
+    id: "CANCELLATION_NEEDS_APPROVAL",
+    text: "Cancellation of the agreement is waiting for an approval",
+    type: "visit"
+  },
 ];
 
 export const getNotice = function(code) {
@@ -292,9 +302,9 @@ export const States = [
     }
   },
   {
-    id: "DONE_UNDER_REQUEST",
+    id: "UNDER_REQUEST",
     validation: function(task) {
-      return task.request && task.request.id === getRequest("DONE").id;
+      return task.request;
     },
     actions: function(task, actorId) {
       if (task.request.actorId === actorId) {
@@ -356,6 +366,10 @@ export const Ticklers = [
   {
     id: "UNDER_DONE_REQUEST",
     notice: getNotice("DONE_NEEDS_APPROVAL")
+  },
+  {
+    id: "UNDER_CANCELLATION_REQUEST",
+    notice: getNotice("CANCELLATION_NEEDS_APPROVAL")
   }
 ];
 
@@ -381,7 +395,26 @@ export const Requests = [
     activityLogDenialRecord: 'denied the completion request',
     activityLogCancelRecord: 'cancelled the completion request',
     statusOnApproval: getStatus("done"),
-    updateFields: [{ field: "archived", value: true}]
+    updateFields: [function(task) { return { field: "archived", value: true};}]
+  },
+  {
+    id: "CANCELLED",
+    requestNotice: getNotice("CANCELLATION_REQUEST"),
+    approvalNotice: getNotice("CANCELLATION_APPROVAL"),
+    deniedNotice: getNotice("CANCELLATION_REQUEST_DENIED"),
+    cancelNotice: getNotice("CANCELLATION_REQUEST_CANCELLED"),
+    tickler: getTickler("UNDER_CANCELLATION_REQUEST"),
+    descriptor: "Cancellation",
+    activityLogApprovalRecord: 'approved the cancellation request',
+    activityLogDenialRecord: 'denied the cancellation request',
+    activityLogCancelRecord: 'cancelled the completion request',
+    statusOnApproval: getStatus("cancelled"),
+    updateFields: [
+      function(task) { return { field: "archived", value: true};},
+      function(task) { return {
+        field: task.author.id === task.request.actorId ? "author.status" : "receiver.status",
+        value: getCondition("red").id};},
+    ]
   }
 ];
 

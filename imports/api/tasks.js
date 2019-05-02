@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
-import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest} from './dictionary.js';
+import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest, getState, getCurrentState} from './dictionary.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export const Tasks = new Mongo.Collection('tasks');
@@ -408,6 +408,39 @@ Meteor.methods({
 
     const task = Tasks.findOne(taskId);
 
+    if (getCurrentState(task).id === getState("LOCKED").id) {
+      var activity = {
+         actor: Meteor.userId(),
+         actorName: getName(Meteor.user()),
+         field: 'status',
+         newValue: 'requested marking as Cancelled',
+         time: new Date().getTime()
+      };
+
+      var request = getRequest("CANCELLED");
+      var notice = createNotice(request.requestNotice);
+      var tickler = request.tickler.id;
+
+      task.activity.push(activity);
+      Tasks.update(taskId, {
+        $set: {
+           activity: task.activity,
+           "author.notices": updateNotices(task.author, notice),
+           "receiver.notices": updateNotices(task.receiver, notice),
+           "author.ticklers": updateTicklers(task.author, tickler, task),
+           "receiver.ticklers": updateTicklers(task.receiver, tickler, task),
+           request: {
+              id: request.id,
+              actorId: Meteor.userId(),
+              created: new Date().getTime()
+            }
+       }
+      });
+
+      notifyOnActivity(task, activity);
+      return;
+    }
+
     var newAuthorStatus = task.author.id === Meteor.userId() ? getCondition("red").id : task.author.status;
     var newReceiverStatus = task.receiver.id === Meteor.userId() ? getCondition("red").id : task.receiver.status;
 
@@ -505,7 +538,7 @@ Meteor.methods({
 
     var request = getRequest("DONE");
     var notice = createNotice(request.requestNotice);
-    var tickler = getTickler("UNDER_DONE_REQUEST").id;
+    var tickler = request.tickler.id;
 
     var updateEntity = {
         activity: task.activity,
@@ -558,7 +591,8 @@ Meteor.methods({
     };
 
     request.updateFields.forEach(function(updateField) {
-      updateEntity[updateField.field] = updateField.value;
+      var toUpdate = updateField(task);
+      updateEntity[toUpdate.field] = toUpdate.value;
     });
 
     Tasks.update(taskId, {

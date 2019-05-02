@@ -691,7 +691,7 @@ if (Meteor.isServer) {
 
         var tasks3 = Tasks.find().fetch();
         assert.equal(tasks3.length, 1);
-        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("UNDER_REQUEST").id);
         assert.equal(tasks3[0].wasAgreed, true);
         assert.equal(tasks3[0].archived, false);
         assert.equal(tasks3[0].request.id, getRequest("DONE").id);
@@ -744,7 +744,7 @@ if (Meteor.isServer) {
 
         var tasks3 = Tasks.find().fetch();
         assert.equal(tasks3.length, 1);
-        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("UNDER_REQUEST").id);
         assert.equal(tasks3[0].wasAgreed, true);
         assert.equal(tasks3[0].archived, false);
         assert.equal(tasks3[0].request.id, getRequest("DONE").id);
@@ -797,7 +797,7 @@ if (Meteor.isServer) {
 
         var tasks3 = Tasks.find().fetch();
         assert.equal(tasks3.length, 1);
-        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("UNDER_REQUEST").id);
 
         const registerTask4 = Meteor.server.method_handlers['tasks.cancelRequest'];
         registerTask4.apply({}, [tasks[0]._id]);
@@ -842,7 +842,7 @@ if (Meteor.isServer) {
 
         var tasks3 = Tasks.find().fetch();
         assert.equal(tasks3.length, 1);
-        assert.equal(getCurrentState(tasks3[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("UNDER_REQUEST").id);
 
         changeUser(otherUserId);
         const registerTask3a = Meteor.server.method_handlers['tasks.removeNotice'];
@@ -850,7 +850,7 @@ if (Meteor.isServer) {
 
         var tasks3a = Tasks.find().fetch();
         assert.equal(tasks3a.length, 1);
-        assert.equal(getCurrentState(tasks3a[0]).id, getState("DONE_UNDER_REQUEST").id);
+        assert.equal(getCurrentState(tasks3a[0]).id, getState("UNDER_REQUEST").id);
         assert.equal(tasks3a[0].receiver.notices.length, 0);
 
         changeUser(userId);
@@ -899,6 +899,66 @@ if (Meteor.isServer) {
         assert.equal(tasks3.length, 1);
         assert.equal(tasks3[0].locked, true);
         assert.equal(getCurrentState(tasks3[0]).id, getState("LOCKED").id);
+      });
+      it('can cancel locked agreement', () => {
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        changeUser(userId);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.lock'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("LOCKED").id);
+
+        const registerTask3a = Meteor.server.method_handlers['tasks.cancel'];
+        registerTask3a.apply({}, [tasks[0]._id]);
+
+        var tasks3a = Tasks.find().fetch();
+        assert.equal(tasks3a.length, 1);
+        assert.equal(getCurrentState(tasks3a[0]).id, getState("UNDER_REQUEST").id);
+        assert.equal(tasks3a[0].wasAgreed, true);
+        assert.equal(tasks3a[0].archived, false);
+        assert.equal(tasks3a[0].request.id, getRequest("CANCELLED").id);
+        assert.equal(tasks3a[0].request.actorId, userId);
+
+        changeUser(otherUserId);
+
+        const registerTask4 = Meteor.server.method_handlers['tasks.approveRequest'];
+        registerTask4.apply({}, [tasks[0]._id]);
+
+        var tasks4 = Tasks.find().fetch();
+        assert.equal(tasks4.length, 1);
+        assert.equal(getCurrentState(tasks4[0]).id, getState("OPPOSED").id);
+        assert.equal(tasks4[0].wasAgreed, true);
+        assert.equal(tasks4[0].archived, true);
+        assert.equal(!!tasks4[0].request, false);
+        assert.equal(tasks4[0].author.notices.length, 2);
+        assert.equal(tasks4[0].receiver.notices.length, 3);
+        assert.equal(tasks4[0].author.status, getCondition("red").id);
       });
 		});
   });
