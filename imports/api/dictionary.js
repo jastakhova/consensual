@@ -226,6 +226,13 @@ export const States = [
       return task.status === getStatus("agreed").id && !task.request && !task.locked;
     },
     actions: function(task, actorId) {
+      if (task.author.id === task.receiver.id) {
+        return [
+          getAction("EDIT"),
+          getAction("STATUS_CHANGE_DONE"),
+          getAction("STATUS_CHANGE_CANCEL")
+        ];
+      }
       return [
         getAction("EDIT"),
         getAction("STATUS_CHANGE_DONE"),
@@ -308,6 +315,18 @@ export const States = [
     },
     actions: function(task, actorId) {
       return [];
+    }
+  },
+  {
+    id: "LOCKED",
+    validation: function(task) {
+      return !!task.locked;
+    },
+    actions: function(task, actorId) {
+      return [
+        getAction("STATUS_CHANGE_DONE"),
+        getAction("STATUS_CHANGE_CANCEL")
+      ];
     }
   }
 ];

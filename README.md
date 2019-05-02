@@ -27,16 +27,16 @@ None
 
 #### Active ToDo
 
-- add locking + notice -- Thursday, Friday +1 week
 - add cancel request + notices + tickler -- Monday, Tuesday
 - add blocking comments + notice + tickler -- Wednesday, Thursday, Friday +1 week
 - add Copy action -- Monday
 - Terms of use email should we sent on new sign-ups not only invites -- Tuesday
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
 - show status of the proposal on the proposal page
-Shifted by 3 days because of:
-  notices (extra 2 days)
-  not working on the weekend
+Shifted by 2 days because of:
+  notices (lost 2 days extra)
+  not working on the weekend (lost 1 day)
+  locking was easy (gained 1 day)
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

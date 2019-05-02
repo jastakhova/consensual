@@ -269,6 +269,12 @@ export default class ProposalCtrl extends Controller {
       ProfileUtils.processMeteorResult);
   }
 
+  markTaskAsLocked() {
+    Meteor.call('tasks.lock',
+      this.proposalId,
+      ProfileUtils.processMeteorResult);
+  }
+
   cancelRequest() {
     Meteor.call('tasks.cancelRequest',
       this.proposalId,

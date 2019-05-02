@@ -89,6 +89,11 @@
             </div>
           </div>
           <div class="col-md-2 col-xs-6 col-sm-3 lower">
+            <button type="button" ng-show="proposal.showAction(proposal.data, 'LOCK')" style="margin-bottom: 10px; border-width: 1px; border-color: green; color: green" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsLocked()">
+              <i class="pe-7s-lock"></i>
+              Lock
+            </button>
+            <br/>
             <button type="button" ng-show="proposal.showAction(proposal.data, 'STATUS_CHANGE_DONE')" style="margin-bottom: 10px; border-width: 1px; border-color: green; color: green" class="btn btn-social btn-outline" ng-click="proposal.markTaskAsDone()">
               <i class="pe-7s-like2"></i>
               Done
@@ -103,6 +108,7 @@
               <i class="pe-7s-trash"></i>
               Cancel
             </button>
+            <br/>
             <button type="button" ng-show="proposal.showAction(proposal.data, 'CANCEL_REQUEST')" style="border-color: red; border-width: 1px; color: red" class="btn btn-social btn-outline" ng-click="proposal.cancelRequest()">
               <i class="pe-7s-trash"></i>
               Cancel {{proposal.data.request.type.descriptor}} request

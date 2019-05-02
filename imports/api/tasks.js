@@ -646,6 +646,33 @@ Meteor.methods({
 
     notifyOnActivity(task, activity);
   },
+  'tasks.lock' (taskId) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+
+    var activity = {
+       actor: Meteor.userId(),
+       actorName: getName(Meteor.user()),
+       field: 'status',
+       newValue: 'locked the agreement',
+       time: new Date().getTime()
+     };
+
+    var notice = createNotice(getNotice("LOCKED"));
+
+    task.activity.push(activity);
+    Tasks.update(taskId, {
+      $set: {
+       activity: task.activity,
+       locked: true,
+       "author.notices": updateNotices(task.author, notice),
+       "receiver.notices": updateNotices(task.receiver, notice)
+      }
+    });
+
+    notifyOnActivity(task, activity);
+  },
   'users.updateName' (name) {
     check(name, String);
 

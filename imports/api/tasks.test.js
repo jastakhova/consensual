@@ -865,6 +865,41 @@ if (Meteor.isServer) {
         assert.equal(tasks4[0].author.notices.length, 1);
         assert.equal(tasks4[0].receiver.notices.length, 1);
       });
+      it('can lock agreement', () => {
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+
+        assert.equal(tasks.length, 1);
+        assert.equal(getCurrentState(tasks[0]).id, getState("PROPOSED").id);
+
+        changeUser(otherUserId);
+
+        const registerTask2 = Meteor.server.method_handlers['tasks.approve'];
+        registerTask2.apply({}, [tasks[0]._id]);
+
+        var tasks2 = Tasks.find().fetch();
+        assert.equal(tasks2.length, 1);
+
+        assert.equal(getCurrentState(tasks2[0]).id, getState("AGREED").id);
+
+        changeUser(userId);
+
+        const registerTask3 = Meteor.server.method_handlers['tasks.lock'];
+        registerTask3.apply({}, [tasks[0]._id]);
+
+        var tasks3 = Tasks.find().fetch();
+        assert.equal(tasks3.length, 1);
+        assert.equal(tasks3[0].locked, true);
+        assert.equal(getCurrentState(tasks3[0]).id, getState("LOCKED").id);
+      });
 		});
   });
 }
