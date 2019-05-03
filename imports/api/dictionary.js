@@ -208,6 +208,7 @@ export const getCondition = function(id, task) {
 export const States = [
   {
     id: "PROPOSED",
+    icon: "timer",
     validation: function(task) {
       return task.status === getStatus("proposed").id;
     },
@@ -232,6 +233,7 @@ export const States = [
   },
   {
     id: "AGREED",
+    icon: "paper-plane",
     validation: function(task) {
       return task.status === getStatus("agreed").id && !task.request && !task.locked;
     },
@@ -254,6 +256,7 @@ export const States = [
   },
   {
     id: "OPPOSED",
+    icon: "close-circle",
     validation: function(task) {
       return task.status === getStatus("cancelled").id;
     },
@@ -263,6 +266,7 @@ export const States = [
   },
   {
     id: "CONSIDERED",
+    icon: "look",
     validation: function(task) {
       var greenCondition = getCondition("green").id;
       return task.status === getStatus("considered").id
@@ -288,6 +292,7 @@ export const States = [
   },
   {
     id: "DEEPLY_CONSIDERED",
+    icon: "look",
     validation: function(task) {
       var yellowCondition = getCondition("yellow").id;
       return task.status === getStatus("considered").id
@@ -303,6 +308,7 @@ export const States = [
   },
   {
     id: "UNDER_REQUEST",
+    icon: "way",
     validation: function(task) {
       return task.request;
     },
@@ -320,6 +326,7 @@ export const States = [
   },
   {
     id: "COMPLETED",
+    icon: "check",
     validation: function(task) {
       return task.status === getStatus("done").id;
     },
@@ -329,6 +336,7 @@ export const States = [
   },
   {
     id: "LOCKED",
+    icon: "lock",
     validation: function(task) {
       return !!task.locked;
     },

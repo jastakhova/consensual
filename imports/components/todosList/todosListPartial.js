@@ -1,5 +1,5 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
-import {getStatus, getNotice} from '../../api/dictionary.js';
+import {getStatus, getNotice, getCurrentState} from '../../api/dictionary.js';
 import ProfileUtils from  './profile.js';
 import { Tasks, Invitees } from '../../api/tasks.js';
 import DateTimePicker from 'date-time-picker';
@@ -367,26 +367,7 @@ export class TodosListPartialCtrl extends Controller {
   }
 
   this.getTaskStatusImage = function(task) {
-    if (Meteor.userId() === task.author.id && task.author.status === 'yellow' ||
-            Meteor.userId() === task.receiver.id && task.receiver.status === 'yellow') {
-              return 'look'; // requires user's attention
-            }
-    if (task.status === 'open') {
-      if (task.author.status === 'yellow' || task.receiver.status === 'yellow') {
-        return 'timer'; // is blocking current user
-      }
-      if (task.eta < new Date()) {
-        return 'alarm'; // is overdue
-      }
-      return 'paper-plane'; // agreed upon and can be executed
-    }
-    if (task.status === 'done') {
-      return 'check'; // done
-    }
-    if (task.status === 'cancelled') {
-      return 'close-circle'; // cancelled
-    }
-    return 'science'; // unrecognized state
+    return getCurrentState(task).icon;
   }
 
   this.showDatePickerForFilters = function() {

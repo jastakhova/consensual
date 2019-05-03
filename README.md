@@ -27,11 +27,11 @@ None
 
 #### Active ToDo
 
+- overdue notice -- Friday
 - add Copy action -- Friday
-- add blocking comments + notice + tickler -- Monday, Tuesday, Wednesday +1 week
-- show status of the proposal on the proposal page -- Thursday
+- transition to main branch -- Monday
+- add blocking comments + notice + tickler -- Tuesday, Wednesday, Thursday +1 week
 - Terms of use email should we sent on new sign-ups not only invites -- Thursday
-- transition to main branch -- Friday
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
 Shifted by 2 days because of:
   notices (lost 2 days extra)
