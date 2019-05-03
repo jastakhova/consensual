@@ -121,6 +121,11 @@ export const Notices = [
     text: "Cancellation of the agreement is waiting for an approval",
     type: "visit"
   },
+  {
+    id: "OVERDUE",
+    text: "Overdue",
+    type: "visit"
+  },
 ];
 
 export const getNotice = function(code) {
@@ -378,6 +383,10 @@ export const Ticklers = [
   {
     id: "UNDER_CANCELLATION_REQUEST",
     notice: getNotice("CANCELLATION_NEEDS_APPROVAL")
+  },
+  {
+    id: "OVERDUE",
+    notice: getNotice("OVERDUE")
   }
 ];
 

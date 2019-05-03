@@ -92,17 +92,21 @@ function updateNotices(person, notice) {
   return person.id === Meteor.userId() ? person.notices : person.notices.concat(notice);
 }
 
+function createTickler(ticklerId) {
+ return {
+  id: ticklerId,
+  length: 1,
+  lastActivated: new Date().getTime() - (24*60*60*1000),
+  created: new Date().getTime()
+ };
+}
+
 function updateTicklers(person, ticklerId, task) {
   return task.author.id === task.receiver.id
     || person.id === Meteor.userId()
     || person.ticklers.filter(t => t.id === ticklerId).length > 0
       ? person.ticklers
-      : person.ticklers.concat({
-         id: ticklerId,
-         length: 1,
-         lastActivated: new Date().getTime() - (24*60*60*1000),
-         created: new Date().getTime()
-        });
+      : person.ticklers.concat(createTickler(ticklerId));
 }
 
 function changeStatusesOnEditing(task) {
@@ -145,7 +149,7 @@ function registerChange(taskId, isNotNeeded, fillActivity, fillUpdateEntity, not
      "author.ticklers": updateTicklers(task.author, "CONSIDERING", task),
      "receiver.ticklers": updateTicklers(task.receiver, "CONSIDERING", task)
   };
-  fillUpdateEntity(updateEntity);
+  fillUpdateEntity(updateEntity, task);
 
   Tasks.update(taskId, { $set: updateEntity });
   notify(task, activity);
@@ -246,8 +250,19 @@ Meteor.methods({
       activity.field = 'time';
       activity.oldValue = new Date(moment(oldTimeUTCString).format()).getTime();
       activity.newValue = new Date(moment(newTimeUTCString).format()).getTime();
-    }, function(updateEntity) {
+    }, function(updateEntity, task) {
       updateEntity.eta = new Date(moment(newTimeUTCString).format()).getTime();
+      // if not overdue anymore remove overdue notice and tickler
+      var notice = createNotice(getNotice("HAS_UPDATES"));
+      var overdue = updateEntity.eta < new Date().getTime();
+      var overdueNoticeId = getNotice("OVERDUE").id;
+      var overdueTicklerId = getTickler("OVERDUE").id;
+      var noticeFilter = n => overdue || n.code != overdueNoticeId;
+      var ticklerFilter = n => overdue || n.id != overdueTicklerId;
+      updateEntity["author.notices"] = updateNotices(task.author, notice).filter(noticeFilter);
+      updateEntity["receiver.notices"] = updateNotices(task.receiver, notice).filter(noticeFilter);
+      updateEntity["author.ticklers"] = updateTicklers(task.author, "CONSIDERING", task).filter(ticklerFilter);
+      updateEntity["receiver.ticklers"] = updateTicklers(task.receiver, "CONSIDERING", task).filter(ticklerFilter);
     }, function(task, activity) {
       notifyOnActivity(task, activity, timezone);
     });
@@ -262,7 +277,7 @@ Meteor.methods({
       activity.field = 'location';
       activity.oldValue = task.location;
       activity.newValue = newLocation;
-    }, function(updateEntity) {
+    }, function(updateEntity, task) {
       updateEntity.location = newLocation;
     }, function(task, activity) {
       notifyOnActivity(task, activity);
@@ -278,7 +293,7 @@ Meteor.methods({
       activity.field = 'description';
       activity.oldValue = task.text;
       activity.newValue = newDescription;
-    }, function(updateEntity) {
+    }, function(updateEntity, task) {
       updateEntity.text = newDescription;
     }, function(task, activity) {
       notifyOnActivity(task, activity);
@@ -294,7 +309,7 @@ Meteor.methods({
       activity.field = 'title';
       activity.oldValue = task.title;
       activity.newValue = newTitle;
-    }, function(updateEntity) {
+    }, function(updateEntity, task) {
       updateEntity.title = newTitle;
     }, function(task, activity) {
       notifyOnActivity(task, activity);
@@ -463,7 +478,6 @@ Meteor.methods({
      };
 
     task.activity.push(activity);
-    var filterTickler = t => t.id != getTickler("CONSIDERING").id;
     Tasks.update(taskId, {
       $set: {
         activity: task.activity,
@@ -471,8 +485,8 @@ Meteor.methods({
         "receiver.status": newReceiverStatus,
         "author.notices": authorNotices,
         "receiver.notices": receiverNotices,
-        "author.ticklers": task.author.id === Meteor.userId() ? task.author.ticklers.filter(filterTickler) : task.author.ticklers,
-        "receiver.ticklers": task.receiver.id === Meteor.userId() ? task.receiver.ticklers.filter(filterTickler) : task.receiver.ticklers,
+        "author.ticklers": [],
+        "receiver.ticklers": [],
         status: getStatus("cancelled").id,
         archived: true
       }
@@ -544,10 +558,10 @@ Meteor.methods({
         activity: task.activity,
         status: selfAgreement ? getStatus("done").id : task.status,
         archived: selfAgreement,
-        "author.notices": updateNotices(task.author, notice),
-        "receiver.notices": updateNotices(task.receiver, notice),
-        "author.ticklers": updateTicklers(task.author, tickler, task),
-        "receiver.ticklers": updateTicklers(task.receiver, tickler, task)
+        "author.notices": selfAgreement ? [] : updateNotices(task.author, notice),
+        "receiver.notices": selfAgreement ? [] : updateNotices(task.receiver, notice),
+        "author.ticklers": selfAgreement ? [] : updateTicklers(task.author, tickler, task),
+        "receiver.ticklers": selfAgreement ? [] : updateTicklers(task.receiver, tickler, task)
     }
 
     if (!selfAgreement) {
@@ -1040,6 +1054,28 @@ if (Meteor.isServer) {
             }
           });
         }
+    });
+
+  }, 1*60*1000  /* 10 minute interval */);
+
+  Meteor.setInterval(function() {
+    console.log("Starting overdue check cycle...");
+
+    var timeToCheck = new Date().getTime();
+    var tickler = getTickler("OVERDUE").id;
+
+    var tasks = Tasks.find({ $and: [
+      {"eta": {$lt: timeToCheck}},
+      {"archived": false},
+      {$nor: [{"author.ticklers": {"id": getTickler("OVERDUE").id}}]}
+      ]}).fetch().forEach(function(task) {
+        console.log(task._id);
+        Tasks.update(task._id, {
+          $set: {
+            "author.ticklers": task.author.ticklers.concat(createTickler(tickler)),
+            "receiver.ticklers": task.receiver.ticklers.concat(createTickler(tickler))
+          }
+        });
     });
 
   }, 10*60*1000  /* 10 minute interval */);

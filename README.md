@@ -27,7 +27,6 @@ None
 
 #### Active ToDo
 
-- overdue notice -- Friday
 - add Copy action -- Friday
 - transition to main branch -- Monday
 - add blocking comments + notice + tickler -- Tuesday, Wednesday, Thursday +1 week

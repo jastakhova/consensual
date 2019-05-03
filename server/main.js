@@ -122,6 +122,7 @@ Meteor.methods({
   'Migrations.new' () {
     // 1. Added: author and receiver objects
     // 2. Converted status from "open"
+    // 3. Adding ticklers, notices,
 
     tasks = Tasks.find();
 
@@ -132,13 +133,20 @@ Meteor.methods({
             author: {
               id: task.authorId,
               name: task.authorName,
-              status: task.authorStatus
+              status: task.authorStatus,
+              notices: [],
+              ticklers: []
             },
             receiver: {
               id: task.receiverId,
               name: task.receiverName,
-              status: task.receiverStatus
-            }
+              status: task.authorStatus,
+              notices: [],
+              ticklers: []
+            },
+            ticklers: [],
+            locked: false,
+            wasAgreed: task.authorStatus === "green" && task.authorStatus
           }
         });
       }
