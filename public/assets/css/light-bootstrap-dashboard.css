@@ -271,7 +271,6 @@ input:focus {
 }
 
 .sidebar .logo {
-    padding: 10px 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -318,12 +317,13 @@ input:focus {
 .sidebar .nav .open > a,
 .sidebar .nav li.dropdown .dropdown-menu li:hover > a,
 .sidebar .nav li:hover > a {
-    background-color: rgba(255, 255, 255, 0.13);
+    background-color: rgba(255, 255, 255, 0.23);
+    color: #cf8c2b;
     opacity: 1;
 }
 
 .sidebar .nav li > a {
-    color: #FFFFFF;
+    color: #603813;
     margin: 5px 15px;
     opacity: .86;
     border-radius: 4px;
@@ -331,7 +331,7 @@ input:focus {
 }
 
 .sidebar .nav li.active > a {
-    color: #FFFFFF;
+    color: #cf8c2b;
     opacity: 1;
     background: rgba(255, 255, 255, 0.23);
 }
@@ -348,10 +348,9 @@ input:focus {
 .sidebar .nav p {
     margin: 0;
     line-height: 30px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 16px;
     text-transform: uppercase;
-    margin-left: 45px;
+    text-align: center;
 }
 
 .sidebar .nav i {
@@ -494,6 +493,17 @@ input:focus {
     background: -o-linear-gradient(top, #FB404B 0%, #bb0502 100%);
     background: -ms-linear-gradient(top, #FB404B 0%, #bb0502 100%);
     background: linear-gradient(to bottom, #FB404B 0%, #bb0502 100%);
+    background-size: 150% 150%;
+}
+
+.sidebar[data-color="beige"]:after {
+    background: #FAF3EA;
+    background: -moz-linear-gradient(top, #FAF3EA 0%, #efc992 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #FAF3EA), color-stop(100%, #efc992));
+    background: -webkit-linear-gradient(top, #FAF3EA 0%, #efc992 100%);
+    background: -o-linear-gradient(top, #FAF3EA 0%, #efc992 100%);
+    background: -ms-linear-gradient(top, #FAF3EA 0%, #efc992 100%);
+    background: linear-gradient(to bottom, #FAF3EA 0%, #efc992 100%);
     background-size: 150% 150%;
 }
 
