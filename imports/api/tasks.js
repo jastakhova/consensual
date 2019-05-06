@@ -392,12 +392,6 @@ Meteor.methods({
     var consideringStatus = getCondition("yellow").id;
     var agreedStatus = getCondition("green").id;
 
-    if (!(task.receiver.id === Meteor.userId() && task.receiver.status === noResponseStatus)
-        && !(task.receiver.id === Meteor.userId() && task.receiver.status === agreedStatus
-              || task.author.id === Meteor.userId() && task.author.status === agreedStatus)) {
-      return;
-    }
-
     var activity = {
        actor: Meteor.userId(),
        actorName: getName(Meteor.user()),

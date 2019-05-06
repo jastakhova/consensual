@@ -140,21 +140,29 @@ Meteor.methods({
             receiver: {
               id: task.receiverId,
               name: task.receiverName,
-              status: task.authorStatus,
+              status: task.receiverStatus,
               notices: [],
               ticklers: []
             },
             ticklers: [],
             locked: false,
-            wasAgreed: task.authorStatus === "green" && task.authorStatus
+            wasAgreed: task.authorStatus === "green" && task.receiverStatus === "green"
           }
         });
       }
       if (task.status === "open" || task.status.status === "green") {
+        var newStatus = "proposed";
+        if (task.receiverStatus === "green") {
+          newStatus = task.authorStatus === "green" ? "agreed" : "considered";
+        }
+
         Tasks.update({_id: task._id}, {
-          $set: {
-            status: ((task.author.status === "green" && task.receiver.status === "green") ? "agreed" : "proposed")
-          }
+          $set: { status: newStatus }
+        });
+      }
+      if ((task.status === "cancelled" || task.status === "done") && !task.archived) {
+        Tasks.update({_id: task._id}, {
+          $set: { archived: true }
         });
       }
     }
