@@ -96,8 +96,10 @@ export class TodosListPartialCtrl extends Controller {
                 task.notice = {
                   texts: Array.from(new Set(notices.map(notice => getNotice(notice.code).text))),
                   actor : actor,
-                  time: moment(Math.min(...notices.map(notice => notice.created))).format("DD MMM h:mm a")
+                  formattedTime: moment(Math.min(...notices.map(notice => notice.created))).format("DD MMM h:mm a"),
+                  time: Math.min(...notices.map(notice => notice.created))
                 };
+                task.eta = task.notice.time;
 
                 if (notices.filter(notice => getNotice(notice.code).type === 'view' && !notice.touched).length > 0) {
                   Meteor.call('tasks.touchNotice',

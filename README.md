@@ -27,6 +27,7 @@ None
 
 #### Active ToDo
 
+- On profile page it is possible to remove other person notifications
 - add Copy action -- Friday
 - transition to main branch -- Monday
 - add blocking comments + notice + tickler -- Tuesday, Wednesday, Thursday +1 week

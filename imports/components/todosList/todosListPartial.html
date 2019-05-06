@@ -53,16 +53,16 @@
           <tr ng-show="taskList.tasks.length == 0"><td>no tasks</td></tr>
 
           <tr ng-show="taskList.notifications" ng-repeat="task in taskList.tasks | limitTo: (!taskList.sliced || taskList.opened ? taskList.length : taskList.limit)" style="background-color: 'white'">
-            <td><div ng-repeat="text in task.notice.texts">{{text}}</div></td>
             <td><a href="#!/tab/proposal/{{task._id}}">{{task.title}}</a></td>
-            <td>{{task.notice.time}}</td>
             <td>
               <a href="#!/tab/profile/{{task.notice.actor.id}}" class="base-color">
-                by
+                with
                 <img class="avatar border-gray" src="{{task.notice.actor.picture}}" alt="..."/>
                 {{task.notice.actor.name}}
               </a>
             </td>
+            <td><div ng-repeat="text in task.notice.texts">{{text}}</div></td>
+            <td>{{task.notice.formattedTime}}</td>
             <td ng-click="todoList.removeNotice(task)" class="link"><i class="pe-7s-close-circle"></i></td>
           </tr>
 
