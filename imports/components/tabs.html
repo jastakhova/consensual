@@ -17,7 +17,7 @@
       <img src="assets/img/consensual_logo_small_alpha.png" style="position: relative;left: 15px;" width="200px">
       <img src="assets/img/consensual_slogan_small_alpha.png" style="position: relative;left: 20px;padding-top:10px;" width="190px">
     </div>
-    <ul class="nav">
+    <ul class="nav" onclick="$(':root').toggleClass('nav-open'); $('.sidebar').removeClass('in');">
       <li>
         <a href="#!/tab/todo">
           <p>Agreements</p>
@@ -33,7 +33,7 @@
           <p>Settings</p>
         </a>
       </li>
-      <li class="only-mobile">
+      <li>
         <a href="#!/login" onclick="Meteor.logout()">
           <p>Log out</p>
         </a>
