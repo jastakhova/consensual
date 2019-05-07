@@ -56,7 +56,8 @@
             <a href=""><h5 class="title same-line">{{proposal.currentUser === proposal.data.receiver.id ? "You" : proposal.data.receiver.name}}</h5></a>
           </div>
           <div class="col-md-3 col-xs-6 col-sm-3 lower">
-            <span class="header-title">ETA:</span>
+            <span class="header-title" style="font-size: 16px">Next Action</span><br/>
+            <span class="header-title">Time:</span>
             <button type="button" ng-show="!proposal.editingTime && proposal.showAction(proposal.data, 'EDIT')" rel="tooltip" title="Edit" ng-click="proposal.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
               <i class="fa fa-edit"></i>
             </button>
