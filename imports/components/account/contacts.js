@@ -7,7 +7,7 @@ export default class ContactsCtrl extends Controller {
         super(...arguments);
 
         this.handleUsers = this.subscribe('allusers');
-        this.handleTasks = this.subscribe('tasks');
+        this.handleTasks = this.subscribe('tasksContacts');
 
         this.searchEdit = false;
         this.search = "";

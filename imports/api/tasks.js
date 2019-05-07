@@ -868,7 +868,20 @@ if (Meteor.isServer) {
   process.env.MAIL_URL = "smtps://team.consensual%40gmail.com:teamConsensual123@smtp.gmail.com:465/";
 
   Meteor.publish('tasks', function tasksPublication() {
-    return Tasks.find({$or: [{"author.id": this.userId}, {"receiver.id": this.userId}]});
+    return Tasks.find({$or: [{"author.id": this.userId}, {"receiver.id": this.userId}]},
+      {"text": 1, "title": 1, "eta": 1, "author": 1, "receiver": 1, "status": 1, "archived": 1, "locked": 1, "wasAgreed": 1});
+  });
+
+  Meteor.publish('tasksContacts', function tasksPublication() {
+    return Tasks.find({$or: [{"author.id": this.userId}, {"receiver.id": this.userId}]}, {"author.id": 1, "receiver.id": 1});
+  });
+
+  Meteor.publish('tasksWith', function tasksPublication(profileId) {
+    return Tasks.find({$or: [{"author.id": this.userId, "receiver.id": profileId}, {"receiver.id": this.userId, "author.id": profileId}]});
+  });
+
+  Meteor.publish('task', function tasksPublication(taskId) {
+    return Tasks.find({_id: taskId});
   });
 
   Meteor.publish('invitees', function inviteesPublication() {

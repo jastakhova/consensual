@@ -12,7 +12,7 @@ export default class ProposalCtrl extends Controller {
   constructor() {
     super(...arguments);
 
-    this.handleTasks = this.subscribe('tasks');
+    this.handleTasks = Meteor.subscribe('task', this.$stateParams.proposalId);
 
     if (Meteor.userId()) {
 			this.subscribe('allusers');

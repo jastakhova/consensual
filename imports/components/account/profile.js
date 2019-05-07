@@ -8,7 +8,7 @@ export default class ProfileCtrl extends TodosListPartialCtrl {
 
         this.profileId = this.$stateParams.profileId;
 
-        this.handleTasks = this.subscribe('tasks');
+        this.handleTasks = Meteor.subscribe('tasksWith', this.profileId);
         this.handleUsers = this.subscribe('allusers');
 
         this.essencial = {};
