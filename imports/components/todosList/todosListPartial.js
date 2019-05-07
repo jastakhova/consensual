@@ -96,7 +96,7 @@ export class TodosListPartialCtrl extends Controller {
                 task.notice = {
                   texts: Array.from(new Set(notices.map(notice => getNotice(notice.code).text))),
                   actor : actor,
-                  formattedTime: moment(Math.min(...notices.map(notice => notice.created))).format("DD MMM h:mm a"),
+                  formattedTime: moment(Math.min(...notices.map(notice => notice.created))).fromNow(),
                   time: Math.min(...notices.map(notice => notice.created))
                 };
                 task.eta = task.notice.time;
