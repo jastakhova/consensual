@@ -891,6 +891,7 @@ if (Meteor.isServer) {
 
   Meteor.setInterval(function() {
     console.log("Starting sending cycle...");
+    var startTime = new Date().getTime();
 
     function getEmailsToProcess() {
       var newReceivers = Promise.await(Emails.rawCollection().distinct("receiver", {"sentAt": { "$exists" : false }}));
@@ -985,10 +986,14 @@ if (Meteor.isServer) {
         }, { multi: true });
       }
     });
+
+    var endTime = new Date().getTime();
+    console.log("Email background process finished in " + (endTime - startTime) + " ms");
   }, 60*1000 /* 1 minute interval */);
 
   Meteor.setInterval(function() {
     console.log("Starting notice check cycle...");
+    var startTime = new Date().getTime();
 
     var dayPeriod = 24*60*60*1000;
 //      var minPeriod = 5*60*1000;
@@ -1005,10 +1010,15 @@ if (Meteor.isServer) {
           }
         });
     });
+
+    var endTime = new Date().getTime();
+    console.log("Notice background process finished in " + (endTime - startTime) + " ms");
+
     }, 10*60*1000  /* 10 minute interval */);
 
   Meteor.setInterval(function() {
     console.log("Starting ticklers check cycle...");
+    var startTime = new Date().getTime();
 
     var dayPeriod = 24*60*60*1000;
 //    var dayPeriod = 5*60*1000;
@@ -1050,10 +1060,14 @@ if (Meteor.isServer) {
         }
     });
 
-  }, 1*60*1000  /* 10 minute interval */);
+    var endTime = new Date().getTime();
+    console.log("Tickler background process finished in " + (endTime - startTime) + " ms");
+
+  }, 10*60*1000  /* 10 minute interval */);
 
   Meteor.setInterval(function() {
     console.log("Starting overdue check cycle...");
+    var startTime = new Date().getTime();
 
     var timeToCheck = new Date().getTime();
     var tickler = getTickler("OVERDUE").id;
@@ -1071,6 +1085,10 @@ if (Meteor.isServer) {
           }
         });
     });
+
+    var endTime = new Date().getTime();
+    console.log("Overdue background process finished in " + (endTime - startTime) + " ms");
+
 
   }, 10*60*1000  /* 10 minute interval */);
 }
