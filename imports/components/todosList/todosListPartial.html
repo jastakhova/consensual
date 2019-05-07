@@ -56,7 +56,6 @@
             <td><a href="#!/tab/proposal/{{task._id}}">{{task.title}}</a></td>
             <td>
               <a href="#!/tab/profile/{{task.notice.actor.id}}" class="base-color">
-                with
                 <img class="avatar border-gray" src="{{task.notice.actor.picture}}" alt="..."/>
                 {{task.notice.actor.name}}
               </a>
@@ -74,18 +73,19 @@
               {{task.time}}
             </td>
             <td ng-show="task.toCurrentUser == task.fromCurrentUser" ng-click="todoList.gotoProposal(task._id)" class="link">
-              self agreement
+              <a href="#!/tab/profile/{{task.author.id}}" class="base-color">
+                <img class="avatar border-gray" src="{{task.authorPicture}}" alt="..."/>
+                Self
+              </a>
             </td>
             <td ng-show="task.toCurrentUser">
               <a href="#!/tab/profile/{{task.author.id}}" class="base-color">
-              from
               <img class="avatar border-gray" src="{{task.authorPicture}}" alt="..."/>
               {{task.author.name}}
               </a>
             </td>
             <td ng-show="task.fromCurrentUser">
               <a href="#!/tab/profile/{{task.receiver.id}}" class="base-color">
-              to
               <img class="avatar border-gray" src="{{task.receiverPicture}}" alt="..."/>
               {{task.receiver.name}}
               </a>
