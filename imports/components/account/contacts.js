@@ -36,7 +36,7 @@ export default class ContactsCtrl extends Controller {
                 })
                 .map(function(key) {
                   var user = id2user[key];
-                  user.picture = ProfileUtils.picture(user);
+                  user.picture = ProfileUtils.pictureSmall(user);
                   user.name = ProfileUtils.getName(user);
                   return user;
                 }).sort(nameComparator);
@@ -66,7 +66,7 @@ export default class ContactsCtrl extends Controller {
     }
 
     accountPicture() {
-      return ProfileUtils.picture(Meteor.user());
+      return ProfileUtils.pictureSmall(Meteor.user());
     }
 
     flipSearchEditing() {

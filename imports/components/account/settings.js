@@ -30,7 +30,7 @@ export default class SettingsCtrl extends Controller {
                 email: ProfileUtils.getEmail(Meteor.user()),
                 subscribed: subscribed,
                 user: Meteor.user(),
-                picture: ProfileUtils.picture(Meteor.user())
+                picture: ProfileUtils.pictureBig(Meteor.user())
               };
             }
         });

@@ -36,8 +36,8 @@ export default class ProfileCtrl extends TodosListPartialCtrl {
                      ? "https://www.facebook.com/search/top/?q=" + encodeURI(user.services.facebook.name)
                      : "",
                    fullName: ProfileUtils.getName(user),
-                   profilePicture: ProfileUtils.picture(user),
-                   accountPicture: ProfileUtils.picture(Meteor.user())
+                   profilePicture: ProfileUtils.pictureBig(user),
+                   accountPicture: ProfileUtils.pictureSmall(Meteor.user())
                 };
 
                 var handleAllUsers = this.handleAllUsers;

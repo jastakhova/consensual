@@ -72,8 +72,8 @@ export default class ProposalCtrl extends Controller {
 
         foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
 
-        foundTask.authorPicture = ProfileUtils.picture(id2user[foundTask.author.id]);
-        foundTask.receiverPicture = ProfileUtils.picture(id2user[foundTask.receiver.id]);
+        foundTask.authorPicture = ProfileUtils.pictureBig(id2user[foundTask.author.id]);
+        foundTask.receiverPicture = ProfileUtils.pictureBig(id2user[foundTask.receiver.id]);
         if (foundTask.request) {
           foundTask.request.type = getRequest(foundTask.request.id);
         }
@@ -116,7 +116,7 @@ export default class ProposalCtrl extends Controller {
   }
 
   accountPicture() {
-    return ProfileUtils.picture(Meteor.user());
+    return ProfileUtils.pictureSmall(Meteor.user());
   }
 
   status(statusColor) {

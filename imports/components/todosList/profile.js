@@ -7,9 +7,15 @@ var ProfileUtils = {
 		});
 		return objMap;
 	},
-	picture: function(user) {
+	pictureSmall: function(user) {
+	  return ProfileUtils.picture(user, 30);
+	},
+	pictureBig: function(user) {
+    return ProfileUtils.picture(user, 100);
+  },
+	picture: function(user, size) {
 		if (user && user.services && user.services.facebook && user.services.facebook.id) {
-			return 'https://graph.facebook.com/' + user.services.facebook.id + '/picture?width=500&height=500';
+			return 'https://graph.facebook.com/' + user.services.facebook.id + '/picture?width=' + size + '&height=' + size;
 		} else {
 			return 'assets/img/default-avatar.png';
 		}

@@ -212,8 +212,8 @@ export class TodosListPartialCtrl extends Controller {
         function prepareTask(x) {
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
-          x.authorPicture = ProfileUtils.picture(id2user[x.author.id]);
-          x.receiverPicture = ProfileUtils.picture(id2user[x.receiver.id]);
+          x.authorPicture = ProfileUtils.pictureSmall(id2user[x.author.id]);
+          x.receiverPicture = ProfileUtils.pictureSmall(id2user[x.receiver.id]);
           x.fromCurrentUser = x.author.id === Meteor.userId() && x.author.id != x.receiver.id;
           x.toCurrentUser = x.receiver.id === Meteor.userId() && x.author.id != x.receiver.id;
           return x;
@@ -277,7 +277,7 @@ export class TodosListPartialCtrl extends Controller {
               .sort(sortGroup.sort)
               .map(sortGroup.prepare ? function(task) {
                 var prepared = sortGroup.prepare(task);
-                prepared.notice.actor.picture = ProfileUtils.picture(id2user[prepared.notice.actor.id]);
+                prepared.notice.actor.picture = ProfileUtils.pictureSmall(id2user[prepared.notice.actor.id]);
                 return prepared;
                 } : prepareTask);
             return {
@@ -351,7 +351,7 @@ export class TodosListPartialCtrl extends Controller {
   }
 
   this.accountPicture = function() {
-    return ProfileUtils.picture(Meteor.user());
+    return ProfileUtils.pictureSmall(Meteor.user());
   }
 
   this.gotoProposal = function(taskId) {

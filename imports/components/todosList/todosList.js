@@ -43,7 +43,7 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
           }, function() {
             Meteor.call('users.getPopular', 3, function(err, result) {
               result.forEach(r => {
-                r.picture = ProfileUtils.picture(r);
+                r.picture = ProfileUtils.pictureSmall(r);
                 r.name = ProfileUtils.getName(r);
                 popularUsers.push(r);
               });
@@ -238,7 +238,7 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
       if (invitee.found) {
         invitee.found.nameToShow = ProfileUtils.getName(invitee.found) + nameSuffix;
         invitee.found.name = ProfileUtils.getName(invitee.found);
-        invitee.found.picture = ProfileUtils.picture(invitee.found);
+        invitee.found.picture = ProfileUtils.pictureSmall(invitee.found);
       }
       return invitee.found;
     }
