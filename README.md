@@ -223,3 +223,7 @@ meteor mongo
 * Done via Native Facebook SDK login for Meteor - bas-meteor-facebook-login https://www.npmjs.com/package/bas-meteor-facebook-login
 * With help of https://github.com/meteor/meteor/issues/9643
 * Erasing cache on simulator https://stackoverflow.com/questions/8323819/is-there-a-quicker-better-way-to-clear-the-iphone-simulator-cache-than-deletin
+
+### Hosting
+We're currently hosting on Galaxy at $30/mo for a half-size instance. I've heard tell the same size container can be had on DigitalOcean for $5/mo. This will matter when we want to scale.
+* https://medium.freecodecamp.org/scaling-meteor-a-year-on-26ee37588e4b
