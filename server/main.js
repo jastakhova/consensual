@@ -179,6 +179,9 @@ if (Meteor.isServer) {
       console.log(commit_id + '...');
       Meteor.call('Migrations.' + commit_id);
     }
+
+    Tasks.rawCollection().createIndex({"author.id": 1});
+    Tasks.rawCollection().createIndex({"receiver.id": 1});
   });
 }
 

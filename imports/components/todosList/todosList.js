@@ -1,10 +1,12 @@
 import { Tasks, Invitees } from '../../api/tasks.js';
 import moment from 'moment';
+//import { Controller } from 'angular-ecmascript/module-helpers';
 import { TodosListPartialCtrl } from './todosListPartial.js';
 import DateTimePicker from 'date-time-picker';
 import ProfileUtils from  './profile.js';
 import '../../../public/assets/js/bootstrap-typeahead.min.js';
 
+//export default class TodosListCtrl extends Controller {
 export default class TodosListCtrl extends TodosListPartialCtrl {
 
   constructor() {

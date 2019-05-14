@@ -38,3 +38,4 @@ twbs:bootstrap
 jquery
 http@1.4.2
 practicalmeteor:sinon
+mdg:meteor-apm-agent

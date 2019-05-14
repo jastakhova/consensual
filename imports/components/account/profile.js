@@ -1,8 +1,10 @@
 import moment from 'moment';
 import ProfileUtils from '../todosList/profile.js';
+//import { Controller } from 'angular-ecmascript/module-helpers';
 import { TodosListPartialCtrl } from '../todosList/todosListPartial.js';
 
 export default class ProfileCtrl extends TodosListPartialCtrl {
+//export default class ProfileCtrl extends Controller {
     constructor() {
         super(...arguments);
 

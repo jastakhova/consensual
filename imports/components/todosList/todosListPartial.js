@@ -191,6 +191,7 @@ export class TodosListPartialCtrl extends Controller {
         if (!this.handleTasks.ready()) {
           return [];
         }
+        var startTime = new Date().getTime();
 
         if (!filterAdjustingWasMade) {
           this.adjustFilters();
@@ -205,7 +206,7 @@ export class TodosListPartialCtrl extends Controller {
       	var withArchiveFlag = this.getReactively("searchWithArchive");
 
       	var id2user = ProfileUtils.getId2User(this, Tasks, Invitees);
-      	this.allUsers = Meteor.users.find({}, {"username": 1, "profile.name" : 1}).fetch();
+      	this.allUsers = Meteor.users.find({}, {fields: {"username": 1, "profile.name" : 1}}).fetch();
 
         useSuggest(ProfileUtils.getSuggest(id2user));
 
@@ -320,6 +321,9 @@ export class TodosListPartialCtrl extends Controller {
           }
           resultGroups[0].datepickerStub = true;
         }
+
+        var endTime = new Date().getTime();
+        console.log("TODO list time was " + (endTime - startTime) + "ms");
         return additionalGroups.concat(resultGroups);
       }
 
