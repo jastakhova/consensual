@@ -27,16 +27,14 @@ None
 
 #### Active ToDo
 
+- "You changed" in activity log (id=kcZue8cQarRvrNhAF)
 - On profile page it is possible to remove other person notifications + Your Recent Activity block doesn't make sense
 - add Copy action -- Friday
 - transition to main branch -- Monday
 - add blocking comments + notice + tickler -- Tuesday, Wednesday, Thursday +1 week
 - Terms of use email should we sent on new sign-ups not only invites -- Thursday
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
-Shifted by 2 days because of:
-  notices (lost 2 days extra)
-  not working on the weekend (lost 1 day)
-  locking and cancellation for locking was easy due to built infrastructure (gained 3 days)
+- SMS integration with twilio-meteor
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

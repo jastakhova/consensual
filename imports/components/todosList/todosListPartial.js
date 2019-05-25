@@ -4,10 +4,20 @@ import ProfileUtils from  './profile.js';
 import { Tasks, Invitees } from '../../api/tasks.js';
 import DateTimePicker from 'date-time-picker';
 
+
+function getMidnight(time) {
+  const day = new Date(time);
+  day.setHours(0, 0, 0, 0);
+  return day;
+}
+
+function getMidnightTime(time) {
+  return getMidnight(time).getTime();
+}
+
 const nextMidnight = new Date(moment().format());
 nextMidnight.setHours(24, 0, 0, 0);
-const prevMidnight = new Date(moment().format());
-prevMidnight.setHours(0, 0, 0, 0);
+const prevMidnight = getMidnight(moment().format());
 const dayAgo = new Date(moment().subtract({ hours: 24}).format());
 
 export class TodosListPartialCtrl extends Controller {
@@ -123,7 +133,7 @@ export class TodosListPartialCtrl extends Controller {
       {name: "By Time", visible: true,
         configuration: {
           sort: "eta",
-          grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
+          grouping: function(task) { return getMidnightTime(task.eta); },
           groupingName: formatDate,
           ingroupSort: sortingByETA,
           limit: 3}},
@@ -153,7 +163,7 @@ export class TodosListPartialCtrl extends Controller {
 
     this.currentSort = requestedSort.length > 0 ? requestedSort[0] : this.sorts[1]; // Default, not initial
     this.currentFilter = requestedFilter.length > 0 ? requestedFilter[0] : this.filters[0];
-    this.currentDate = this.$state.params.date ? parseInt(this.$state.params.date) : new Date(moment().format()).getTime();
+    this.currentDate = this.$state.params.date ? parseInt(this.$state.params.date) : getMidnightTime(moment().format());
 
     this.adjustFilters = function() {
       if ($("#filters").find($("button.filterToggle")).length == 0) {
