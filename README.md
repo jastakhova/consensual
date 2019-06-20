@@ -21,18 +21,30 @@ Thanks for your support!
 
 ## Roadmap
 
-### Alpha Release (v0): 2018 Q4
-#### Urgent tasks
-None
+#### Nearest plan
+
+- Wix Page [Day]
+- PitchDec [Day]
+
+- Refactoring for speed (getting rid of subscriptions) [Yulia]
+- Native login [Yulia]
+- Finishing Approval flow (copy & blocking comments & etc) [Yulia]
+
+- Demo [Yulia]
+- Good design [Yulia]
+
+- Facebook blogging [Day]
+- Socializing w/ investors [Day]
+- ExecSum [Day]
+
 
 #### Active ToDo
 
 - "You changed" in activity log (id=kcZue8cQarRvrNhAF)
 - On profile page it is possible to remove other person notifications + Your Recent Activity block doesn't make sense
-- add Copy action -- Friday
-- transition to main branch -- Monday
-- add blocking comments + notice + tickler -- Tuesday, Wednesday, Thursday +1 week
-- Terms of use email should we sent on new sign-ups not only invites -- Thursday
+- add Copy action
+- add blocking comments + notice + tickler
+- Terms of use email should we sent on new sign-ups not only invites
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
 - SMS integration with twilio-meteor
 
