@@ -28,6 +28,7 @@ export class TodosListPartialCtrl extends Controller {
   	this.scope = args[0];
 
     this.handleTasks = this.subscribe('tasks');
+    this.subscribe('currentuser');
 
     this.filtersOpen = false;
 
@@ -212,9 +213,6 @@ export class TodosListPartialCtrl extends Controller {
     });
 
     this.todoListMain = function(useSuggest, oneTime, additionalFilter) {
-        if (!this.handleTasks.ready()) {
-          return [];
-        }
         var startTime = new Date().getTime();
 
         if (!filterAdjustingWasMade) {

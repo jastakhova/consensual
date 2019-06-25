@@ -7,7 +7,7 @@ import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
 import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest, getState, getCurrentState} from './dictionary.js';
-import {Tasks, Emails, Invitees, createTickler} from './background.js';
+import {Tasks, Emails, Invitees, createTickler, getName} from './background.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export {
@@ -37,14 +37,6 @@ function getMailingTemplate() {
   }
 
   return mailingTemplate;
-}
-
-function getName(user) {
-  return user.username ? user.username : user.profile.name;
-}
-
-function getEmail(user) {
-  return user.email ? user.email : user.services.facebook.email;
 }
 
 function notifyOnNewValue(task, receiver, verb, entity, newValue, oldValue, timezone) {

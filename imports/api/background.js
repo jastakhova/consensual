@@ -14,6 +14,14 @@ export const createTickler = function (ticklerId) {
  };
 };
 
+export const getName = function (user) {
+  return user.username ? user.username : user.profile.name;
+}
+
+function getEmail(user) {
+  return user.email ? user.email : user.services.facebook.email;
+}
+
 if (Meteor.isServer) {
   Meteor.setInterval(function() {
     console.log("Starting sending cycle...");

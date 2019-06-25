@@ -65,25 +65,6 @@ var ProfileUtils = {
     return user.email ? user.email : user.services.facebook.email;
   },
 
-  getConnectedPeople: function(controller, tasksDB, inviteesDB) {
-    var connectedUsers = new Set();
-    tasksDB.find({$or: [{"author.id": Meteor.userId()}, {"receiver.id": Meteor.userId()}]}).fetch().forEach(task => {
-      connectedUsers.add(task.author.id);
-      connectedUsers.add(task.receiver.id);
-    });
-
-    controller.invitees = inviteesDB.find().fetch();
-    var existingUsers = Meteor.users.find({$or: [
-        {_id: {$in: Array.from(connectedUsers)}},
-        ProfileUtils.foundersFilter()]},
-      {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1}}).fetch();
-    return controller.invitees.concat(existingUsers);
-  },
-
-  getId2User: function(controller, tasksDB, inviteesDB) {
-    return ProfileUtils.createMapFromList(ProfileUtils.getConnectedPeople(controller, tasksDB, inviteesDB), "_id");
-  },
-
   getSuggest: function(id2user) {
     var suggest = [];
     var suggestSize = 0;

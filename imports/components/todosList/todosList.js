@@ -1,12 +1,10 @@
 import { Tasks, Invitees } from '../../api/tasks.js';
 import moment from 'moment';
-//import { Controller } from 'angular-ecmascript/module-helpers';
 import { TodosListPartialCtrl } from './todosListPartial.js';
 import DateTimePicker from 'date-time-picker';
 import ProfileUtils from  './profile.js';
 import '../../../public/assets/js/bootstrap-typeahead.min.js';
 
-//export default class TodosListCtrl extends Controller {
 export default class TodosListCtrl extends TodosListPartialCtrl {
 
   constructor() {
@@ -15,7 +13,6 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
   	this.scope = arguments[0];
 
     this.handleInvitees = this.subscribe('invitees');
-//    this.handleAllUsers = this.subscribe('allusers');
 
     this.hideCompleted = false;
     this.proposingInProgress = false;
@@ -29,12 +26,7 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
 
     this.helpers({
       tasks() {
-        if (!this.handleTasks.ready() || !this.handleInvitees.ready()) {
-          return [];
-        }
-
         try {
-          var proposingInProgress = this.getReactively("proposingInProgress");
           var popularUsers = this.popularUsers;
 
           return this.todoListMain(function(getSuggest) {
