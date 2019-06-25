@@ -7,7 +7,7 @@ import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
 import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest, getState, getCurrentState} from './dictionary.js';
-import {Tasks, Emails, Invitees, createTickler, getName} from './background.js';
+import {Tasks, Emails, Invitees, createTickler, getName, updateTicklersRaw, createNotice} from './background.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export {
@@ -76,23 +76,12 @@ function touchNotice(notices, noticeReceiverId) {
     : notices;
 }
 
-function createNotice(notice) {
-  return {
-      code: notice.id,
-      created: new Date().getTime()
-   };
-}
-
 function updateNotices(person, notice) {
   return person.id === Meteor.userId() ? person.notices : person.notices.concat(notice);
 }
 
 function updateTicklers(person, ticklerId, task) {
-  return task.author.id === task.receiver.id
-    || person.id === Meteor.userId()
-    || person.ticklers.filter(t => t.id === ticklerId).length > 0
-      ? person.ticklers
-      : person.ticklers.concat(createTickler(ticklerId));
+  return updateTicklersRaw(person, ticklerId, task, person.id === Meteor.userId());
 }
 
 function changeStatusesOnEditing(task) {
@@ -912,13 +901,6 @@ if (Meteor.isServer) {
     function () {
           return Meteor.users.find({_id: this.userId},
             {fields: {"username": 1, "email" : 1, "subscribed": 1, "profile.name" : 1, "services.facebook.email": 1, "services.facebook.id": 1}});
-        }
-  );
-
-  Meteor.publish("allusers",
-    function () {
-          return Meteor.users.find({},
-            {fields: {"username": 1, "profile.name" : 1, "services.facebook.id": 1, "email": 1, "services.facebook.email": 1, "services.facebook.name": 1}});
         }
   );
 }

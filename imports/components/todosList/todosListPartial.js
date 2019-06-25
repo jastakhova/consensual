@@ -3,6 +3,7 @@ import {getStatus, getNotice, getCurrentState} from '../../api/dictionary.js';
 import ProfileUtils from  './profile.js';
 import { Tasks, Invitees } from '../../api/tasks.js';
 import DateTimePicker from 'date-time-picker';
+import { ReactiveVar } from 'meteor/reactive-var'
 
 
 function getMidnight(time) {
@@ -27,12 +28,11 @@ export class TodosListPartialCtrl extends Controller {
 
   	this.scope = args[0];
 
-    this.handleTasks = this.subscribe('tasks');
     this.subscribe('currentuser');
 
     this.filtersOpen = false;
 
-    this.id2ConnectedUser = {};
+    this.id2ConnectedUser = new ReactiveVar({});
 
     this.searchEdit = false;
     this.search = "";
@@ -88,7 +88,8 @@ export class TodosListPartialCtrl extends Controller {
         configuration: {
           sort: "eta",
           grouping: function(task) {const day = new Date(task.eta); day.setHours(0, 0, 0, 0); return day.getTime();},
-          groupingName: formatDate}, additionalGroups: [
+          groupingName: formatDate},
+          additionalGroups: [
             {name: "Notifications", selector:
               { $or: [
                 {"author.id" : Meteor.userId(), "author.notices": {$exists: true, $not: {$size: 0}}},
@@ -226,27 +227,28 @@ export class TodosListPartialCtrl extends Controller {
       	var searchValue = this.getReactively("search");
       	var dateValue = this.getReactively("currentDate");
       	var withArchiveFlag = this.getReactively("searchWithArchive");
-      	var id2ConnectedUser = this.getReactively("id2ConnectedUser");
 
-        if (Object.keys(id2ConnectedUser).length === 0 /*|| needs update */) {
+        console.log("Loading");
+        if (Object.keys(controller.id2ConnectedUser.get()).length === 0) {
           Meteor.call('users.getConnected', function(err, result) {
             if (err) {
               ProfileUtils.processMeteorResult(err, result);
               return;
             }
 
-            controller.id2ConnectedUser = ProfileUtils.createMapFromList(result, "_id");
+            controller.id2ConnectedUser.set(ProfileUtils.createMapFromList(result, "_id"));
+            console.log("Assigned " + Meteor.isServer);
           });
         }
 
-        if (Object.keys(id2ConnectedUser).length > 0) {
+        if (Object.keys(controller.id2ConnectedUser.get()).length > 0) {
           if (this.getReactively("proposingInProgress")) {
-            useSuggest(ProfileUtils.getSuggest(controller.id2ConnectedUser));
+            useSuggest(ProfileUtils.getSuggest(controller.id2ConnectedUser.get()));
           }
 
           if (this.getReactively("searchEdit") && !this.searchTypeahead) {
             $(".searchtypeahead").typeahead({
-              source: ProfileUtils.getSuggest(controller.id2ConnectedUser)(),
+              source: ProfileUtils.getSuggest(controller.id2ConnectedUser.get())(),
               matcher: function(item) {
                 return item.name.startsWith(this.query.replace(/^from:/g, "").replace(/^to:/g, ""));
               },
@@ -265,8 +267,8 @@ export class TodosListPartialCtrl extends Controller {
         function prepareTask(x) {
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
-          x.authorPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser[x.author.id]);
-          x.receiverPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser[x.receiver.id]);
+          x.authorPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser.get()[x.author.id]);
+          x.receiverPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser.get()[x.receiver.id]);
           x.fromCurrentUser = x.author.id === Meteor.userId() && x.author.id != x.receiver.id;
           x.toCurrentUser = x.receiver.id === Meteor.userId() && x.author.id != x.receiver.id;
           return x;
@@ -305,7 +307,7 @@ export class TodosListPartialCtrl extends Controller {
         }
 
         var additionalGroups = [];
-        if (sortMethod.name == "Default" && selector.name === this.filters[0].name && searchValue === "") {
+        if (sortMethod.name == "Default" && selector.name === this.filters[0].name && searchValue === "" && !this.profileId) {
           sortMethod = this.sorts[0]; // doing "Initial" style of sorting
           additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
             var selector = additionalFilter ? {$and: [additionalFilter, sortGroup.selector]} : sortGroup.selector;
@@ -313,7 +315,7 @@ export class TodosListPartialCtrl extends Controller {
               .sort(sortGroup.sort)
               .map(sortGroup.prepare ? function(task) {
                 var prepared = sortGroup.prepare(task);
-                prepared.notice.actor.picture = ProfileUtils.pictureSmall(controller.id2ConnectedUser[prepared.notice.actor.id]);
+                prepared.notice.actor.picture = ProfileUtils.pictureSmall(controller.id2ConnectedUser.get()[prepared.notice.actor.id]);
                 return prepared;
                 } : prepareTask);
             return {

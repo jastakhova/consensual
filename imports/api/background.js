@@ -14,6 +14,21 @@ export const createTickler = function (ticklerId) {
  };
 };
 
+export const createNotice = function (notice) {
+ return {
+     code: notice.id,
+     created: new Date().getTime()
+  };
+}
+
+export const updateTicklersRaw = function (person, ticklerId, task, noUpdate) {
+ return task.author.id === task.receiver.id
+   || noUpdate
+   || person.ticklers.filter(t => t.id === ticklerId).length > 0
+     ? person.ticklers
+     : person.ticklers.concat(createTickler(ticklerId));
+}
+
 export const getName = function (user) {
   return user.username ? user.username : user.profile.name;
 }
@@ -214,8 +229,8 @@ if (Meteor.isServer) {
         console.log(task._id);
         Tasks.update(task._id, {
           $set: {
-            "author.ticklers": updateTicklers(task.author, tickler, task),
-            "receiver.ticklers": updateTicklers(task.receiver, tickler, task)
+            "author.ticklers": updateTicklersRaw(task.author, tickler, task, false),
+            "receiver.ticklers": updateTicklersRaw(task.receiver, tickler, task, false)
           }
         });
     });

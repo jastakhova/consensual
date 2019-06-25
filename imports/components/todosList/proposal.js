@@ -14,9 +14,7 @@ export default class ProposalCtrl extends Controller {
 
     this.handleTasks = Meteor.subscribe('task', this.$stateParams.proposalId);
 
-    if (Meteor.userId()) {
-			this.subscribe('allusers');
-		}
+    this.subscribe('currentuser');
 
     this.proposalId = this.$stateParams.proposalId;
     this.editingTime = false;
@@ -30,9 +28,13 @@ export default class ProposalCtrl extends Controller {
     this.acknowledgeLabel = 'Approve';
     this.needsToApproveStatusChange = false;
     this.editor = undefined;
+    this.id2ConnectedUser = {};
 
     this.helpers({
       data() {
+        var id2ConnectedUser = this.getReactively("id2ConnectedUser");
+        this.id2ConnectedUser = id2ConnectedUser; // needed to simulate usage of the previous var
+
         if (!this.handleTasks.ready()) {
           return {};
         }
@@ -60,6 +62,19 @@ export default class ProposalCtrl extends Controller {
           return timeObj.format("hh:mm a");
         }
 
+        var controller = this;
+        if (Object.keys(id2ConnectedUser).length === 0) {
+          Meteor.call('users.getConnected', function(err, result) {
+            if (err) {
+              ProfileUtils.processMeteorResult(err, result);
+              return;
+            }
+
+            controller.id2ConnectedUser = ProfileUtils.createMapFromList(result, "_id");
+          });
+        }
+
+
         var users = Meteor.users.find({$or: [{_id: foundTask.author.id}, {_id: foundTask.receiver.id}]}).fetch();
         var id2user = ProfileUtils.createMapFromList(users, "_id");
         foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
@@ -72,8 +87,8 @@ export default class ProposalCtrl extends Controller {
 
         foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
 
-        foundTask.authorPicture = ProfileUtils.pictureBig(id2user[foundTask.author.id]);
-        foundTask.receiverPicture = ProfileUtils.pictureBig(id2user[foundTask.receiver.id]);
+        foundTask.authorPicture = ProfileUtils.pictureBig(this.id2ConnectedUser[foundTask.author.id]);
+        foundTask.receiverPicture = ProfileUtils.pictureBig(this.id2ConnectedUser[foundTask.receiver.id]);
         if (foundTask.request) {
           foundTask.request.type = getRequest(foundTask.request.id);
         }

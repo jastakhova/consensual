@@ -12,6 +12,7 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
 
   	this.scope = arguments[0];
 
+    this.subscribe('tasks');
     this.handleInvitees = this.subscribe('invitees');
 
     this.hideCompleted = false;
