@@ -859,6 +859,12 @@ Meteor.methods({
 
     return Meteor.users.find({_id: {$in: receivers}}).fetch();
   },
+  'users.getAll' (fields) {
+    if (!Meteor.isServer) {
+      return [];
+    }
+    return Meteor.users.find({}, {fields: {"username": 1, "profile.name" : 1}}).fetch();
+  },
   'users.getConnected' () {
     if (!Meteor.isServer) {
       return [];

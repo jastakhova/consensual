@@ -15,7 +15,7 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
   	this.scope = arguments[0];
 
     this.handleInvitees = this.subscribe('invitees');
-    this.handleAllUsers = this.subscribe('allusers');
+//    this.handleAllUsers = this.subscribe('allusers');
 
     this.hideCompleted = false;
     this.proposingInProgress = false;
@@ -34,14 +34,11 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
         }
 
         try {
-          var handleAllUsers = this.handleAllUsers;
           var proposingInProgress = this.getReactively("proposingInProgress");
           var popularUsers = this.popularUsers;
 
           return this.todoListMain(function(getSuggest) {
-            if (handleAllUsers.ready() && proposingInProgress && Meteor.userId()) {
-              $(".nametypeahead").typeahead({ source: getSuggest(), autoSelect: false});
-            }
+            $(".nametypeahead").typeahead({ source: getSuggest(), autoSelect: false});
           }, function() {
             Meteor.call('users.getPopular', 3, function(err, result) {
               result.forEach(r => {

@@ -31,6 +31,8 @@ export class TodosListPartialCtrl extends Controller {
 
     this.filtersOpen = false;
 
+    this.id2ConnectedUser = {};
+
     this.searchEdit = false;
     this.search = "";
     this.searchWithArchive = false;
@@ -197,6 +199,18 @@ export class TodosListPartialCtrl extends Controller {
     $("#filters").resize(this.adjustFilters);
     var filterAdjustingWasMade = false;
 
+    var controller = this;
+    Meteor.call('users.getAll', {"username": 1, "profile.name" : 1}, function(err, result) {
+      if (err) {
+        ProfileUtils.processMeteorResult(err, result);
+        return;
+      }
+
+      if (controller.allUsers.length == 0) {
+        result.forEach(r => controller.allUsers.push(r));
+      }
+    });
+
     this.todoListMain = function(useSuggest, oneTime, additionalFilter) {
         if (!this.handleTasks.ready()) {
           return [];
@@ -214,37 +228,50 @@ export class TodosListPartialCtrl extends Controller {
       	var searchValue = this.getReactively("search");
       	var dateValue = this.getReactively("currentDate");
       	var withArchiveFlag = this.getReactively("searchWithArchive");
+      	var id2ConnectedUser = this.getReactively("id2ConnectedUser");
 
-      	var id2user = ProfileUtils.getId2User(this, Tasks, Invitees);
-      	this.allUsers = Meteor.users.find({}, {fields: {"username": 1, "profile.name" : 1}}).fetch();
+        if (Object.keys(id2ConnectedUser).length === 0 /*|| needs update */) {
+          Meteor.call('users.getConnected', function(err, result) {
+            if (err) {
+              ProfileUtils.processMeteorResult(err, result);
+              return;
+            }
 
-        useSuggest(ProfileUtils.getSuggest(id2user));
+            controller.id2ConnectedUser = ProfileUtils.createMapFromList(result, "_id");
+          });
+        }
+
+        if (Object.keys(id2ConnectedUser).length > 0) {
+          if (this.getReactively("proposingInProgress")) {
+            useSuggest(ProfileUtils.getSuggest(controller.id2ConnectedUser));
+          }
+
+          if (this.getReactively("searchEdit") && !this.searchTypeahead) {
+            $(".searchtypeahead").typeahead({
+              source: ProfileUtils.getSuggest(controller.id2ConnectedUser)(),
+              matcher: function(item) {
+                return item.name.startsWith(this.query.replace(/^from:/g, "").replace(/^to:/g, ""));
+              },
+              autoSelect: false,
+              updater: function(item) {
+                var newSearch = (this.query.startsWith("from:") ? "from:" : "to:") + item.name;
+                return {name: newSearch, id: item.id};
+              },
+              afterSelect: function(item) {
+                $(".searchtypeahead")[0].dispatchEvent(new Event("input", { bubbles: true }));
+              }});
+            this.searchTypeahead = true;
+          }
+        }
 
         function prepareTask(x) {
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
-          x.authorPicture = ProfileUtils.pictureSmall(id2user[x.author.id]);
-          x.receiverPicture = ProfileUtils.pictureSmall(id2user[x.receiver.id]);
+          x.authorPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser[x.author.id]);
+          x.receiverPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser[x.receiver.id]);
           x.fromCurrentUser = x.author.id === Meteor.userId() && x.author.id != x.receiver.id;
           x.toCurrentUser = x.receiver.id === Meteor.userId() && x.author.id != x.receiver.id;
           return x;
-        }
-
-        if (this.getReactively("searchEdit") && !this.getReactively("searchTypeahead")) {
-          $(".searchtypeahead").typeahead({
-            source: ProfileUtils.getSuggest(id2user)(),
-            matcher: function(item) {
-              return item.name.startsWith(this.query.replace(/^from:/g, "").replace(/^to:/g, ""));
-            },
-            autoSelect: false,
-            updater: function(item) {
-              var newSearch = (this.query.startsWith("from:") ? "from:" : "to:") + item.name;
-              return {name: newSearch, id: item.id};
-            },
-            afterSelect: function(item) {
-              $(".searchtypeahead")[0].dispatchEvent(new Event("input", { bubbles: true }));
-            }});
-          this.searchTypeahead = true;
         }
 
         function retrieveSearchSelector(query, controller) {
@@ -288,7 +315,7 @@ export class TodosListPartialCtrl extends Controller {
               .sort(sortGroup.sort)
               .map(sortGroup.prepare ? function(task) {
                 var prepared = sortGroup.prepare(task);
-                prepared.notice.actor.picture = ProfileUtils.pictureSmall(id2user[prepared.notice.actor.id]);
+                prepared.notice.actor.picture = ProfileUtils.pictureSmall(controller.id2ConnectedUser[prepared.notice.actor.id]);
                 return prepared;
                 } : prepareTask);
             return {
