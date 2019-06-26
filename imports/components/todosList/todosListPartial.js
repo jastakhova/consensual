@@ -228,7 +228,6 @@ export class TodosListPartialCtrl extends Controller {
       	var dateValue = this.getReactively("currentDate");
       	var withArchiveFlag = this.getReactively("searchWithArchive");
 
-        console.log("Loading");
         if (Object.keys(controller.id2ConnectedUser.get()).length === 0) {
           Meteor.call('users.getConnected', function(err, result) {
             if (err) {
@@ -237,7 +236,6 @@ export class TodosListPartialCtrl extends Controller {
             }
 
             controller.id2ConnectedUser.set(ProfileUtils.createMapFromList(result, "_id"));
-            console.log("Assigned " + Meteor.isServer);
           });
         }
 

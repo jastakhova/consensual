@@ -7,6 +7,7 @@ import {parse} from 'markdown/lib/index'
 import marked from 'marked'
 import 'bootstrap-markdown/js/bootstrap-markdown';
 import {getCurrentState, getAction, getCondition, getNotice, getRequest} from '../../api/dictionary.js';
+import { ReactiveVar } from 'meteor/reactive-var'
 
 export default class ProposalCtrl extends Controller {
   constructor() {
@@ -28,13 +29,10 @@ export default class ProposalCtrl extends Controller {
     this.acknowledgeLabel = 'Approve';
     this.needsToApproveStatusChange = false;
     this.editor = undefined;
-    this.id2ConnectedUser = {};
+    this.id2ConnectedUser = new ReactiveVar({});
 
     this.helpers({
       data() {
-        var id2ConnectedUser = this.getReactively("id2ConnectedUser");
-        this.id2ConnectedUser = id2ConnectedUser; // needed to simulate usage of the previous var
-
         if (!this.handleTasks.ready()) {
           return {};
         }
@@ -63,14 +61,14 @@ export default class ProposalCtrl extends Controller {
         }
 
         var controller = this;
-        if (Object.keys(id2ConnectedUser).length === 0) {
+        if (Object.keys(this.id2ConnectedUser.get()).length === 0) {
           Meteor.call('users.getConnected', function(err, result) {
             if (err) {
               ProfileUtils.processMeteorResult(err, result);
               return;
             }
 
-            controller.id2ConnectedUser = ProfileUtils.createMapFromList(result, "_id");
+            controller.id2ConnectedUser.set(ProfileUtils.createMapFromList(result, "_id"));
           });
         }
 
@@ -87,8 +85,8 @@ export default class ProposalCtrl extends Controller {
 
         foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
 
-        foundTask.authorPicture = ProfileUtils.pictureBig(this.id2ConnectedUser[foundTask.author.id]);
-        foundTask.receiverPicture = ProfileUtils.pictureBig(this.id2ConnectedUser[foundTask.receiver.id]);
+        foundTask.authorPicture = ProfileUtils.pictureBig(this.id2ConnectedUser.get()[foundTask.author.id]);
+        foundTask.receiverPicture = ProfileUtils.pictureBig(this.id2ConnectedUser.get()[foundTask.receiver.id]);
         if (foundTask.request) {
           foundTask.request.type = getRequest(foundTask.request.id);
         }
