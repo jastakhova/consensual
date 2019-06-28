@@ -29,14 +29,6 @@ export const updateTicklersRaw = function (person, ticklerId, task, noUpdate) {
      : person.ticklers.concat(createTickler(ticklerId));
 }
 
-export const getName = function (user) {
-  return user.username ? user.username : user.profile.name;
-}
-
-function getEmail(user) {
-  return user.email ? user.email : user.services.facebook.email;
-}
-
 if (Meteor.isServer) {
   Meteor.setInterval(function() {
     console.log("Starting sending cycle...");
@@ -78,9 +70,9 @@ if (Meteor.isServer) {
 
     emails.forEach(function(record) {
       var receiver = id2user.get(record._id);
-      if (receiver && receiver.services && receiver.services.facebook && getEmail(receiver)) {
-        var receiverEmail = getEmail(receiver);
-        var receiverName = getName(receiver);
+      if (receiver && receiver.services && receiver.services.facebook && ProfileUtils.getEmail(receiver)) {
+        var receiverEmail = ProfileUtils.getEmail(receiver);
+        var receiverName = ProfileUtils.getName(receiver);
 
         console.log("Sending mail to " + receiverName + " at " + receiverEmail);
         var groupedByActor = Object.values(_.groupBy(record.emails, m => m.actor + m.task))
@@ -88,7 +80,7 @@ if (Meteor.isServer) {
         var allUpdates = groupedByActor.map(function(taskGroup) {
           var taskId = taskGroup[0].task;
           var task = id2task.get(taskId);
-          var actorName = getName(id2user.get(taskGroup[0].actor));
+          var actorName = ProfileUtils.getName(id2user.get(taskGroup[0].actor));
           var link = process.env.ROOT_URL + "/#!/tab/proposal/" + taskId;
           var href = "<a href=\"" + link + "\">'" + task.title + "'</a>";
 
@@ -124,7 +116,7 @@ if (Meteor.isServer) {
         var activityToSend = record.emails[0];
 
         var task = id2task.get(activityToSend.task);
-        var subject = "Recent changes to Consensual agreements" + (groupedByActor.length > 1 ? "" : " by " + getName(id2user.get((groupedByActor[0])[0].actor)));
+        var subject = "Recent changes to Consensual agreements" + (groupedByActor.length > 1 ? "" : " by " + ProfileUtils.getName(id2user.get((groupedByActor[0])[0].actor)));
         var text = "<html><body>Hi!<br/>" + allUpdates.join('') + "</body></html>";
         Meteor.call('email.send', receiverName + "<" + receiverEmail + ">", subject, text);
         var emailIds = record.emails.map(e => e._id);

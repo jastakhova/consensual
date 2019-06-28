@@ -695,10 +695,10 @@ Meteor.methods({
 
     Meteor.users.update({_id: Meteor.userId()}, { $set: { username: name }});
   },
-  'users.updateEmail' (email) {
+  'users.updateEmail' (email, id) {
     check(email, String);
 
-    Meteor.users.update({_id: Meteor.userId()}, { $set: { email }});
+    Meteor.users.update({_id: (id ? id : Meteor.userId())}, { $set: { email }});
   },
   'users.subscribe' (subscribed) {
     Meteor.users.update({_id: Meteor.userId()}, { $set: { subscribed }});

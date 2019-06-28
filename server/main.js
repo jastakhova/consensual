@@ -185,6 +185,22 @@ if (Meteor.isServer) {
   });
 }
 
+Accounts.emailTemplates.siteName = "Consensual";
+Accounts.emailTemplates.from = "Team Consensual <team.consensual@gmail.com>";
+Accounts.emailTemplates.verifyEmail.subject = function (user) {
+    return "Email verification @ Consensual";
+};
+Accounts.emailTemplates.verifyEmail.html = function (user, url) {
+   return "Hi " + user.profile.name + ",\n\n<br/><br/>" +
+     " Please verify your email by simply clicking the link below:\n\n" + url;
+};
+
+AccountsTemplates.configure({
+    postSignUpHook: function(userId, info) {
+      Meteor.call('users.updateEmail', "undefined", userId);
+    }
+});
+
 //Package.onTest(function (api) {
 //  api.use('cultofcoders:mocha');
 //

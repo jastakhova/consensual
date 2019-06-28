@@ -87,3 +87,21 @@ var ProfileUtils = {
 };
 
 export default ProfileUtils;
+
+AccountsTemplates.configure({
+    overrideLoginErrors: false,
+    sendVerificationEmail: true,
+    confirmPassword: false,
+    continuousValidation: true,
+    negativeValidation: true,
+    negativeFeedback: true
+});
+
+AccountsTemplates.addField({
+    _id: 'name',
+    type: 'text',
+    required: true,
+    minLength: 5,
+    displayName: "Name",
+    errStr: 'At least 5 symbols',
+});

@@ -158,32 +158,19 @@ consensual.directive('contactsOnly', function() {
   };
 });
 
-AccountsTemplates.configure({
-    //defaultLayout: 'emptyLayout',
-    showForgotPasswordLink: false,
-    overrideLoginErrors: true,
-    enablePasswordChange: true,
-    sendVerificationEmail: false,
-    //enforceEmailVerification: true,
-    //confirmPassword: true,
-    //continuousValidation: false,
-    //displayFormLabels: false,
-    forbidClientAccountCreation: true,
-    //formValidationFeedback: true,
-    //homeRoutePath: 'paaths',
-    //showAddRemoveServices: false,
-    //showPlaceholders: true,
-
-    negativeValidation: false,
-    negativeFeedback: false,
-    positiveValidation: false,
-    positiveFeedback: false,
-
-    // Privacy Policy and Terms of Use
-    //privacyUrl: 'privacy',
-    //termsUrl: 'terms-of-use',
-
-    // onSubmitHook: mySubmitFunc
+Accounts.verifyEmail = _.wrap(Accounts.verifyEmail, function (origVerifyEmail, token, callback) {
+  return origVerifyEmail.call(Accounts, token, _.wrap(callback, function (origCallback, err) {
+    try {
+      if (! err) {
+        Meteor.users.find({$and: [{ 'email': { $exists: false } , 'emails.verified': { $exists: true }}]})
+        .fetch().forEach(function(user) {
+          Meteor.call('users.updateEmail', user.emails[0].address);
+       });
+      }
+    } finally {
+      return origCallback.apply(null, _.rest(arguments));
+    }
+  }));
 });
 
 new Loader(App)

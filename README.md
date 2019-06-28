@@ -26,8 +26,9 @@ Thanks for your support!
 - Wix Page [Day]
 - PitchDec [Day]
 
-- Refactoring for speed (getting rid of subscriptions) [Yulia]
++ Refactoring for speed (getting rid of subscriptions) [Yulia]
 - Native login [Yulia]
+  - Native app login and register
 - Finishing Approval flow (copy & blocking comments & etc) [Yulia]
 
 - Demo [Yulia]
@@ -47,6 +48,9 @@ Thanks for your support!
 - Terms of use email should we sent on new sign-ups not only invites
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
 - SMS integration with twilio-meteor
+- No forgot or reset password
+- no picture for native logins
+- no email verification on email change
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires
