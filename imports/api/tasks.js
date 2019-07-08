@@ -7,7 +7,7 @@ import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
 import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest, getState, getCurrentState} from './dictionary.js';
-import {Tasks, Emails, Invitees, createTickler, getName, updateTicklersRaw, createNotice} from './background.js';
+import {Tasks, Emails, Invitees, createTickler, updateTicklersRaw, createNotice} from './background.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export {
@@ -107,7 +107,7 @@ function registerChange(taskId, isNotNeeded, fillActivity, fillUpdateEntity, not
   var newStatuses = changeStatusesOnEditing(task);
   var activity = {
      actor: Meteor.userId(),
-     actorName: getName(Meteor.user()),
+     actorName: ProfileUtils.getName(Meteor.user()),
      time: new Date().getTime()
   };
   fillActivity(task, activity);
@@ -147,7 +147,7 @@ Meteor.methods({
 
     var actor = newTask.author ? newTask.author : Meteor.userId();
     var actorUser = Meteor.users.findOne({_id: actor});
-    var actorName = getName(actorUser);
+    var actorName = ProfileUtils.getName(actorUser);
     var selfAgreement = newTask.receiver === actor;
     var receiver = selfAgreement
       ? actorUser
@@ -185,7 +185,7 @@ Meteor.methods({
 
      var receiver = {
        id: newTask.receiver,
-       name: getName(receiver),
+       name: ProfileUtils.getName(receiver),
        status: selfAgreement ? 'green' : 'grey',
        notices: notices,
        ticklers: []
@@ -334,7 +334,7 @@ Meteor.methods({
 
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: getStatus("agreed").id,
        time: new Date().getTime()
@@ -369,7 +369,7 @@ Meteor.methods({
 
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: getStatus("considered").id,
        time: new Date().getTime()
@@ -395,7 +395,7 @@ Meteor.methods({
     if (getCurrentState(task).id === getState("LOCKED").id) {
       var activity = {
          actor: Meteor.userId(),
-         actorName: getName(Meteor.user()),
+         actorName: ProfileUtils.getName(Meteor.user()),
          field: 'status',
          newValue: 'requested marking as Cancelled',
          time: new Date().getTime()
@@ -440,7 +440,7 @@ Meteor.methods({
 
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: getStatus("cancelled").id,
        time: new Date().getTime()
@@ -470,7 +470,7 @@ Meteor.methods({
 
     task.comments.push({
           author: Meteor.userId(),
-          authorName: getName(Meteor.user()),
+          authorName: ProfileUtils.getName(Meteor.user()),
           text: text,
           time: new Date().getTime()
         });
@@ -505,7 +505,7 @@ Meteor.methods({
     var activity = selfAgreement
     ? {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        oldValue: 'Open',
        newValue: 'Completed',
@@ -513,7 +513,7 @@ Meteor.methods({
      }
      : {
         actor: Meteor.userId(),
-        actorName: getName(Meteor.user()),
+        actorName: ProfileUtils.getName(Meteor.user()),
         field: 'status',
         newValue: 'requested marking as Done',
         time: new Date().getTime()
@@ -554,7 +554,7 @@ Meteor.methods({
     var request = getRequest(task.request.id);
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: request.activityLogApprovalRecord,
        time: new Date().getTime()
@@ -593,7 +593,7 @@ Meteor.methods({
     var request = getRequest(task.request.id);
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: request.activityLogDenialRecord,
        time: new Date().getTime()
@@ -624,7 +624,7 @@ Meteor.methods({
     var request = getRequest(task.request.id);
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: request.activityLogCancelRecord,
        time: new Date().getTime()
@@ -670,7 +670,7 @@ Meteor.methods({
 
     var activity = {
        actor: Meteor.userId(),
-       actorName: getName(Meteor.user()),
+       actorName: ProfileUtils.getName(Meteor.user()),
        field: 'status',
        newValue: 'locked the agreement',
        time: new Date().getTime()
@@ -721,7 +721,7 @@ Meteor.methods({
   'email.withError'(error) {
     if (Meteor.user()) {
       Meteor.call('email.send', 'Team Consensual <team.consensual@gmail.com>', "New Error " + error.message,
-        "Error occurred for " + getName(Meteor.user()) + " (" + Meteor.userId() + "). Proceed to " + process.env.ROOT_URL);
+        "Error occurred for " + ProfileUtils.getName(Meteor.user()) + " (" + Meteor.userId() + "). Proceed to " + process.env.ROOT_URL);
     }
   },
   'email.invite'(to) {
@@ -738,8 +738,8 @@ Meteor.methods({
 
       try {
         Meteor.call('email.send', to.name + ' <' + to.email + '>',
-            "Invitation to join Consensual from " + getName(Meteor.user()),
-            "<html><body>Hi!<br/>" + getName(Meteor.user()) + " invites you to join Consensual app." +
+            "Invitation to join Consensual from " + ProfileUtils.getName(Meteor.user()),
+            "<html><body>Hi!<br/>" + ProfileUtils.getName(Meteor.user()) + " invites you to join Consensual app." +
             "Proceed to " + process.env.ROOT_URL + "?in=" + id + ".</body></html>");
 
         Meteor.call('tasks.insert', {
