@@ -254,3 +254,8 @@ div.md-editor>textarea {
   position: relative;
   padding-left: 25px;
 }
+
+/* Overrides separator between login inputs */
+.table > tbody > tr > td {
+  border-top: none !important;
+}

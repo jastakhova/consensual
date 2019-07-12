@@ -27,8 +27,8 @@ Thanks for your support!
 - PitchDec [Day]
 
 + Refactoring for speed (getting rid of subscriptions) [Yulia]
-- Native login [Yulia]
-  - Native app login and register
++ Native login [Yulia]
+  + Native app login and register
 - Finishing Approval flow (copy & blocking comments & etc) [Yulia]
 
 - Demo [Yulia]
@@ -198,6 +198,18 @@ $ sudo node main.js
 ### Deployment
 ```
 $ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy app.consensu.al
+```
+
+### Deployment to ios device
+```
+meteor run ios-device --mobile-server https://app.consensu.al
+```
+
+Sometimes you also need a specific update, for example:
+```
+meteor update webapp
+meteor npm view cordova-plugin-facebook4 version
+meteor add cordova:cordova-plugin-facebook4@5.0.0
 ```
 
 ### Testing
