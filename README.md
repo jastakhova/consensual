@@ -41,7 +41,6 @@ Thanks for your support!
 
 #### Active ToDo
 
-- "You changed" in activity log (id=kcZue8cQarRvrNhAF)
 - On profile page it is possible to remove other person notifications + Your Recent Activity block doesn't make sense
 - add Copy action
 - add blocking comments + notice + tickler

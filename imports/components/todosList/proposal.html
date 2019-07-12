@@ -171,7 +171,7 @@
                 <span style="word-wrap:break-word" class="col-md-10 col-lg-10 col-sm-11 col-xs-9"><b>{{(activityRecord.actor === proposal.currentUser) ? 'You' : activityRecord.actorName }} </b>
                   {{activityRecord.field === 'agreement' ? 'created this ' : (activityRecord.field === 'status' && !activityRecord.oldValue ? activityRecord.newValue : 'changed')}}
                   <b ng-show="activityRecord.field !== 'status' || activityRecord.oldValue"> {{activityRecord.field}}</b>
-                  <span ng-show="activityRecord.oldValue"> from '{{proposal.display(activityRecord.oldValue)}}' to '{{proposal.display(activityRecord.newValue)}}'.</span>
+                  <span ng-show="activityRecord.oldValue"> from '{{proposal.display(activityRecord.oldValue, activityRecord.field === 'time')}}' to '{{proposal.display(activityRecord.newValue, activityRecord.field === 'time')}}'.</span>
                 </span>
               </div>
             </div>

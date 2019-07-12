@@ -195,7 +195,9 @@ if (Meteor.isServer) {
         var tasks2 = Tasks.find().fetch();
         assert.equal(tasks2.length, 1);
 
-        assert.ok(initialTime !== tasks2[0].eta);
+        var initialTimeTimestamp = new Date(moment(initialTime).format()).getTime();
+        assert.ok(initialTimeTimestamp !== tasks2[0].eta);
+        assert.ok(tasks2[0].activity.filter(a => a.oldValue == initialTimeTimestamp && a.newValue != initialTimeTimestamp).length > 0);
         assert.equal(getCurrentState(tasks2[0]).id, getState("PROPOSED").id);
 
         assert.equal(tasks[0].author.status, tasks2[0].author.status);

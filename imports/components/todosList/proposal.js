@@ -120,8 +120,8 @@ export default class ProposalCtrl extends Controller {
     return marked(text, { breaks: true });
   }
 
-  display(value) {
-    return (moment(new Date(value)).isValid() ? moment(new Date(value)).format(datetimeDisplayFormat) : value);
+  display(value, isDate) {
+    return (isDate ? moment(new Date(value)).format(datetimeDisplayFormat) : value);
   }
 
   logout() {

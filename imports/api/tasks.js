@@ -61,10 +61,6 @@ function notifyOnActivity(task, activity, timezone) {
     activity.newValue, activity.oldValue, timezone);
 }
 
-function capitalize(status) {
-  return status.charAt(0).toUpperCase() + status.slice(1);
-}
-
 function touchNotice(notices, noticeReceiverId) {
   return noticeReceiverId === Meteor.userId()
     ? notices.map(function(notice) {
@@ -77,7 +73,11 @@ function touchNotice(notices, noticeReceiverId) {
 }
 
 function updateNotices(person, notice) {
-  return person.id === Meteor.userId() ? person.notices : person.notices.concat(notice);
+  var earliest = person.notices.filter(n => n.code == notice.code).map(n => n.created).sort();
+  return person.id === Meteor.userId()
+    ? person.notices
+    : person.notices.concat(notice)
+        .filter(n => n.code != notice.code || earliest.length == 0 || earliest[0] == n.created);
 }
 
 function updateTicklers(person, ticklerId, task) {
@@ -110,7 +110,7 @@ function registerChange(taskId, isNotNeeded, fillActivity, fillUpdateEntity, not
      actorName: ProfileUtils.getName(Meteor.user()),
      time: new Date().getTime()
   };
-  fillActivity(task, activity);
+  fillActivity(activity, task);
   task.activity.push(activity);
 
   var notice = createNotice(getNotice("HAS_UPDATES"));
@@ -248,7 +248,7 @@ Meteor.methods({
 
     registerChange(taskId, function(task) {
       return newLocation === task.location;
-    }, function(task, activity) {
+    }, function(activity, task) {
       activity.field = 'location';
       activity.oldValue = task.location;
       activity.newValue = newLocation;
@@ -264,7 +264,7 @@ Meteor.methods({
 
     registerChange(taskId, function(task) {
       return newDescription === task.text;
-    }, function(task, activity) {
+    }, function(activity, task) {
       activity.field = 'description';
       activity.oldValue = task.text;
       activity.newValue = newDescription;
@@ -280,7 +280,7 @@ Meteor.methods({
 
     registerChange(taskId, function(task) {
       return newTitle === task.title;
-    }, function(task, activity) {
+    }, function(activity, task) {
       activity.field = 'title';
       activity.oldValue = task.title;
       activity.newValue = newTitle;

@@ -5,6 +5,10 @@ export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
 export const Invitees = new Mongo.Collection('invitees');
 
+function capitalize(status) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 export const createTickler = function (ticklerId) {
  return {
   id: ticklerId,
