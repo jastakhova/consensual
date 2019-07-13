@@ -41,8 +41,10 @@ Thanks for your support!
 
 #### Active ToDo
 
-- On profile page it is possible to remove other person notifications + Your Recent Activity block doesn't make sense
-- add Copy action
++ add Copy action
+  - Publish
+  - Delete
+  - reference links
 - add blocking comments + notice + tickler
 - Terms of use email should we sent on new sign-ups not only invites
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
@@ -50,6 +52,8 @@ Thanks for your support!
 - No forgot or reset password
 - no picture for native logins
 - no email verification on email change
+- on profile page all filters are opposite (for example "no response")
+- not obvious from whom to who
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

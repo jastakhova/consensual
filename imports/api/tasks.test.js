@@ -4,6 +4,7 @@ import { assert } from 'meteor/practicalmeteor:chai';
 import { sinon } from 'meteor/practicalmeteor:sinon';
 
 import { Invitees, Tasks } from './tasks.js';
+import { Drafts } from './drafts.js';
 import { getCurrentState, getState, getCondition, getNotice, getRequest } from './dictionary.js';
 
 if (Meteor.isServer) {
@@ -46,6 +47,7 @@ if (Meteor.isServer) {
 			afterEach(( ) => {
 			  Invitees.remove({_id: inviteeId});
 			  Tasks.remove({"author.id": userId});
+			  Drafts.remove({"author.id": userId});
 
         Meteor.users.remove({_id: userId});
         Meteor.users.remove({_id: otherUserId});
@@ -961,6 +963,30 @@ if (Meteor.isServer) {
         assert.equal(tasks4[0].author.notices.length, 2);
         assert.equal(tasks4[0].receiver.notices.length, 3);
         assert.equal(tasks4[0].author.status, getCondition("red").id);
+      });
+
+      it('can copy task', () => {
+        assert.equal(Tasks.find().count(), 0);
+
+        var task = {
+          task: "Long description",
+          time: moment().utc().format(),
+          receiver: otherUserId
+        };
+
+        const registerTask = Meteor.server.method_handlers['tasks.insert'];
+        registerTask.apply({}, [task]);
+
+        var tasks = Tasks.find().fetch();
+        assert.equal(tasks.length, 1);
+
+        const copyTask = Meteor.server.method_handlers['tasks.copy'];
+        var draftId = copyTask.apply({}, [tasks[0]._id]);
+        assert.ok(draftId.length > 0);
+
+        var drafts = Drafts.find().fetch();
+        assert.equal(drafts.length, 1);
+        assert.equal(drafts[0].author.id, userId);
       });
 		});
   });

@@ -20,6 +20,7 @@ import { FB_API } from 'bas-meteor-facebook-login';
 
 import TodosListCtrl from '../imports/components/todosList/todosList';
 import ProposalCtrl from '../imports/components/todosList/proposal';
+import DraftCtrl from '../imports/components/todosList/draft';
 import LoginCtrl from '../imports/components/account/login';
 import ProfileCtrl from '../imports/components/account/profile';
 import SettingsCtrl from '../imports/components/account/settings';
@@ -176,6 +177,7 @@ Accounts.verifyEmail = _.wrap(Accounts.verifyEmail, function (origVerifyEmail, t
 new Loader(App)
 	.load(TodosListCtrl)
 	.load(ProposalCtrl)
+	.load(DraftCtrl)
   .load(LoginCtrl)
   .load(ProfileCtrl)
   .load(SettingsCtrl)

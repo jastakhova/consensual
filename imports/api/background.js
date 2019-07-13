@@ -4,6 +4,7 @@ import ProfileUtils from '../components/todosList/profile.js';
 export const Tasks = new Mongo.Collection('tasks');
 export const Emails = new Mongo.Collection('emails');
 export const Invitees = new Mongo.Collection('invitees');
+export const Drafts = new Mongo.Collection('drafts');
 
 function capitalize(status) {
   return status.charAt(0).toUpperCase() + status.slice(1);

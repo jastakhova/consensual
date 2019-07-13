@@ -1,50 +1,42 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
-import { Tasks } from '../../api/tasks.js';
+import { Drafts } from '../../api/background.js';
 import ProfileUtils from './profile.js';
 import DateTimePicker from 'date-time-picker';
 import { Tracker } from 'meteor/tracker'
 import {parse} from 'markdown/lib/index'
 import marked from 'marked'
 import 'bootstrap-markdown/js/bootstrap-markdown';
-import {getCurrentState, getAction, getCondition, getNotice, getRequest} from '../../api/dictionary.js';
 import { ReactiveVar } from 'meteor/reactive-var'
 
-export default class ProposalCtrl extends Controller {
+export default class DraftCtrl extends Controller {
   constructor() {
     super(...arguments);
 
-    this.handleTasks = Meteor.subscribe('task', this.$stateParams.proposalId);
+    this.handleDrafts = Meteor.subscribe('draft', this.$stateParams.draftId);
 
     this.subscribe('currentuser');
 
-    this.proposalId = this.$stateParams.proposalId;
+    this.draftId = this.$stateParams.draftId;
     this.editingTime = false;
     this.editingLocation = false;
     this.editingDescription = false;
     this.editingTitle = false;
     this.currentUser = Meteor.userId();
-    this.currentUserIsInDoubt = false;
-    this.commentsShowed = true;
-    this.comment = '';
-    this.acknowledgeLabel = 'Approve';
-    this.needsToApproveStatusChange = false;
     this.editor = undefined;
     this.id2ConnectedUser = new ReactiveVar({});
 
     this.helpers({
       data() {
-        if (!this.handleTasks.ready()) {
+        if (!this.handleDrafts.ready()) {
           return {};
         }
 
         try {
-        var foundTask = Tasks.findOne({_id: this.proposalId});
-        if (!foundTask) {
+        var foundDraft = Drafts.findOne({_id: this.draftId});
+        if (!foundDraft) {
           this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
           return {};
         }
-
-        Meteor.call('tasks.removeNotice', this.proposalId, ProfileUtils.processMeteorResult);
 
         var currentTime = moment();
         var formatTime = function(ts) {
@@ -72,21 +64,10 @@ export default class ProposalCtrl extends Controller {
           });
         }
 
-        foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);
-        this.selectedDate = moment(foundTask.eta).format("MM-DD-YYYY");
-        this.selectedTime = moment(foundTask.eta).format("HH:mm");
-        this.previousDateTime = moment(foundTask.eta).format();
-        foundTask.comments.forEach(function(obj) {
-          obj.formattedTime = moment(obj.time).format("DD MMM h:mm a");
-        });
-
-        foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
-
-        foundTask.authorPicture = ProfileUtils.pictureBig(this.id2ConnectedUser.get()[foundTask.author.id]);
-        foundTask.receiverPicture = ProfileUtils.pictureBig(this.id2ConnectedUser.get()[foundTask.receiver.id]);
-        if (foundTask.request) {
-          foundTask.request.type = getRequest(foundTask.request.id);
-        }
+        foundDraft.ETA = moment(foundDraft.eta).format(datetimeDisplayFormat);
+        this.selectedDate = moment(foundDraft.eta).format("MM-DD-YYYY");
+        this.selectedTime = moment(foundDraft.eta).format("HH:mm");
+        this.previousDateTime = moment(foundDraft.eta).format();
 
         var markdown = this.markdown;
 
@@ -95,14 +76,12 @@ export default class ProposalCtrl extends Controller {
             return markdown(e.getContent());
           },
           onShow: function(e) {
-            e.setContent(foundTask.text);
+            e.setContent(foundDraft.text);
           }});
 
-        $('div.pre').html(markdown(foundTask.text));
+        $('div.pre').html(markdown(foundDraft.text));
 
-        foundTask.allowedActions = getCurrentState(foundTask).actions(foundTask, this.currentUser);
-
-        return foundTask;
+        return foundDraft;
         } catch (err) {
           console.log(err);
           ProfileUtils.showError();
@@ -128,20 +107,6 @@ export default class ProposalCtrl extends Controller {
   accountPicture() {
     return ProfileUtils.pictureSmall(Meteor.user());
   }
-
-  status(statusColor) {
-  	if (statusColor === 'green') {
-  		return "approves";
-  	}
-		return "is considering"
-  }
-
-  getStatusLabel(task, person) {
-		if (!task || !task._id) {
-      return "";
-		}
-		return getCondition(person.status, task).label;
-	}
 
 	flipTitleEditingStatus(newOne) {
     this.editingTitle = newOne ? newOne : !this.editingTitle;
@@ -170,8 +135,8 @@ export default class ProposalCtrl extends Controller {
   saveTime() {
     this.newDateTime = moment(this.selectedDate + ' ' + this.selectedTime, "MM-DD-YYYY HH:mm").utc().format();
 
-    Meteor.call('tasks.updateTime',
-        this.proposalId,
+    Meteor.call('drafts.updateTime',
+        this.draftId,
         moment.utc(this.previousDateTime).format(),
         this.newDateTime,
         Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -180,8 +145,8 @@ export default class ProposalCtrl extends Controller {
   }
 
   saveLocation(location) {
-    Meteor.call('tasks.updateLocation',
-      this.proposalId,
+    Meteor.call('drafts.updateLocation',
+      this.draftId,
       location,
       ProfileUtils.processMeteorResult);
     this.flipLocationEditingStatus();
@@ -189,8 +154,8 @@ export default class ProposalCtrl extends Controller {
 
   saveDescription() {
     var description = $('textarea[name="editDescription"]').val();
-    Meteor.call('tasks.updateDescription',
-      this.proposalId,
+    Meteor.call('drafts.updateDescription',
+      this.draftId,
       description,
       ProfileUtils.processMeteorResult);
     $('div.pre').html(this.markdown(description));
@@ -198,8 +163,8 @@ export default class ProposalCtrl extends Controller {
   }
 
   saveTitle(title) {
-    Meteor.call('tasks.updateTitle',
-      this.proposalId,
+    Meteor.call('drafts.updateTitle',
+      this.draftId,
       title,
       ProfileUtils.processMeteorResult);
     this.flipTitleEditingStatus();
@@ -242,84 +207,24 @@ export default class ProposalCtrl extends Controller {
     })
   }
 
-  approveTask() {
-    Meteor.call('tasks.approve',
-      this.proposalId,
+  publishDraft() {
+    Meteor.call('drafts.publish',
+      this.draftId,
       ProfileUtils.processMeteorResult);
   }
 
-  markTaskAsDone() {
-    Meteor.call('tasks.markAsDone',
-      this.proposalId,
+  deleteDraft() {
+    Meteor.call('drafts.delete',
+      this.draftId,
       ProfileUtils.processMeteorResult);
-  }
-
-  markTaskAsMaybe() {
-    Meteor.call('tasks.maybe',
-      this.proposalId,
-      ProfileUtils.processMeteorResult);
-  }
-
-  markTaskAsCancelled(noticeCode) {
-    Meteor.call('tasks.cancel',
-      this.proposalId,
-      getNotice(noticeCode),
-      ProfileUtils.processMeteorResult);
-  }
-
-  markRequestAsApproved() {
-    Meteor.call('tasks.approveRequest',
-      this.proposalId,
-      ProfileUtils.processMeteorResult);
-  }
-
-  markRequestAsDenied() {
-    Meteor.call('tasks.denyRequest',
-      this.proposalId,
-      ProfileUtils.processMeteorResult);
-  }
-
-  markTaskAsLocked() {
-    Meteor.call('tasks.lock',
-      this.proposalId,
-      ProfileUtils.processMeteorResult);
-  }
-
-  cancelRequest() {
-    Meteor.call('tasks.cancelRequest',
-      this.proposalId,
-      ProfileUtils.processMeteorResult);
-  }
-
-  copy() {
-    var controller = this;
-    Meteor.call('tasks.copy',
-      this.proposalId,
-      function(err, res) {
-        if (!err) {
-          controller.$state.go('tab.draft', {'draftId': res});
-        }
-        ProfileUtils.processMeteorResult(err, res);
-      }
-    );
-  }
-
-  addComment() {
-    Meteor.call('tasks.addComment', this.proposalId, this.comment, ProfileUtils.processMeteorResult);
-    this.comment = '';
-    this.setPristineAndUntouched(this, 'addComment');
   }
 
   setPristineAndUntouched(controller, fieldName) {
-    var fieldCtrl = controller.$scope.editProposalForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
+    var fieldCtrl = controller.$scope.editDraftForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
     fieldCtrl.$setPristine();
     fieldCtrl.$setUntouched();
   }
-
-  showAction(task, action) {
-    return task.allowedActions && task.allowedActions.indexOf(getAction(action)) >= 0;
-  }
 }
 
-ProposalCtrl.$name = 'ProposalCtrl';
-ProposalCtrl.$inject = ['$stateParams', '$state'];
+DraftCtrl.$name = 'DraftCtrl';
+DraftCtrl.$inject = ['$stateParams', '$state'];

@@ -1,5 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../imports/api/tasks.js';
+import '../imports/api/subscribe.js';
+import '../imports/api/drafts.js';
 import 'bas-meteor-facebook-login';
 
 Migrations = [

@@ -2,6 +2,7 @@ import { Config } from 'angular-ecmascript/module-helpers';
 
 import todoListUrl from './todosList/todosList.html';
 import proposalUrl from './todosList/proposal.html';
+import draftUrl from './todosList/draft.html';
 import loginUrl from './account/login.html';
 import settingsUrl from './account/settings.html';
 import contactsUrl from './account/contacts.html';
@@ -33,6 +34,15 @@ export default class RoutesConfig extends Config {
           'tab-proposal': {
             templateUrl: proposalUrl,
             controller: 'ProposalCtrl as proposal'
+            }
+          }
+      })
+      .state('tab.draft', {
+        url: '/draft/:draftId',
+        views: {
+          'tab-draft': {
+            templateUrl: draftUrl,
+            controller: 'DraftCtrl as draft'
             }
           }
       })
