@@ -987,6 +987,7 @@ if (Meteor.isServer) {
         var drafts = Drafts.find().fetch();
         assert.equal(drafts.length, 1);
         assert.equal(drafts[0].author.id, userId);
+        assert.equal(drafts[0].receiver.id, otherUserId);
       });
 		});
   });

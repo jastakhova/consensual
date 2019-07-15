@@ -21,9 +21,17 @@ export default class DraftCtrl extends Controller {
     this.editingLocation = false;
     this.editingDescription = false;
     this.editingTitle = false;
+    this.editingReceiver = false;
+
     this.currentUser = Meteor.userId();
     this.editor = undefined;
     this.id2ConnectedUser = new ReactiveVar({});
+
+    this.newReceiver = {};
+    this.suggestInitialized = false;
+
+    this.popularUsers = [];
+    this.allUsers = [];
 
     this.helpers({
       data() {
@@ -32,11 +40,61 @@ export default class DraftCtrl extends Controller {
         }
 
         try {
+        var popularUsers = this.popularUsers;
+        var controller = this;
+
+        if (this.allUsers.length == 0) {
+          Meteor.call('users.getAll', {"username": 1, "profile.name" : 1}, function(err, result) {
+            if (err) {
+              ProfileUtils.processMeteorResult(err, result);
+              return;
+            }
+
+            if (controller.allUsers.length == 0) {
+              result.forEach(r => controller.allUsers.push(r));
+            }
+          });
+        }
+
+        if (Object.keys(this.id2ConnectedUser.get()).length === 0) {
+          Meteor.call('users.getConnected', function(err, result) {
+            if (err) {
+              ProfileUtils.processMeteorResult(err, result);
+              return;
+            }
+
+            controller.id2ConnectedUser.set(ProfileUtils.createMapFromList(result, "_id"));
+          });
+        }
+
+        if (Object.keys(controller.id2ConnectedUser.get()).length > 0 && !this.suggestInitialized) {
+          var howToGetSuggest = ProfileUtils.getSuggest(controller.id2ConnectedUser.get());
+          $(".nametypeahead").typeahead({ source: howToGetSuggest(), autoSelect: false});
+          this.suggestInitialized = true;
+        }
+
+        if (this.popularUsers.length == 0) {
+          Meteor.call('users.getPopular', 3, function(err, result) {
+            if (popularUsers.length == 0) {
+              result.forEach(r => {
+                r.picture = ProfileUtils.pictureSmall(r);
+                r.name = ProfileUtils.getName(r);
+                popularUsers.push(r);
+              });
+            }
+          });
+        }
+
         var foundDraft = Drafts.findOne({_id: this.draftId});
         if (!foundDraft) {
           this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
           return {};
         }
+
+        var receiverData = this.id2ConnectedUser.get()[foundDraft.receiver.id];
+        this.newReceiver.name = foundDraft.receiver.name;
+        this.newReceiver.id = foundDraft.receiver.id;
+        foundDraft.receiver.picture = ProfileUtils.pictureSmall(receiverData);
 
         var currentTime = moment();
         var formatTime = function(ts) {
@@ -120,6 +178,10 @@ export default class DraftCtrl extends Controller {
     this.editingLocation = !this.editingLocation;
   }
 
+  flipReceiverEditingStatus() {
+      this.editingReceiver = !this.editingReceiver;
+    }
+
   flipDescriptionEditingStatus(text) {
     this.editingDescription = !this.editingDescription;
   }
@@ -168,6 +230,59 @@ export default class DraftCtrl extends Controller {
       title,
       ProfileUtils.processMeteorResult);
     this.flipTitleEditingStatus();
+  }
+
+  setReceiver(user) {
+    if (!user) {
+      user = Meteor.user();
+    }
+
+    this.newReceiver.name = user.name ? user.name : ProfileUtils.getName(user);
+    this.newReceiver.id = user._id;
+
+    if ($('.nametypeahead').typeahead('getActive')) {
+      $('.nametypeahead').typeahead('getActive').id = user._id;
+      $('.nametypeahead').typeahead('getActive').name = this.newReceiver.name;
+    }
+
+    this.saveReceiver();
+  }
+
+  saveReceiver() {
+    if ($('.nametypeahead').typeahead('getActive')
+      && this.newReceiver.id != $('.nametypeahead').typeahead('getActive').id) {
+      this.newReceiver.id = $('.nametypeahead').typeahead('getActive').id;
+      this.newReceiver.name = $('.nametypeahead').typeahead('getActive').name;
+    }
+
+    if (this.newReceiver.id) {
+      Meteor.call('drafts.updateReceiver',
+            this.draftId,
+            this.newReceiver.id,
+            ProfileUtils.processMeteorResult);
+      this.flipReceiverEditingStatus();
+    }
+  }
+
+  suggestKeyEntered() {
+    var suggest = this.newReceiver.name.toLowerCase();
+    if (suggest.length < 5) {
+      return;
+    }
+
+    var initialLength = Meteor.settings.public.contacts.length;
+    var uniqueUsers = new Set(Meteor.settings.public.contacts.map(u => u.id));
+
+    this.allUsers
+      .filter(u => ProfileUtils.getName(u).toLowerCase().includes(suggest) && !uniqueUsers.has(u._id))
+      .forEach(u => {
+          Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: u._id, name: ProfileUtils.getName(u)}
+        }
+      );
+
+    if (initialLength !== Meteor.settings.public.contacts.length) {
+      $(".nametypeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
+    }
   }
 
   showDatePicker() {

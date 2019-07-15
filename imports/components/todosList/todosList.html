@@ -48,7 +48,7 @@
               <label>To whom?</label><br/>
               <input type="text" name="autocompleteOff1" autocomplete="off" style="display:none;">
               <div class="col-md-3" style="margin: 8px 0px">
-                <img ng-repeat="popularUser in todoList.popularUsers" class="avatar border-gray link" src="{{popularUser.picture}}" alt="{{popularUser.name}}" title="{{popularUser.name}}" ng-click="todoList.setReceiver(popularUser)"/>
+                <img ng-repeat="popularUser in todoList.popularUsers" class="avatar avatar-small border-gray link" src="{{popularUser.picture}}" alt="{{popularUser.name}}" title="{{popularUser.name}}" ng-click="todoList.setReceiver(popularUser)"/>
                 <span class="circle link" ng-click="todoList.setReceiver()">self</span>
                 <span style="margin: 0px 10px">or</span>
               </div>

@@ -694,7 +694,7 @@ Meteor.methods({
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
-    var receiverId = Meteor.userId === task.author.id ? task.receiver.id : task.author.id;
+    var receiverId = Meteor.userId() === task.author.id ? task.receiver.id : task.author.id;
 
     if (!Meteor.isServer) {
       return "";

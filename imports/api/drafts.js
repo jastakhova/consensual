@@ -92,5 +92,19 @@ Meteor.methods({
 
     draft.title = newTitle;
     Drafts.update(draftId, { $set: draft });
+  },
+  'drafts.updateReceiver' (draftId, newReceiverId) {
+    check(draftId, String);
+    check(newReceiverId, String);
+
+    const draft = Drafts.findOne(draftId);
+
+    if (newReceiverId === draft.receiver.id) {
+      return;
+    }
+
+    draft.receiver.id = newReceiverId;
+    draft.receiver.name = ProfileUtils.getName(Meteor.users.findOne({_id: newReceiverId}));
+    Drafts.update(draftId, { $set: draft });
   }
 });

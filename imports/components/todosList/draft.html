@@ -32,43 +32,70 @@
       <form name="editdraftForm" autocomplete="off">
         <button class="hidden">Receives Enter key for the form and does nothing</button>
         <div class="row">
-          <div class="col-md-4 col-xs-12 col-sm-6 center">
-          </div>
-          <div class="col-md-3 col-xs-6 col-sm-3 lower">
-            <span class="header-title" style="font-size: 16px">Next Action</span><br/>
-            <span class="header-title">Time:</span>
-            <button type="button" ng-show="!draft.editingTime " rel="tooltip" title="Edit" ng-click="draft.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
-              <i class="fa fa-edit"></i>
-            </button>
-            <div ng-show="!draft.editingTime">{{draft.data.ETA}}
-            </div>
-            <div class="card" ng-show="draft.editingTime">
-              <div class="content">
-                <label>Date</label>
-                <div class="form-group" ng-click="draft.showDatePicker()">
-                  <div class="input-group">
-                    <input type="text" class="form-control" ng-model="draft.selectedDate" readonly name="editDate" required-field>
-                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
-                  </div>
+          <div class="col-md-4 col-xs-12 col-sm-6 lower">
+            <div class="form-group">
+              <span class="header-title" style="font-size: 16px">To Whom?</span>
+              <button type="button" rel="tooltip" title="{{draft.editingReceiver ? 'Save' : 'Edit'}}" ng-click="draft.editingReceiver ? draft.saveReceiver() : draft.flipReceiverEditingStatus()" class="btn {{draft.editingReceiver ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
+                <i class="fa fa-edit"></i>
+              </button><br/>
+              <input type="text" name="autocompleteOff1" autocomplete="off" style="display:none;">
+              <div ng-show="!draft.editingReceiver" ng-click="draft.flipReceiverEditingStatus()" style="word-wrap:break-word; margin: 10px 0px">
+                <img class="avatar avatar-small border-gray" src="{{draft.data.receiver.picture}}" alt="{{draft.data.receiver.name}}" title="{{draft.data.receiver.name}}" style="margin-right: 5px"/>
+                {{draft.data.receiver.name}}
+              </div>
+              <div ng-show="draft.editingReceiver">
+                <div>
+                  <input type="text" name="newReceiver" ng-model="draft.newReceiver.name" ng-keyup="draft.suggestKeyEntered()" class="form-control nametypeahead" data-provide="typeahead" placeholder="Start entering the name" autocomplete="off" autofill="off"/>
+                  <!-- TODO: add invitations -->
+                  <!--<div ng-hide="todoList.invitationLimitReached" class="alternative-action link" data-toggle="modal" data-target="#inviteModal">invite a new person to connect to</div>-->
                 </div>
-                <label>Time</label>
-                <div class="form-group" ng-click="draft.showTimePicker()">
-                  <div class="input-group">
-                    <input type="text" class="form-control" ng-model="draft.selectedTime" readonly name="editTime" required-field>
-                    <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
-                  </div>
+                <div style="margin: 8px 0px">
+                  <span style="margin: 0px 10px">or</span>
+                  <img ng-repeat="popularUser in draft.popularUsers" class="avatar border-gray link" src="{{popularUser.picture}}" alt="{{popularUser.name}}" title="{{popularUser.name}}" ng-click="draft.setReceiver(popularUser)" style="border-radius: 50%"/>
+                  <span class="circle link" ng-click="draft.setReceiver()">self</span>
                 </div>
-                <button ng-disabled="editDraftForm.editDate.$invalid || editDraftForm.editTime.$invalid" type="submit" ng-click="draft.saveTime()" class="btn btn-info btn-fill">Save</button>
               </div>
             </div>
-            <div class="header-title" style="margin-top: 20px">Place:&nbsp;
-              <button type="button" rel="tooltip" title="{{proposal.editingLocation ? 'Save' : 'Edit'}}" ng-click="draft.editingLocation ? draft.saveLocation(draft.data.location) : draft.flipLocationEditingStatus()" class="btn {{draft.editingLocation ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
+          </div>
+          <div class="col-md-3 col-xs-6 col-sm-3 lower">
+            <span class="header-title" style="font-size: 16px">WHEN and WHERE?</span><br/>
+            <div class="form-group">
+              <span class="header-title">Time:</span>
+              <button type="button" ng-show="!draft.editingTime " rel="tooltip" title="Edit" ng-click="draft.flipTimeEditingStatus()" class="btn btn-danger btn-simple btn-xs">
                 <i class="fa fa-edit"></i>
               </button>
+              <div ng-show="!draft.editingTime">{{draft.data.ETA}}
+              </div>
+              <div class="card" ng-show="draft.editingTime">
+                <div class="content">
+                  <label>Date</label>
+                  <div class="form-group" ng-click="draft.showDatePicker()">
+                    <div class="input-group">
+                      <input type="text" class="form-control" ng-model="draft.selectedDate" readonly name="editDate" required-field>
+                      <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                    </div>
+                  </div>
+                  <label>Time</label>
+                  <div class="form-group" ng-click="draft.showTimePicker()">
+                    <div class="input-group">
+                      <input type="text" class="form-control" ng-model="draft.selectedTime" readonly name="editTime" required-field>
+                      <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
+                    </div>
+                  </div>
+                  <button ng-disabled="editDraftForm.editDate.$invalid || editDraftForm.editTime.$invalid" type="submit" ng-click="draft.saveTime()" class="btn btn-info btn-fill">Save</button>
+                </div>
+              </div>
             </div>
-            <div ng-show="!draft.editingLocation" ng-click="draft.flipLocationEditingStatus()" style="word-wrap:break-word">{{draft.data.location}}</div>
-            <div ng-show="draft.editingLocation">
-              <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && draft.saveLocation(draft.data.location)" ng-model="draft.data.location" name="editLocation" required-field autocomplete="off">
+            <div class="form-group">
+              <div class="header-title" style="margin-top: 20px">Place:&nbsp;
+                <button type="button" rel="tooltip" title="{{draft.editingLocation ? 'Save' : 'Edit'}}" ng-click="draft.editingLocation ? draft.saveLocation(draft.data.location) : draft.flipLocationEditingStatus()" class="btn {{draft.editingLocation ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </div>
+              <div ng-show="!draft.editingLocation" ng-click="draft.flipLocationEditingStatus()" style="word-wrap:break-word">{{draft.data.location}}</div>
+              <div ng-show="draft.editingLocation">
+                <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && draft.saveLocation(draft.data.location)" ng-model="draft.data.location" name="editLocation" required-field autocomplete="off">
+              </div>
             </div>
           </div>
           <div class="col-md-2 col-xs-6 col-sm-3 lower">

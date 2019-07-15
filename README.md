@@ -42,9 +42,12 @@ Thanks for your support!
 #### Active ToDo
 
 + add Copy action
+  + add choosing of the receiver
+  - add invitation to drafts
   - Publish
   - Delete
   - reference links
+  - drafts page
 - add blocking comments + notice + tickler
 - Terms of use email should we sent on new sign-ups not only invites
 - Highlighting the changes or adding warning message on top of changes when visiting the proposal page
