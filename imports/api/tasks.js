@@ -7,7 +7,7 @@ import { Email } from 'meteor/email';
 import { Promise } from 'meteor/promise';
 import fs from 'fs';
 import {Actions, getNotice, getAction, getCondition, getStatus, getTickler, getRequest, getState, getCurrentState} from './dictionary.js';
-import {Tasks, Emails, Invitees, createTickler, updateTicklersRaw, createNotice} from './background.js';
+import {Tasks, Emails, Invitees, Drafts, createTickler, updateTicklersRaw, createNotice} from './background.js';
 import ProfileUtils from '../components/todosList/profile.js';
 
 export {
@@ -741,7 +741,7 @@ Meteor.methods({
     check(to.name, String);
     check(to.email, String);
 
-    if (Meteor.user()) {
+    if (Meteor.user() && Meteor.isServer) {
       var id = Invitees.insert({
         invitorId: Meteor.userId(),
         username: to.name,
@@ -800,6 +800,12 @@ Meteor.methods({
               "receiver.id": newUserId
             }
           }, { multi: true });
+
+        Drafts.update({"receiver.id": invitee._id}, {
+           $set: {
+               "receiver.id": newUserId
+             }
+           }, { multi: true });
       });
 
       Invitees.remove({ $or: [{email}, {_id: inviteeId}]});

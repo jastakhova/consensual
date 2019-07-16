@@ -44,7 +44,7 @@ Thanks for your support!
 + add Copy action
   + add choosing of the receiver
   + not saving receiver when entered wrong
-  - add invitation to drafts
+  + add invitation to drafts
   - Publish
   - Delete
   - reference links
@@ -58,6 +58,8 @@ Thanks for your support!
 - no email verification on email change
 - on profile page all filters are opposite (for example "no response")
 - not obvious from whom to who
+- invitation limit
+- suggest shows all invitees (not invited by any specific person)
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

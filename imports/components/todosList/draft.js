@@ -1,5 +1,5 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
-import { Drafts } from '../../api/background.js';
+import { Drafts, Invitees } from '../../api/background.js';
 import ProfileUtils from './profile.js';
 import DateTimePicker from 'date-time-picker';
 import { Tracker } from 'meteor/tracker'
@@ -13,6 +13,7 @@ export default class DraftCtrl extends Controller {
     super(...arguments);
 
     this.handleDrafts = Meteor.subscribe('draft', this.$stateParams.draftId);
+    this.handleInvitees = this.subscribe('invitees');
 
     this.subscribe('currentuser');
 
@@ -31,6 +32,10 @@ export default class DraftCtrl extends Controller {
     this.receiverCorrect = true;
     this.suggestInitialized = false;
 
+    this.invitationLimitReached = false;
+    this.newInvitee = {};
+    this.invitees = [];
+
     this.popularUsers = [];
     this.allUsers = [];
 
@@ -43,6 +48,10 @@ export default class DraftCtrl extends Controller {
         try {
         var popularUsers = this.popularUsers;
         var controller = this;
+
+        if (this.invitees.length == 0) {
+          this.invitees = Invitees.find({}).fetch();
+        }
 
         if (this.allUsers.length == 0) {
           Meteor.call('users.getAll', {"username": 1, "profile.name" : 1}, function(err, result) {
@@ -351,6 +360,69 @@ export default class DraftCtrl extends Controller {
     var fieldCtrl = controller.$scope.editDraftForm.$$controls.filter(function(x) { return x.$name === fieldName;})[0];
     fieldCtrl.$setPristine();
     fieldCtrl.$setUntouched();
+  }
+
+  findInvitee() {
+    if (!this.newInvitee.name) {
+      this.newInvitee.name = "";
+    }
+
+    if (!this.newInvitee.email) {
+      this.newInvitee.email = "";
+    }
+
+    function findAlreadyExisting(invitee, collection, nameSuffix) {
+      var filtered = collection.filter(u =>
+        invitee.name != "" && ProfileUtils.getName(u).toLowerCase() === invitee.name.toLowerCase()
+        || invitee.email != "" && ProfileUtils.getEmail(u).toLowerCase() === invitee.email.toLowerCase());
+
+      invitee.found = filtered.length > 0 ? filtered[0] : undefined;
+      if (invitee.found) {
+        invitee.found.nameToShow = ProfileUtils.getName(invitee.found) + nameSuffix;
+        invitee.found.name = ProfileUtils.getName(invitee.found);
+        invitee.found.picture = ProfileUtils.pictureSmall(invitee.found);
+      }
+      return invitee.found;
+    }
+
+    if (!findAlreadyExisting(this.newInvitee, this.allUsers, "")) {
+      findAlreadyExisting(this.newInvitee, this.invitees, " (already invited)");
+    }
+  }
+
+  inviteNewPerson() {
+    var to = this.newInvitee;
+    var controller = this;
+
+    function addNewPersonToSuggest(id, name) {
+      $(".nametypeahead").typeahead({ source: Meteor.settings.public.contacts, autoSelect: false});
+      controller.newReceiver.name = name;
+      controller.newReceiver.id = id;
+      controller.receiverCorrect = true;
+      $('.nametypeahead').val(name);
+      if ($('.nametypeahead').typeahead('getActive')) {
+        $('.nametypeahead').typeahead('getActive').id = id;
+        $('.nametypeahead').typeahead('getActive').name = name;
+      }
+
+      controller.$scope.$apply();
+    }
+
+    if (this.newInvitee.found) {
+      addNewPersonToSuggest(this.newInvitee.found._id, this.newInvitee.found.name);
+    } else {
+      Meteor.call('email.invite', to, function(error, result) {
+        if (result) {
+          Meteor.settings.public.contacts[Meteor.settings.public.contacts.length] = {id: result, name:  to.name};
+          addNewPersonToSuggest(result, to.name);
+        } else {
+          var err = "We couldn't send an email to " + to.email;
+          console.log(err);
+          ProfileUtils.showError(err);
+          Meteor.call('email.withError', err);
+        }
+      });
+    }
   }
 }
 

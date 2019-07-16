@@ -62,7 +62,11 @@ var ProfileUtils = {
   },
 
   getEmail: function(user) {
-    return user.email ? user.email : user.services.facebook.email;
+    return user.email
+      ? user.email
+      : (user.services && user.services.facebook
+        ? user.services.facebook.email
+        : "");
   },
 
   getSuggest: function(id2user) {
