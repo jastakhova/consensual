@@ -28,6 +28,7 @@ export default class DraftCtrl extends Controller {
     this.id2ConnectedUser = new ReactiveVar({});
 
     this.newReceiver = {};
+    this.receiverCorrect = true;
     this.suggestInitialized = false;
 
     this.popularUsers = [];
@@ -69,7 +70,15 @@ export default class DraftCtrl extends Controller {
 
         if (Object.keys(controller.id2ConnectedUser.get()).length > 0 && !this.suggestInitialized) {
           var howToGetSuggest = ProfileUtils.getSuggest(controller.id2ConnectedUser.get());
-          $(".nametypeahead").typeahead({ source: howToGetSuggest(), autoSelect: false});
+          $(".nametypeahead").typeahead({
+            source: howToGetSuggest(),
+            autoSelect: false,
+            updater: function(item) {
+              controller.receiverCorrect = true;
+              controller.$scope.$apply();
+              return item;
+            }
+          });
           this.suggestInitialized = true;
         }
 
@@ -266,6 +275,10 @@ export default class DraftCtrl extends Controller {
 
   suggestKeyEntered() {
     var suggest = this.newReceiver.name.toLowerCase();
+
+    this.receiverCorrect = $('.nametypeahead').typeahead('getActive')
+      && $('.nametypeahead').typeahead('getActive').name.toLowerCase() === this.newReceiver.name.toLowerCase();
+
     if (suggest.length < 5) {
       return;
     }

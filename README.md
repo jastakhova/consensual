@@ -43,6 +43,7 @@ Thanks for your support!
 
 + add Copy action
   + add choosing of the receiver
+  + not saving receiver when entered wrong
   - add invitation to drafts
   - Publish
   - Delete

@@ -35,7 +35,7 @@
           <div class="col-md-4 col-xs-12 col-sm-6 lower">
             <div class="form-group">
               <span class="header-title" style="font-size: 16px">To Whom?</span>
-              <button type="button" rel="tooltip" title="{{draft.editingReceiver ? 'Save' : 'Edit'}}" ng-click="draft.editingReceiver ? draft.saveReceiver() : draft.flipReceiverEditingStatus()" class="btn {{draft.editingReceiver ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
+              <button type="button" rel="tooltip" title="{{draft.editingReceiver ? 'Save' : 'Edit'}}" ng-disabled="draft.editingReceiver && !draft.receiverCorrect  " ng-click="draft.editingReceiver ? draft.saveReceiver() : draft.flipReceiverEditingStatus()" class="btn {{draft.editingReceiver && draft.receiverCorrect ? 'btn-success': 'btn-danger'}} btn-simple btn-xs">
                 <i class="fa fa-edit"></i>
               </button><br/>
               <input type="text" name="autocompleteOff1" autocomplete="off" style="display:none;">
