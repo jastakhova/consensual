@@ -345,15 +345,22 @@ export default class DraftCtrl extends Controller {
   }
 
   publishDraft() {
+    var controller = this;
     Meteor.call('drafts.publish',
       this.draftId,
-      ProfileUtils.processMeteorResult);
+      function(err, res) {
+        if (!err) {
+          controller.$state.go('tab.proposal', {'proposalId': res});
+        }
+        ProfileUtils.processMeteorResult(err, res);
+      });
   }
 
   deleteDraft() {
     Meteor.call('drafts.delete',
       this.draftId,
       ProfileUtils.processMeteorResult);
+    this.$state.go('tab.drafts');
   }
 
   setPristineAndUntouched(controller, fieldName) {

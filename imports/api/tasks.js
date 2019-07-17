@@ -133,7 +133,6 @@ function registerChange(taskId, isNotNeeded, fillActivity, fillUpdateEntity, not
 Meteor.methods({
   'tasks.insert' (newTask) {
     check(newTask.task, String);
-    check(newTask.time, String);
     check(newTask.receiver, String);
 
     // Make sure the user is logged in before inserting a task
@@ -152,6 +151,7 @@ Meteor.methods({
     var receiver = selfAgreement
       ? actorUser
       : Meteor.users.findOne({_id: newTask.receiver}) || Invitees.findOne({_id: newTask.receiver});
+    var eta = newTask.eta ? newTask.eta : new Date(moment(newTask.time).format()).getTime();
 
     function getTitle(text, title) {
       if (title) {
@@ -194,7 +194,7 @@ Meteor.methods({
     var createdTask = {
       text: newTask.task,
       title: getTitle(newTask.task, newTask.title),
-      eta: new Date(moment(newTask.time).format()).getTime(),
+      eta: eta,
       location: '...',
 
       author: author,
@@ -213,6 +213,7 @@ Meteor.methods({
     var id = Tasks.insert(createdTask);
     createdTask['_id'] = id;
     notifyOnNewValue(createdTask, newTask.receiver, "created", "agreement", newTask.task);
+    return id;
   },
   'tasks.updateTime' (taskId, oldTimeUTCString, newTimeUTCString, timezone) {
     check(taskId, String);

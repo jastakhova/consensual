@@ -2,6 +2,7 @@ import { Config } from 'angular-ecmascript/module-helpers';
 
 import todoListUrl from './todosList/todosList.html';
 import proposalUrl from './todosList/proposal.html';
+import draftListUrl from './todosList/draftList.html';
 import draftUrl from './todosList/draft.html';
 import loginUrl from './account/login.html';
 import settingsUrl from './account/settings.html';
@@ -25,6 +26,15 @@ export default class RoutesConfig extends Config {
           'tab-todo': {
             templateUrl: todoListUrl,
             controller: 'TodosListCtrl as todoList'
+          }
+        }
+      })
+      .state('tab.drafts', {
+        url: '/todo?group&filter&date',
+        views: {
+          'tab-drafts': {
+            templateUrl: draftListUrl,
+            controller: 'DraftListCtrl as drafts'
           }
         }
       })

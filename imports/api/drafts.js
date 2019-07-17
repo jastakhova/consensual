@@ -2,8 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
 import moment from 'moment-timezone';
-import {Drafts} from './background.js';
+import {Drafts, Tasks} from './background.js';
 import ProfileUtils from '../components/todosList/profile.js';
+import { Promise } from 'meteor/promise';
 
 
 export {
@@ -37,9 +38,25 @@ Meteor.methods({
     });
   },
   'drafts.publish' (draftId) {
-    //TODO: + add reference of the copy to the parent
+    const draft = Drafts.findOne(draftId);
+    var task = {
+      title: draft.title,
+      task: draft.text,
+      eta: draft.eta,
+      receiver: draft.receiver.id,
+    };
+    var newTaskId = Promise.await(Meteor.call('tasks.insert', task));
+
+    var task = Tasks.findOne(draft.parent);
+    var children = task.children ? task.children : [];
+    children.push(newTaskId);
+    Tasks.update(draft.parent, { $set: {children} });
+    Drafts.update(draftId, { $set: {removed: new Date().getTime()} });
+
+    return newTaskId;
   },
   'drafts.delete' (draftId) {
+    Drafts.update(draftId, { $set: {removed: new Date().getTime()} });
   },
   'drafts.updateTime' (draftId, oldTimeUTCString, newTimeUTCString, timezone) {
     check(draftId, String);

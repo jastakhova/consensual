@@ -234,7 +234,18 @@ if (Meteor.isServer) {
 
     var endTime = new Date().getTime();
     console.log("Overdue background process finished in " + (endTime - startTime) + " ms");
-
-
   }, 10*60*1000  /* 10 minute interval */);
+
+    Meteor.setInterval(function() {
+      console.log("Starting draft cleaning cycle...");
+      var startTime = new Date().getTime();
+
+      var tinyPeriod = 5*60*1000;
+      var timeToCheck = new Date().getTime() - tinyPeriod;
+
+      Drafts.remove({ removed: { $lt : timeToCheck} });
+
+      var endTime = new Date().getTime();
+      console.log("Draft cleaning background process finished in " + (endTime - startTime) + " ms");
+    }, 60*60*1000  /* 1 hour interval */);
 }

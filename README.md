@@ -45,8 +45,8 @@ Thanks for your support!
   + add choosing of the receiver
   + not saving receiver when entered wrong
   + add invitation to drafts
-  - Publish
-  - Delete
+  + Publish
+  + Delete
   - reference links
   - drafts page
 - add blocking comments + notice + tickler
