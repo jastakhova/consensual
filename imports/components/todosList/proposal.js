@@ -1,5 +1,5 @@
 import { Controller } from 'angular-ecmascript/module-helpers';
-import { Tasks } from '../../api/tasks.js';
+import { Tasks } from '../../api/background.js';
 import ProfileUtils from './profile.js';
 import DateTimePicker from 'date-time-picker';
 import { Tracker } from 'meteor/tracker'
@@ -82,6 +82,8 @@ export default class ProposalCtrl extends Controller {
 
         foundTask.activity.forEach(record => record.formattedTime = formatTime(record.time));
 
+        this.prepareChildrenTasks(foundTask, formatTime);
+
         foundTask.authorPicture = ProfileUtils.pictureBig(this.id2ConnectedUser.get()[foundTask.author.id]);
         foundTask.receiverPicture = ProfileUtils.pictureBig(this.id2ConnectedUser.get()[foundTask.receiver.id]);
         if (foundTask.request) {
@@ -163,6 +165,10 @@ export default class ProposalCtrl extends Controller {
     this.activityShowed = !this.activityShowed;
   }
 
+  flipChildrenShowingStatus() {
+    this.childrenShowed = !this.childrenShowed;
+  }
+
   flipCommentsShowingStatus() {
     this.commentsShowed = !this.commentsShowed;
   }
@@ -195,6 +201,26 @@ export default class ProposalCtrl extends Controller {
       ProfileUtils.processMeteorResult);
     $('div.pre').html(this.markdown(description));
     this.flipDescriptionEditingStatus(description);
+  }
+
+  prepareChildrenTasks(foundTask, formatTime) {
+    foundTask.children = [];
+    var controller = this;
+    Meteor.call('tasks.getChildren',
+      this.proposalId,
+      function(err, res) {
+        if (!err) {
+          foundTask.children = res.map(child => {
+            child.formattedTime = formatTime(child.eta);
+            var receiver = controller.id2ConnectedUser.get()[child.receiver.id];
+            child.picture = ProfileUtils.pictureSmall(receiver);
+            child.name = ProfileUtils.getName(receiver);
+            return child;
+          });
+        }
+        ProfileUtils.processMeteorResult(err, res);
+      }
+    );
   }
 
   saveTitle(title) {

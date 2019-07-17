@@ -704,6 +704,18 @@ Meteor.methods({
     return Promise.await(Meteor.call('drafts.create',
       task.title, task.text, receiverId, task.location, task.eta, taskId));
   },
+  'tasks.getChildren' (taskId) {
+    check(taskId, String);
+
+    const task = Tasks.findOne(taskId);
+    var children = Tasks.find({_id: {$in: task.children}}, {eta: 1, receiver: 1, title: 1}).fetch();
+    Drafts.find({ $and: [{parent: taskId}, {"author.id": Meteor.userId()}, {removed: {$exists: false}}]}).fetch().forEach(draft => {
+      draft.draft = true;
+      children.push(draft);
+    });
+
+    return children;
+  },
   'users.updateName' (name) {
     check(name, String);
 

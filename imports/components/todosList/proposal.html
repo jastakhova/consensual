@@ -163,6 +163,23 @@
             <div class="col-xs-8 col-sm-6 col-md-4 col-lg-4" ng-show="proposal.showAction(proposal.data, 'REQUEST_DENY')" style="padding-left: 0px;"><button type="button" style="background-color: red; border: none;" ng-click="proposal.markRequestAsDenied()" class="btn btn-info btn-fill">Nope...</button></div>
           </div>
         </div>
+        <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.children.length > 0">
+          <div class="card col-md-8">
+            <div class="header" style="{{proposal.childrenShowed ? '':'padding-bottom:15px;'}} cursor: pointer;" ng-click="proposal.flipChildrenShowingStatus()">
+              <i class="pe-7s-{{proposal.childrenShowed ? 'close-circle': 'plus'}}"></i>
+              <span class="title" style="padding-left:5px">Related agreements</span>
+            </div>
+            <div class="content" ng-show="proposal.childrenShowed">
+              <hr style="margin-top: 10px">
+              <div class="row" ng-repeat="childRecord in proposal.data.children | orderBy:'+eta'" style="margin-bottom: 10px">
+                <span class="col-md-2 col-lg-2 col-sm-1 col-xs-3" style="padding-left: 0px; padding-right: 0px; max-width: 70px; color: grey">{{childRecord.formattedTime}}</span>
+                <img class="avatar avatar-small border-gray link" src="{{childRecord.picture}}" alt="{{childRecord.name}}" title="{{childRecord.name}}"/>
+                <a href="#!/tab/{{(childRecord.draft ? 'draft' : 'proposal') + '/' + childRecord._id}}">{{childRecord.title}}</a>
+                <span ng-show="childRecord.draft" style="margin-left: 5px">Your draft</span>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row" style="padding-left: 15px; padding-right: 27px;" ng-show="proposal.data.activity.length > 0">
           <div class="card col-md-8">
             <div class="header" style="{{proposal.activityShowed ? '':'padding-bottom:15px;'}} cursor: pointer;" ng-click="proposal.flipActivityShowingStatus()">
