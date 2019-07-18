@@ -160,8 +160,6 @@ export default class DraftCtrl extends Controller {
 
         var parentId = foundDraft.parent;
         foundDraft.parent = this.parent.get();
-        console.log("Parent was ");
-        console.log(this.parent.get());
         if (!foundDraft.parent.name) {
           Meteor.call('drafts.getParent', parentId,
             function(err, res) {
@@ -171,7 +169,6 @@ export default class DraftCtrl extends Controller {
                   res.picture = ProfileUtils.pictureSmall(receiver);
                   res.name = ProfileUtils.getName(receiver);
                   controller.parent.set(res);
-                  console.log("Loading parent");
                 }
                 ProfileUtils.processMeteorResult(err, res);
             });

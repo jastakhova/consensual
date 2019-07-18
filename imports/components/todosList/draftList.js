@@ -23,6 +23,7 @@ export default class DraftListCtrl extends TodosListPartialCtrl {
                     filters: [
                       {name: "All", groupName: "All Your Drafts", hide: true, selector: {}}
                     ],
+                    additionalFilter: {removed: {$exists: false}},
                     noStatus: true,
                     tab: "draft",
                     noArchive: true,
