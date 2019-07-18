@@ -19,6 +19,7 @@ import { Template } from 'meteor/templating';
 import { FB_API } from 'bas-meteor-facebook-login';
 
 import TodosListCtrl from '../imports/components/todosList/todosList';
+import DraftListCtrl from '../imports/components/todosList/draftList';
 import ProposalCtrl from '../imports/components/todosList/proposal';
 import DraftCtrl from '../imports/components/todosList/draft';
 import LoginCtrl from '../imports/components/account/login';
@@ -178,6 +179,7 @@ new Loader(App)
 	.load(TodosListCtrl)
 	.load(ProposalCtrl)
 	.load(DraftCtrl)
+	.load(DraftListCtrl)
   .load(LoginCtrl)
   .load(ProfileCtrl)
   .load(SettingsCtrl)

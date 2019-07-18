@@ -55,9 +55,10 @@ export default class ProfileCtrl extends TodosListPartialCtrl {
 
                 return this.todoListMain(
                   function(notUsedSuggest) {},
-                  function() {},
-                  {$or: [{"author.id": this.profileId}, {"receiver.id": this.profileId}]}
-                );
+                  function() {}, {
+                  additionalFilter:
+                    {$or: [{"author.id": this.profileId}, {"receiver.id": this.profileId}]}
+                });
               } catch (err) {
                 console.log(err);
                 ProfileUtils.showError();

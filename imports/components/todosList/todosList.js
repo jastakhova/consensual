@@ -40,6 +40,8 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
                 popularUsers.push(r);
               });
             });
+          }, {
+            showAdditionalGroups: true
           });
         } catch (err) {
           console.log(err);

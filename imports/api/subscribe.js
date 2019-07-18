@@ -26,6 +26,10 @@ if (Meteor.isServer) {
     return Drafts.find({_id: draftId});
   });
 
+  Meteor.publish('drafts', function tasksPublication() {
+    return Drafts.find({$and: [{"author.id": this.userId}, {removed: {$exists: false}}]});
+  });
+
   Meteor.publish('invitees', function inviteesPublication() {
     return Invitees.find({invitorId: this.userId});
   });

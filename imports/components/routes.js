@@ -30,11 +30,11 @@ export default class RoutesConfig extends Config {
         }
       })
       .state('tab.drafts', {
-        url: '/todo?group&filter&date', /* TODO: change */
+        url: '/drafts?group&date',
         views: {
           'tab-drafts': {
             templateUrl: draftListUrl,
-            controller: 'DraftListCtrl as drafts'
+            controller: 'DraftListCtrl as todoList'
           }
         }
       })

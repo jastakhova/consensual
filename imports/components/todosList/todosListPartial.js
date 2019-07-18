@@ -155,9 +155,11 @@ export class TodosListPartialCtrl extends Controller {
            },
            groupingName: function(group, filter) {return group == "Self-agreements" ? group : "Agreements with " + group;},
            ingroupSort: function(task1, task2) {
-              return ProfileUtils.comparator(
-                ProfileUtils.getLatestActivityTime(task2, Meteor.userId()),
-                ProfileUtils.getLatestActivityTime(task1, Meteor.userId()))
+              return task1.noActivity
+              ? ProfileUtils.comparator(task1.eta, task2.eta)
+              : ProfileUtils.comparator(
+                  ProfileUtils.getLatestActivityTime(task2, Meteor.userId()),
+                  ProfileUtils.getLatestActivityTime(task1, Meteor.userId()))
            },
            limit: 3}},
     ];
@@ -213,7 +215,7 @@ export class TodosListPartialCtrl extends Controller {
       }
     });
 
-    this.todoListMain = function(useSuggest, oneTime, additionalFilter) {
+    this.todoListMain = function(useSuggest, oneTime, settings) {
         var startTime = new Date().getTime();
 
         if (!filterAdjustingWasMade) {
@@ -227,6 +229,13 @@ export class TodosListPartialCtrl extends Controller {
       	var searchValue = this.getReactively("search");
       	var dateValue = this.getReactively("currentDate");
       	var withArchiveFlag = this.getReactively("searchWithArchive");
+
+        var db = settings.db ? settings.db : Tasks;
+      	if (settings.filters) {
+          this.filters = settings.filters;
+          selector = this.filters[0];
+        }
+        this.noArchive = settings.noArchive;
 
         if (Object.keys(controller.id2ConnectedUser.get()).length === 0) {
           Meteor.call('users.getConnected', function(err, result) {
@@ -269,6 +278,8 @@ export class TodosListPartialCtrl extends Controller {
           x.receiverPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser.get()[x.receiver.id]);
           x.fromCurrentUser = x.author.id === Meteor.userId() && x.author.id != x.receiver.id;
           x.toCurrentUser = x.receiver.id === Meteor.userId() && x.author.id != x.receiver.id;
+          x.tab = settings.tab ? settings.tab : "proposal";
+          x.noActivity = settings.noActivity;
           return x;
         }
 
@@ -305,11 +316,11 @@ export class TodosListPartialCtrl extends Controller {
         }
 
         var additionalGroups = [];
-        if (sortMethod.name == "Default" && selector.name === this.filters[0].name && searchValue === "" && !this.profileId) {
+        if (sortMethod.name == "Default" && selector.name === this.filters[0].name && searchValue === "" && settings.showAdditionalGroups) {
           sortMethod = this.sorts[0]; // doing "Initial" style of sorting
           additionalGroups = sortMethod.additionalGroups.map(sortGroup => {
-            var selector = additionalFilter ? {$and: [additionalFilter, sortGroup.selector]} : sortGroup.selector;
-            var tasks = Tasks.find(selector).fetch()
+            var selector = settings.additionalFilter ? {$and: [settings.additionalFilter, sortGroup.selector]} : sortGroup.selector;
+            var tasks = db.find(selector).fetch()
               .sort(sortGroup.sort)
               .map(sortGroup.prepare ? function(task) {
                 var prepared = sortGroup.prepare(task);
@@ -330,20 +341,21 @@ export class TodosListPartialCtrl extends Controller {
         var sortingField = sortMethod.configuration.sort;
         var initialSort = sortMethod.name === "Initial";
 
-        var selectorWithSpecifics = additionalFilter ? {$and: [selector.selector, additionalFilter]} : selector.selector;
+        var selectorWithSpecifics = settings.additionalFilter ? {$and: [selector.selector, settings.additionalFilter]} : selector.selector;
         var selectorWithSortFiltering = initialSort ? {$and: [selectorWithSpecifics, {eta: {$gt: dateValue}}]} : selectorWithSpecifics;
         var selectorWithArchive = selector.nonarchive && !withArchiveFlag ? {$and: [selectorWithSortFiltering, {archived: false}]} : selectorWithSortFiltering;
         var selectorWithSearch = searchValue === "" ?
           selectorWithArchive :
           {$and: [selectorWithArchive, retrieveSearchSelector(searchValue, this)]};
 
-        var tasks = Tasks.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
+        var tasks = db.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
         var resultGroups = Object.keys(groups)
             .sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);})
             .map(groupKey => {
               return {
                 name: sortMethod.configuration.groupingName(groupKey, selector),
+                noStatus: settings.noStatus,
                 tasks: groups[groupKey].sort(sortMethod.configuration.ingroupSort),
                 sliced: Object.keys(groups).length > 1 && groups[groupKey].length > sortMethod.configuration.limit,
                 limit: sortMethod.configuration.limit
@@ -393,8 +405,11 @@ export class TodosListPartialCtrl extends Controller {
     return ProfileUtils.pictureSmall(Meteor.user());
   }
 
-  this.gotoProposal = function(taskId) {
-    this.$state.go('tab.proposal', {'proposalId': taskId});
+  this.gotoProposal = function(task) {
+    var tab = task.tab ? task.tab : 'proposal';
+    var params = {};
+    params[tab + 'Id'] = task._id;
+    this.$state.go('tab.' + tab, params);
   }
 
 	this.flipSearchEditing = function() {
