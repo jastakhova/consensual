@@ -711,7 +711,9 @@ Meteor.methods({
     check(taskId, String);
 
     const task = Tasks.findOne(taskId);
-    var children = Tasks.find({_id: {$in: task.children}}, {eta: 1, receiver: 1, title: 1}).fetch();
+    var children = task.children
+      ? Tasks.find({_id: {$in: task.children}}, {eta: 1, receiver: 1, title: 1}).fetch()
+      : [];
     Drafts.find({ $and: [{parent: taskId}, {"author.id": Meteor.userId()}, {removed: {$exists: false}}]}).fetch().forEach(draft => {
       draft.draft = true;
       children.push(draft);
