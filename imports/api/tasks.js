@@ -209,6 +209,9 @@ Meteor.methods({
       wasAgreed: selfAgreement,
     };
     createdTask.receiver.ticklers = updateTicklers(receiver, "CONSIDERING", createdTask);
+    if (newTask.parent) {
+      createdTask.parent = newTask.parent;
+    }
 
     var id = Tasks.insert(createdTask);
     createdTask['_id'] = id;
@@ -713,6 +716,12 @@ Meteor.methods({
       draft.draft = true;
       children.push(draft);
     });
+
+    if (task.parent) {
+      var parent = Tasks.findOne(task.parent);
+      parent.isParent = true;
+      children.push(parent);
+    }
 
     return children;
   },

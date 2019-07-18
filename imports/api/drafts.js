@@ -44,6 +44,7 @@ Meteor.methods({
       task: draft.text,
       eta: draft.eta,
       receiver: draft.receiver.id,
+      parent: draft.parent
     };
     var newTaskId = Promise.await(Meteor.call('tasks.insert', task));
 
@@ -123,5 +124,10 @@ Meteor.methods({
     draft.receiver.id = newReceiverId;
     draft.receiver.name = ProfileUtils.getName(Meteor.users.findOne({_id: newReceiverId}));
     Drafts.update(draftId, { $set: draft });
+  },
+  'drafts.getParent' (parentId) {
+    check(parentId, String);
+
+    return Tasks.findOne({_id: parentId}, {receiver: 1, eta: 1, title: 1});
   }
 });

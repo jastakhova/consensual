@@ -30,6 +30,7 @@ export default class ProposalCtrl extends Controller {
     this.needsToApproveStatusChange = false;
     this.editor = undefined;
     this.id2ConnectedUser = new ReactiveVar({});
+    this.children = new ReactiveVar([]);
 
     this.helpers({
       data() {
@@ -204,23 +205,25 @@ export default class ProposalCtrl extends Controller {
   }
 
   prepareChildrenTasks(foundTask, formatTime) {
-    foundTask.children = [];
     var controller = this;
-    Meteor.call('tasks.getChildren',
-      this.proposalId,
-      function(err, res) {
-        if (!err) {
-          foundTask.children = res.map(child => {
-            child.formattedTime = formatTime(child.eta);
-            var receiver = controller.id2ConnectedUser.get()[child.receiver.id];
-            child.picture = ProfileUtils.pictureSmall(receiver);
-            child.name = ProfileUtils.getName(receiver);
-            return child;
-          });
+    if (controller.children.get().length == 0) {
+      Meteor.call('tasks.getChildren',
+        this.proposalId,
+        function(err, res) {
+          if (!err) {
+            controller.children.set(res.map(child => {
+              child.formattedTime = formatTime(child.eta);
+              var receiver = controller.id2ConnectedUser.get()[child.receiver.id];
+              child.picture = ProfileUtils.pictureSmall(receiver);
+              child.name = ProfileUtils.getName(receiver);
+              return child;
+            }));
+          }
+          ProfileUtils.processMeteorResult(err, res);
         }
-        ProfileUtils.processMeteorResult(err, res);
-      }
-    );
+      );
+    }
+    foundTask.children = controller.children.get();
   }
 
   saveTitle(title) {

@@ -134,6 +134,16 @@
             </div>
           </div>
         </div>
+        <div class="row" style="margin-top: 30px; margin-bottom: 20px" ng-show="draft.data.parent.formattedTime">
+          <div class="col-md-8">
+            <div class="header-title" style="font-size: 16px">Parent Agreement</div>&nbsp;
+            <div>
+              <span class="col-md-2 col-lg-2 col-sm-2 col-xs-4" style="padding-left: 0px; padding-right: 0px; max-width: 70px; color: grey">{{draft.data.parent.formattedTime}}</span>
+              <img class="avatar avatar-small border-gray link" src="{{draft.data.parent.picture}}" alt="{{draft.data.parent.name}}" title="{{draft.data.parent.name}}"/>
+              <a style="margin-left: 10px" href="#!/tab/{{(draft.data.parent.draft ? 'draft' : 'proposal') + '/' + draft.data.parent._id}}">{{draft.data.parent.title}}</a>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
     <div class="modal fade modal-mini modal-primary" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

@@ -176,6 +176,7 @@
                 <img class="avatar avatar-small border-gray link" src="{{childRecord.picture}}" alt="{{childRecord.name}}" title="{{childRecord.name}}"/>
                 <a href="#!/tab/{{(childRecord.draft ? 'draft' : 'proposal') + '/' + childRecord._id}}">{{childRecord.title}}</a>
                 <span ng-show="childRecord.draft" style="margin-left: 5px">Your draft</span>
+                <span ng-show="childRecord.isParent" style="margin-left: 5px">Parent agreement</span>
               </div>
             </div>
           </div>

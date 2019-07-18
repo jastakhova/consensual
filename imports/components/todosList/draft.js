@@ -27,6 +27,7 @@ export default class DraftCtrl extends Controller {
     this.currentUser = Meteor.userId();
     this.editor = undefined;
     this.id2ConnectedUser = new ReactiveVar({});
+    this.parent = new ReactiveVar({});
 
     this.newReceiver = {};
     this.receiverCorrect = true;
@@ -156,6 +157,25 @@ export default class DraftCtrl extends Controller {
           }});
 
         $('div.pre').html(markdown(foundDraft.text));
+
+        var parentId = foundDraft.parent;
+        foundDraft.parent = this.parent.get();
+        console.log("Parent was ");
+        console.log(this.parent.get());
+        if (!foundDraft.parent.name) {
+          Meteor.call('drafts.getParent', parentId,
+            function(err, res) {
+                if (!err) {
+                  res.formattedTime = moment(res.eta).format("DD MMM h:mm a");
+                  var receiver = controller.id2ConnectedUser.get()[res.receiver.id];
+                  res.picture = ProfileUtils.pictureSmall(receiver);
+                  res.name = ProfileUtils.getName(receiver);
+                  controller.parent.set(res);
+                  console.log("Loading parent");
+                }
+                ProfileUtils.processMeteorResult(err, res);
+            });
+        }
 
         return foundDraft;
         } catch (err) {
