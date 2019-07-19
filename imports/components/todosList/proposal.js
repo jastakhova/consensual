@@ -206,18 +206,19 @@ export default class ProposalCtrl extends Controller {
 
   prepareChildrenTasks(foundTask, formatTime) {
     var controller = this;
-    if (controller.children.get().length == 0) {
+    if (controller.children.get() && controller.children.get().length == 0) {
       Meteor.call('tasks.getChildren',
         this.proposalId,
         function(err, res) {
           if (!err) {
-            controller.children.set(res.map(child => {
-              child.formattedTime = formatTime(child.eta);
-              var receiver = controller.id2ConnectedUser.get()[child.receiver.id];
-              child.picture = ProfileUtils.pictureSmall(receiver);
-              child.name = ProfileUtils.getName(receiver);
-              return child;
-            }));
+            var children = res.map(child => {
+                child.formattedTime = formatTime(child.eta);
+                var receiver = controller.id2ConnectedUser.get()[child.receiver.id];
+                child.picture = ProfileUtils.pictureSmall(receiver);
+                child.name = ProfileUtils.getName(receiver);
+                return child;
+              });
+            controller.children.set(children.length > 0 ? children : undefined);
           }
           ProfileUtils.processMeteorResult(err, res);
         }
