@@ -44,6 +44,8 @@ export default class ContactsCtrl extends Controller {
                   var groups = _.groupBy(users, function(user) {
                     return ProfileUtils.getName(user).charAt(0);
                   });
+                  // Clearing contacts before push to prevent duplicates
+                  controller.contacts = [];
                   Object.keys(groups)
                       .sort(function(key1, key2) {return ProfileUtils.comparator(key1, key2);})
                       .map(groupKey => {
