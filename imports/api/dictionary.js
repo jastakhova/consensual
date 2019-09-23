@@ -412,7 +412,12 @@ export const Requests = [
     activityLogDenialRecord: 'denied the completion request',
     activityLogCancelRecord: 'cancelled the completion request',
     statusOnApproval: getStatus("done"),
-    updateFields: [function(task) { return { field: "archived", value: true};}]
+    // should also remove overdue ticklers and notices
+    updateFields: [
+      function(task) { return { field: "archived", value: true};},
+      function(task) { return { field: "author.ticklers", value: []};},
+      function(task) { return { field: "receiver.ticklers", value: []};}
+    ]
   },
   {
     id: "CANCELLED",

@@ -233,7 +233,7 @@ Meteor.methods({
       updateEntity.eta = new Date(moment(newTimeUTCString).format()).getTime();
       // if not overdue anymore remove overdue notice and tickler
       var notice = createNotice(getNotice("HAS_UPDATES"));
-      var overdue = updateEntity.eta < new Date().getTime();
+      var overdue = updateEntity.eta < new Date().getTime() && !updateEntity.archived;
       var overdueNoticeId = getNotice("OVERDUE").id;
       var overdueTicklerId = getTickler("OVERDUE").id;
       var noticeFilter = n => overdue || n.code != overdueNoticeId;

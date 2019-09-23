@@ -15,7 +15,6 @@ export default class TodosListCtrl extends TodosListPartialCtrl {
     this.subscribe('tasks');
     this.handleInvitees = this.subscribe('invitees');
 
-    this.hideCompleted = false;
     this.proposingInProgress = false;
 
     this.newInvitee = {};
