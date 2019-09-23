@@ -264,3 +264,18 @@ div.md-editor>textarea {
 div.at-pwd-form > form > div > .table > tbody > tr > td {
   border-top: none !important;
 }
+
+/* All of #at... fields need to have same width setting,
+otherwise it overlaps the parent container on mobile version.
+Check in Safari */
+#at-field-name {
+  width: 100%;
+}
+
+#at-field-email {
+  width: 100%;
+}
+
+#at-field-password {
+  width: 100%;
+}
