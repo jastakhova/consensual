@@ -93,6 +93,7 @@ consensual = angular.module(App, [
 consensual.run(['$ionicHistory', '$state', '$rootScope', '$templateCache', function ($ionicHistory, $state, $rootScope, $templateCache) {
   AccountsTemplates.options.onSubmitHook = onSubmitHook;
   AccountsTemplates.options.onLogoutHook = onLogoutHook;
+  AccountsTemplates.setState('signUp');
 
   // Always enforce login on page load
   if (!Meteor.isLoggedIn()) {
