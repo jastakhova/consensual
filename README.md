@@ -60,6 +60,7 @@ Thanks for your support!
 - not obvious from whom to who
 - invitation limit
 - suggest shows all invitees (not invited by any specific person)
+- allow archival if the other person is not responding for a month
 
 - [talk] Approve logic is not well understood by ppl
 - [issue] Losing of data if facebook token expires

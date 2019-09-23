@@ -221,7 +221,7 @@ export const States = [
       if (task.author.id === actorId) {
         return [
           getAction("EDIT"),
-          getAction("STATUS_CHANGE_DONE"),
+//          getAction("STATUS_CHANGE_DONE"),
           getAction("STATUS_CHANGE_CANCEL")
         ];
       }
@@ -283,7 +283,7 @@ export const States = [
         || task.receiver.id === actorId && task.receiver.status === greenCondition) {
           return [
             getAction("EDIT"),
-            getAction("STATUS_CHANGE_DONE"),
+//            getAction("STATUS_CHANGE_DONE"),
             getAction("STATUS_CHANGE_CANCEL"),
             getAction("RECONSIDER")
           ];
