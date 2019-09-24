@@ -62,11 +62,13 @@ var ProfileUtils = {
   },
 
   getEmail: function(user) {
+    var verifiedEmail = user.emails.filter(e => e.verified);
+    verifiedEmail = verifiedEmail.length == 0 ? "" : verifiedEmail[0].address;
     return user.email
       ? user.email
       : (user.services && user.services.facebook
         ? user.services.facebook.email
-        : "");
+        : verifiedEmail);
   },
 
   getSuggest: function(id2user) {
