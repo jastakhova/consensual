@@ -912,5 +912,13 @@ Meteor.methods({
     endTime = new Date().getTime();
     console.log("Collecting invitees in " + (endTime - startTime) + "ms");
     return invitees.concat(existingUsers);
+  },
+  'users.impersonate' () {
+    if (!Meteor.isServer) {
+      return [];
+    }
+    var demoUser = Meteor.users.findOne({"profile.name": "Demo account"});
+    this.setUserId(demoUser._id);
+    return demoUser._id;
   }
 });

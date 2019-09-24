@@ -7,6 +7,14 @@
               <div ng-hide="login.isNativeApp && login.data">
                 <blaze-template name="atForm" replace ></blaze-template>
               </div>
+              <div class="item item-divider at-sep">
+                OR
+              </div>
+              <div class="item center">
+              <button ng-click="login.loginWithDemoUser()" class="button button-block btn-test-user btn btn-fill">
+                Try with a Demo Account
+              </button>
+              </div>
               <!--<div class="list" ng-show="login.isNativeApp && !login.data">-->
                 <!--<div class="center item item-divider">-->
                   <!--<h4 class="title">Sign In</h4>-->

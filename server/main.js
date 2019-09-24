@@ -3,6 +3,7 @@ import { Tasks } from '../imports/api/tasks.js';
 import '../imports/api/subscribe.js';
 import '../imports/api/drafts.js';
 import 'bas-meteor-facebook-login';
+import { Accounts } from 'meteor/accounts-base';
 
 Migrations = [
 //  '1539727846000',
@@ -10,7 +11,8 @@ Migrations = [
 //  '1540319678000',
 //  '1540929490000',
 //  '1542315428741',
-//  'new'
+//  'faebcab3cfadde88309be',
+  'new'
 ];
 
 Meteor.methods({
@@ -121,7 +123,7 @@ Meteor.methods({
       }
     }
   },
-  'Migrations.new' () {
+  'Migrations.faebcab3cfadde88309be' () {
     // 1. Added: author and receiver objects
     // 2. Converted status from "open"
     // 3. Adding ticklers, notices,
@@ -167,6 +169,41 @@ Meteor.methods({
           $set: { archived: true }
         });
       }
+    }
+  },
+  'Migrations.new' () {
+    // 1. Added:
+    //            new demo account for impersonating
+    var name = "Demo account";
+    var email = "team.consensual+demo@gmail.com";
+    var password = "password";
+
+    var demo = Meteor.users.find({"profile.name": "Demo account"}).fetch();
+
+    if (demo.length == 0) {
+      Accounts.onCreateUser((options, user) => {
+        // no need for email verification if it's a demo profile
+        if (options.profile) {
+          if (options.profile.name == name) {
+          user.emails = user.emails.map(e => {
+            e.verified = true;
+            return e;
+            });
+          }
+          user.profile = options.profile;
+        }
+
+        return user;
+      });
+
+      Accounts.createUser({
+        username: email,
+        email: email,
+        password: password,
+        profile: {
+          name: name
+        }
+      });
     }
   }
 });

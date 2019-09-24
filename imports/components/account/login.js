@@ -1,6 +1,8 @@
+import { Meteor } from 'meteor/meteor';
 import { Controller } from 'angular-ecmascript/module-helpers';
 import moment from 'moment';
 import { FB_API } from 'bas-meteor-facebook-login';
+import ProfileUtils from '../todosList/profile.js';
 
 export default class LoginCtrl extends Controller {
     constructor() {
@@ -41,7 +43,20 @@ export default class LoginCtrl extends Controller {
 
       FB_API.login(permissions, fbLoginSuccess, fbLoginFail);
     }
+
+    loginWithDemoUser() {
+      var controller = this;
+      Meteor.call('users.impersonate', function(err, result) {
+          if (err) {
+            ProfileUtils.processMeteorResult(err, result);
+            return;
+          }
+
+          Meteor.connection.setUserId(result);
+          controller.$state.go('tab.todo');
+      });
+    }
 }
 
 LoginCtrl.$name = 'LoginCtrl';
-LoginCtrl.$inject = ['$stateParams'];
+LoginCtrl.$inject = ['$stateParams', '$state'];
