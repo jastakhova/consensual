@@ -12,7 +12,7 @@ Migrations = [
 //  '1540929490000',
 //  '1542315428741',
 //  'faebcab3cfadde88309be',
-  'new'
+//  'new'
 ];
 
 Meteor.methods({
