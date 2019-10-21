@@ -227,6 +227,16 @@ meteor add cordova:cordova-plugin-facebook4@5.0.0
 meteor test --driver-package=cultofcoders:mocha
 ```
 
+Why we chose Cypress for integration testing? https://www.youtube.com/watch?v=lK_ihqnQQEM
+Cypress Hello World https://dev.to/splitified/test-your-meteor-app-with-docker-jenkins-and-cypress-part-1-12om
+
+To run it:
+
+```
+meteor npm run cypress-gui
+```
+
+
 ### Mongo
 
 ```
@@ -263,3 +273,5 @@ meteor mongo
 ### Hosting
 We're currently hosting on Galaxy at $30/mo for a half-size instance. I've heard tell the same size container can be had on DigitalOcean for $5/mo. This will matter when we want to scale.
 * https://medium.freecodecamp.org/scaling-meteor-a-year-on-26ee37588e4b
+
+

@@ -4,11 +4,11 @@
         <div class="row">
           <div class="card">
             <div class="content picker-container">
-              <div ng-hide="login.isNativeApp && login.data">
+              <div ng-hide="login.isNativeApp || login.data">
                 <blaze-template name="atForm" replace ></blaze-template>
-              </div>
-              <div class="item item-divider at-sep">
-                OR
+                <div class="item item-divider at-sep">
+                  OR
+                </div>
               </div>
               <div class="item center">
               <button ng-click="login.loginWithDemoUser()" class="button button-block btn-test-user btn btn-fill">
@@ -28,7 +28,7 @@
                 <!--</div>-->
               <!--</div>-->
               <a style="text-align: center;" ng-show="login.data" href="#!/tab/todo">
-                <p>Go to the main page</p>
+                <p class="go-to-main-page">Go to the main page</p>
               </a>
             </div>
           </div>

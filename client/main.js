@@ -161,11 +161,13 @@ consensual.directive('contactsOnly', function() {
   };
 });
 
+
 Accounts.verifyEmail = _.wrap(Accounts.verifyEmail, function (origVerifyEmail, token, callback) {
   return origVerifyEmail.call(Accounts, token, _.wrap(callback, function (origCallback, err) {
     try {
-      if (! err) {
-        Meteor.users.find({$and: [{ 'email': { $exists: false } , 'emails.verified': { $exists: true }}]})
+      if (!err) {
+        Meteor.users.find({$or: [{$and: [{ 'email': { $exists: false } , 'emails.verified': { $exists: true }},
+        { 'email': 'undefined' , 'emails.verified': { $exists: true }}]}]})
         .fetch().forEach(function(user) {
           Meteor.call('users.updateEmail', user.emails[0].address);
        });

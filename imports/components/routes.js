@@ -11,6 +11,7 @@ import profileUrl from './account/profile.html';
 import tabsTemplateUrl from './tabs.html';
 import notFoundTemplateUrl from './account/notfound.html';
 import partialTemplateUrl from './todosList/todosListPartial.html'; // important for ng-include
+import { Accounts } from 'meteor/accounts-base';
 
 export default class RoutesConfig extends Config {
   configure() {
@@ -93,13 +94,30 @@ export default class RoutesConfig extends Config {
         }
       })
       .state('login', {
-        url: '/login?in',
+        url: '/login?',
         templateUrl: loginUrl,
         controller: 'LoginCtrl as login'
       })
       ;
 
-    this.$urlRouterProvider.otherwise('tab/todo');
+    this.$urlRouterProvider.otherwise(function($injector, $location) {
+      if ($location.$$hash.startsWith("/verify-email/")) {
+        const token = $location.$$hash.replace("/verify-email/", "");
+        Accounts.verifyEmail(token, function(error) {
+          Accounts._enableAutoLogin();
+          if (!error) {
+            Accounts._loginButtonsSession.set('justVerifiedEmail', true);
+          } else {
+            Meteor.logout();
+          }
+        });
+        return;
+      }
+
+      return 'tab/todo';
+    });
+
+//    this.$urlRouterProvider.otherwise('tab/todo');
   }
 }
 
