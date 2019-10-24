@@ -166,7 +166,7 @@ Accounts.verifyEmail = _.wrap(Accounts.verifyEmail, function (origVerifyEmail, t
   return origVerifyEmail.call(Accounts, token, _.wrap(callback, function (origCallback, err) {
     try {
       if (!err) {
-        Meteor.users.find({$or: [{$and: [{ 'email': { $exists: false } , 'emails.verified': { $exists: true }},
+        Meteor.users.find({$or: [{$or: [{ 'email': { $exists: false } , 'emails.verified': { $exists: true }},
         { 'email': 'undefined' , 'emails.verified': { $exists: true }}]}]})
         .fetch().forEach(function(user) {
           Meteor.call('users.updateEmail', user.emails[0].address);

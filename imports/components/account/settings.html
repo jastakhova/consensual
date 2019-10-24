@@ -54,7 +54,7 @@
                 <i class="fa fa-edit"></i>
               </button>
             </div>
-            <div ng-show="!profile.editingEmail" ng-click="profile.flipEmailEditingStatus()" style="word-wrap:break-word">{{profile.data.email}}</div>
+            <div class="email-field" ng-show="!profile.editingEmail" ng-click="profile.flipEmailEditingStatus()" style="word-wrap:break-word">{{profile.data.email}}</div>
             <div ng-show="profile.editingEmail">
               <input type="text" class="form-control form-group" ng-keydown="$event.keyCode === 13 && !$event.shiftKey && profile.saveEmail(profile.data.email)" ng-model="profile.data.email" name="editEmail" required-field autocomplete="off">
             </div>

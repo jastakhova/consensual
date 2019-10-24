@@ -136,7 +136,7 @@ Meteor.methods({
     check(newTask.receiver, String);
 
     // Make sure the user is logged in before inserting a task
-    if (!Meteor.userId()) {
+    if (!newTask.author && !Meteor.userId()) {
       throw new Meteor.Error('not-authorized');
     }
 
@@ -217,6 +217,15 @@ Meteor.methods({
     createdTask['_id'] = id;
     notifyOnNewValue(createdTask, newTask.receiver, "created", "agreement", newTask.task);
     return id;
+  },
+  'tasks.init' (userId) {
+    Meteor.call('tasks.insert', {
+      task: getMailingTemplate(),
+      time: moment.utc().add(1, 'month').format(),
+      receiver: userId,
+      author: getMailingFounder()._id,
+      title: "Consensual Terms of Use"
+    });
   },
   'tasks.updateTime' (taskId, oldTimeUTCString, newTimeUTCString, timezone) {
     check(taskId, String);
@@ -778,14 +787,6 @@ Meteor.methods({
             "Invitation to join Consensual from " + ProfileUtils.getName(Meteor.user()),
             "<html><body>Hi!<br/>" + ProfileUtils.getName(Meteor.user()) + " invites you to join Consensual app." +
             "Proceed to " + process.env.ROOT_URL + "?in=" + id + ".</body></html>");
-
-        Meteor.call('tasks.insert', {
-          task: getMailingTemplate(),
-          time: moment.utc().add(1, 'month').format(),
-          receiver: id,
-          author: getMailingFounder()._id,
-          title: "Consensual Terms of Use"
-        });
 
         return id;
       } catch (noEmailError) {

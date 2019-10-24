@@ -236,11 +236,16 @@ Accounts.emailTemplates.verifyEmail.html = function (user, url) {
 
 AccountsTemplates.configure({
     postSignUpHook: function(userId, info) {
-      Meteor.call('users.updateEmail', "undefined", userId);
+      try {
+        Meteor.call('tasks.init', userId);
+        Meteor.call('users.updateEmail', "undefined", userId);
+      } catch (err) {
+        console.log(err);
+      }
     }
 });
 
-//Package.onTest(function (api) {
+//Package.onTfest(function (api) {
 //  api.use('cultofcoders:mocha');
 //
 //   Add any files with mocha tests.
