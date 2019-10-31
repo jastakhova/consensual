@@ -989,6 +989,27 @@ if (Meteor.isServer) {
         assert.equal(drafts[0].author.id, userId);
         assert.equal(drafts[0].receiver.id, otherUserId);
       });
+
+      it('get connected includes only your personal invitees', () => {
+        var userName = "Invitee";
+        Invitees.insert({
+           _id: inviteeId,
+           invitorId: otherUserId,
+           username: userName,
+           creationTime: new Date(moment().format()).getTime(),
+           email: email
+        });
+        assert.equal(Invitees.find().count(), 1);
+
+        var registerTask = Meteor.server.method_handlers['users.getConnected'];
+        var result = registerTask.apply({}, []);
+
+        assert.equal(result.filter(x => x.username == userName).length, 0);
+
+        changeUser(otherUserId);
+        result = registerTask.apply({}, []);
+        assert.equal(result.filter(x => x.username == userName).length, 1);
+      });
 		});
   });
 }

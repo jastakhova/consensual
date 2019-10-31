@@ -905,7 +905,7 @@ Meteor.methods({
     console.log("Collecting connected users in " + (endTime - startTime) + "ms");
 
     startTime = new Date().getTime();
-    var invitees = Invitees.find().fetch();
+    var invitees = Invitees.find({invitorId: Meteor.userId()}).fetch();
     var existingUsers = Meteor.users.find({$or: [
         {_id: {$in: Array.from(connectedUsers)}},
         ProfileUtils.foundersFilter()]},

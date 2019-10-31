@@ -23,21 +23,18 @@ Thanks for your support!
 
 #### Nearest plan
 
-- Wix Page [Day]
 - PitchDec [Day]
 
-+ Refactoring for speed (getting rid of subscriptions) [Yulia]
-+ Native login [Yulia]
-  + Native app login and register
+- known issues:
+  - contact list for just signed up person - invitees
+  - access to all agreements by link
+  - can you mark as Done for a locked agreement
+  - invitation resolution
+  - no profile picture on contacts page
+- integrational testing (adding task, list of popular people, invitation)
+- help link 
 - Finishing Approval flow (copy & blocking comments & etc) [Yulia]
-
-- Demo [Yulia]
-- Good design [Yulia]
-
-- Facebook blogging [Day]
-- Socializing w/ investors [Day]
-- ExecSum [Day]
-
+- Design [Yulia]
 
 #### Active ToDo
 
