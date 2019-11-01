@@ -19,11 +19,11 @@ if (Meteor.isServer) {
   });
 
   Meteor.publish('task', function tasksPublication(taskId) {
-    return Tasks.find({_id: taskId});
+    return Tasks.find({$and: [{_id: taskId}, {$or: [{"author.id": this.userId}, {"receiver.id": this.userId}]}]});
   });
 
   Meteor.publish('draft', function tasksPublication(draftId) {
-    return Drafts.find({_id: draftId});
+    return Drafts.find({$and: [{_id: draftId}, {"author.id": this.userId}]});
   });
 
   Meteor.publish('drafts', function tasksPublication() {

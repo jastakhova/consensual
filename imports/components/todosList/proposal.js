@@ -39,12 +39,6 @@ export default class ProposalCtrl extends Controller {
         }
 
         try {
-        var foundTask = Tasks.findOne({_id: this.proposalId});
-        if (!foundTask) {
-          this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
-          return {};
-        }
-
         Meteor.call('tasks.removeNotice', this.proposalId, ProfileUtils.processMeteorResult);
 
         var currentTime = moment();
@@ -71,6 +65,12 @@ export default class ProposalCtrl extends Controller {
 
             controller.id2ConnectedUser.set(ProfileUtils.createMapFromList(result, "_id"));
           });
+        }
+
+        var foundTask = Tasks.findOne({_id: this.proposalId});
+        if (!foundTask) {
+          this.$state.go('tab.notfound', this.$stateParams, {location: 'replace', reload: true, inherit: false});
+          return {};
         }
 
         foundTask.ETA = moment(foundTask.eta).format(datetimeDisplayFormat);

@@ -10,6 +10,7 @@ import contactsUrl from './account/contacts.html';
 import profileUrl from './account/profile.html';
 import tabsTemplateUrl from './tabs.html';
 import notFoundTemplateUrl from './account/notfound.html';
+import noAccessTemplateUrl from './account/noaccess.html';
 import partialTemplateUrl from './todosList/todosListPartial.html'; // important for ng-include
 import { Accounts } from 'meteor/accounts-base';
 
@@ -75,6 +76,15 @@ export default class RoutesConfig extends Config {
               }
             }
         })
+      .state('tab.noaccess', {
+        url: '/noaccess',
+        views: {
+          'tab-noaccess': {
+            templateUrl: noAccessTemplateUrl,
+            controller: 'NotFoundCtrl as notfound'
+            }
+          }
+      })
       .state('tab.settings', {
         url: '/settings',
         views: {

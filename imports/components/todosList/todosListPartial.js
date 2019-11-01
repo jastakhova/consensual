@@ -272,6 +272,7 @@ export class TodosListPartialCtrl extends Controller {
         }
 
         function prepareTask(x) {
+          console.log(x.author);
           x.time = moment(x.eta).format("DD MMM h:mm a");
 
           x.authorPicture = ProfileUtils.pictureSmall(controller.id2ConnectedUser.get()[x.author.id]);
@@ -348,6 +349,7 @@ export class TodosListPartialCtrl extends Controller {
           selectorWithArchive :
           {$and: [selectorWithArchive, retrieveSearchSelector(searchValue, this)]};
 
+        console.log(selectorWithSearch);
         var tasks = db.find(selectorWithSearch, { sort: { sortingField : 1 } }).fetch().map(prepareTask);
         var groups = _.groupBy(tasks, sortMethod.configuration.grouping);
         var resultGroups = Object.keys(groups)

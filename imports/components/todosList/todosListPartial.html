@@ -73,7 +73,7 @@
               {{task.time}}
             </td>
             <td ng-show="task.toCurrentUser == task.fromCurrentUser" ng-click="todoList.gotoProposal(task)" class="link">
-              <a href="#!/tab/profile/{{task.author.id}}" class="base-color">
+              <a href="#!/tab/profile/{{task.author.id}}" class="base-color selfagreement-QA">
                 <img class="avatar border-gray" src="{{task.authorPicture}}" alt="..."/>
                 Self
               </a>
@@ -90,7 +90,7 @@
               {{task.receiver.name}}
               </a>
             </td>
-            <td><a href="#!/tab/{{task.tab}}/{{task._id}}">{{task.title}}</a></td>
+            <td><a class="taskLink" href="#!/tab/{{task.tab}}/{{task._id}}">{{task.title}}</a></td>
           </tr>
           </tbody>
         </table>

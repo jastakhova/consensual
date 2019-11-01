@@ -26,13 +26,14 @@ Thanks for your support!
 - PitchDec [Day]
 
 - known issues:
-  - contact list for just signed up person - invitees
-  - access to all agreements by link
   - can you mark as Done for a locked agreement
   - invitation resolution
   - no profile picture on contacts page
+  - your own profile page is empty even when you have self agreements
 - integrational testing (adding task, list of popular people, invitation)
 - help link 
+- founder emoji around Day and my names
+- when no agreemnets with a person their profile page looks oddly empty
 - Finishing Approval flow (copy & blocking comments & etc) [Yulia]
 - Design [Yulia]
 
