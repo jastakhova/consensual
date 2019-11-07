@@ -58,7 +58,7 @@
               </div>
             </div>
             <label style="text-align: left; width: 100%">When do you need it?</label><br/>
-            <div style="text-align: center" class="col-md-4 col-sm-4 col-xs-4 alternative-action link" ng-repeat="timeOption in todoList.timeOptions" ng-click="todoList.setTimeOption(timeOption)">{{timeOption.name}}</div>
+            <div ng-repeat="timeOption in todoList.timeOptions" style="text-align: center" class="col-md-4 col-sm-4 col-xs-4 alternative-action link {{timeOption.name}}" ng-click="todoList.setTimeOption(timeOption)">{{timeOption.name}}</div>
             <br/>
             <div class="col-md-3">
               <div class="form-group">

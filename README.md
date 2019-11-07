@@ -26,8 +26,12 @@ Thanks for your support!
 - PitchDec [Day]
 
 - known issues:
-  - can you mark as Done for a locked agreement
   - invitation resolution
+      - invited person is in person contacts
+      - invited person is in the system as a user
+      - invited person is in the system as invited by this person already      
+      - invited person is in the system as invited by someone other 
+      - invited person is not in a system
   - no profile picture on contacts page
   - your own profile page is empty even when you have self agreements
 - integrational testing (adding task, list of popular people, invitation)
