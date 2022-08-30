@@ -33,7 +33,7 @@
     "marked": "^0.6.2",
     "meteor-node-stubs": "^0.4.1",
     "moment": "^2.22.2",
-    "moment-timezone": "^0.5.21",
+    "moment-timezone": "^0.5.35",
     "turndown": "^5.0.1",
     "underscore": "^1.9.1"
   },
